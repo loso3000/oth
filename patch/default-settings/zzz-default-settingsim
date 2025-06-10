@@ -1,0 +1,101 @@
+#!/bin/sh
+setup_ssid()
+{
+    local r="radio$1"
+    
+    if ! uci show wireless.${r} >/dev/null 2>&1; then
+        return
+    fi
+    local s="wlan$1"
+    logger "default-wifi: setup $1's ssid"
+    local mac=`ifconfig ${s} | grep "HWaddr" | awk '{print $5}'`
+    local wifimac=`echo ${mac}|awk -F ":" '{print $4""$5""$6 }'|tr A-Z a-z|cut -c4-`
+    # uci set wireless.${r}.disabled=0
+    uci set wireless.${r}.country=CN
+    # uci set wireless.${r}.channel=149
+    if [ `uci get wireless.${r}.channel` -lt 14 ]; then
+        uci set wireless.${r}.channel=11
+        uci set wireless.default_${r}.ssid=Op-2.4G
+    else
+        uci set wireless.${r}.channel=149
+        uci set wireless.default_${r}.ssid=Op-5G
+    fi
+    uci set wireless.default_${r}.encryption='psk2'
+    uci set wireless.default_${r}.key='12345678'
+    uci commit
+}
+WIFI_NUM=`find /sys/class/net/ -name wlan* | wc -l`
+if [ ${WIFI_NUM} -gt 0 ]; then
+    # update /etc/config/wireless
+    for i in `seq 0 ${WIFI_NUM}`; do
+        setup_ssid ${i}
+    done
+fi
+uci set luci.main.lang=zh_cn
+uci set system.@system[0].timezone=CST-8
+uci set system.@system[0].zonename=Asia/Shanghai
+uci set dhcp.@dnsmasq[0].cachesize='10000'
+uci set dhcp.@dnsmasq[0].min_ttl='3600'
+uci set dhcp.@dnsmasq[0].filter_aaaa='0'
+uci set dhcp.@dnsmasq[0].localservice='0'
+uci set dhcp.@dnsmasq[0].nonwildcard='0'
+uci set dhcp.lan.ra='hybrid'
+uci set dhcp.lan.dhcpv6='hybrid'
+uci set dhcp.lan.ndp=''
+uci set dhcp.lan.ignore='0'
+uci set dhcp.lan.ra_management='1'
+uci set dhcp.lan.ra_default='1'
+uci set dhcp.lan.force='1'
+uci set network.lan.delegate='0'
+uci set network.wan.mtu=1460
+uci set network.wan.metric='41'
+uci set network.wan.delegate='0'
+uci set network.wan.ipv6='auto'
+uci set fstab.@global[0].anon_mount=1
+sed -i '/option disabled/d' /etc/config/wireless
+sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
+uci set wireless.radio0.disabled=0
+uci set wireless.radio1.disabled=0
+uci set turboacc.config.sw_flow='0'
+uci commit turboacc
+uci commit wireless
+wifi up
+uci commit luci
+uci commit system
+uci commit dhcp
+uci commit fstab
+uci commit network
+
+rm -f /usr/lib/lua/luci/view/admin_status/index/ddns.htm
+rm -f /usr/lib/lua/luci/view/admin_status/index/upnp.htm
+rm -f /usr/lib/lua/luci/view/admin_status/index/minidlna.htm
+
+ln -sf /sbin/ip /usr/bin/ip
+
+# sed -i 's/root::0:0:99999:7:::/root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:7:::/g' /etc/shadow
+# [ -f '/bin/bash' ] && sed -i 's|root:x:0:0:root:/root:/bin/ash|root:x:0:0:root:/root:/bin/bash|g' /etc/passwd
+echo "iptables -t nat -I POSTROUTING -o br-lan -j MASQUERADE" > /etc/firewall.user
+echo '# iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo '# iptables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo '# [ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo '# [ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53' >> /etc/firewall.user
+echo 'iptables -I zone_lan_forward -t filter -m conntrack --ctstate DNAT -j ACCEPT' >> /etc/firewall.user
+[ "x$(uci -q get netwizard.netwizard.display)" = "x1"  ] &&  echo ' ' > /etc/config/netwizarded
+sed -i 's/immortalwrt.org/openwrt.org/g'  /etc/config/luci
+sed -i 's/\"nas\"/\"services\"/g' /usr/lib/lua/luci/controller/samba4.lua
+sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release
+cat /etc/openwrt_release1 >> /etc/openwrt_release
+sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
+echo "DISTRIB_DESCRIPTION='EzOpWrt '" >> /etc/openwrt_release
+
+sed -i '/lcp-echo/d' /etc/ppp/options
+echo "lcp-echo-failure 10" >>  /etc/ppp/options
+echo "lcp-echo-interval 200" >>  /etc/ppp/options
+sed -i '/log-facility/d' /etc/dnsmasq.conf
+echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+
+sed -i 's/cbi.submit\"] = true/cbi.submit\"] = \"1\"/g' /usr/lib/lua/luci/dispatcher.lua
+echo 'hsts=0' > /root/.wgetrc
+rm -rf /tmp/luci-*
+
+exit 0

@@ -1,0 +1,31 @@
+--- patch/rebooty.js	2025-04-13 16:55:48.489819905 +0000
++++ patch/reboot.js	2025-04-13 16:55:48.493819943 +0000
+@@ -30,7 +30,27 @@
+ 		body.appendChild(E('hr'));
+ 		body.appendChild(E('button', {
+ 			'class': 'cbi-button cbi-button-action important',
+-			'click': ui.createHandlerFn(this, 'handleReboot')
++			'click': function () {
++				ui.showModal(_('Reboot'), [
++					E('p', {}, _('Reboots the operating system of your device')),
++					E('div', { class: 'right' }, [
++					E('button', {
++						'class': 'cbi-button cbi-button-action important',
++						'style': 'background: red!important; border-color: red!important',
++						'click': function () {
++							ui.hideModal();
++							this.handleReboot();
++						}.bind(this)
++					}, _('OK')),
++					E('button', {
++						'class': 'btn cbi-button cbi-button-apply',
++						'click': function () {
++							ui.hideModal();
++						}
++					}, _('Cancel'))
++					])
++				]);
++			}.bind(this)
+ 		}, _('Perform reboot')));
+ 
+ 		return body;
