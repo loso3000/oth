@@ -73,7 +73,7 @@ e.default="0"
 
 e=t:option(Button, "restart", translate("Perform operation"))
 e.inputtitle=translate("Click to execute")
-o.rawhtml=true
+e.rawhtml=true
 e.template ='partexp'
 
 return m

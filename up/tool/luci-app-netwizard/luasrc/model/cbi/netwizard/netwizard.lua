@@ -178,7 +178,7 @@ e = s:taboption("othersetup", Flag, "https",translate('Accessing using HTTPS'), 
 
 
 
-e=t:option(Button, "restart", translate("Perform operation"))
+e=s:option(Button, "restart", translate("Perform operation"))
 e.inputtitle=translate("Click to execute")
 e.template ='netwizard'
 
