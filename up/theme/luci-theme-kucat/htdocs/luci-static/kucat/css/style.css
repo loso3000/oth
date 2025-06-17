@@ -2851,20 +2851,13 @@ td>.ifacebadge,.td>.ifacebadge {
 }
 
 #syslog {
-  font-size: small;
-  overflow-y: hidden;
-  font-family: monospace;
-  width: 100%;
-  min-height: 15rem;
   padding: 10px;
   resize: none;
   margin: 0rem border-radius:var(--radius2);
   word-wrap: break-word;
   white-space: pre-wrap;
-  background-color: var(--inputbg-color);
-  color: var(--inputtext-color);
-  border: 1px solid var(--inputborder-color)
 }
+
 
 #syslog:focus {
   outline: 0
@@ -4688,7 +4681,7 @@ div#file-manager-container #status-bar #status-info {
     line-height: 1
   }
 
-  #syslog,#diag-rc-output>pre,#command-rc-output>pre,[data-page="admin-services-wol"] .notice code {
+  #diag-rc-output>pre,#command-rc-output>pre,[data-page="admin-services-wol"] .notice code {
     font-size: var(--font-x) !important
   }
 
