@@ -14,11 +14,11 @@ PKG_LICENSE:=Apache-2.0
 
 LUCI_TITLE:=LuCI support for eqosplus.
 LUCI_DESCRIPTION:=LuCI support for Easy eqosplus(Support speed limit based on IP address).
-LUCI_DEPENDS:=+bash +tc +kmod-sched-core +kmod-sched-connmark +kmod-sched-cake
+LUCI_DEPENDS:=+bash +nftables +tc +kmod-sched-core +kmod-sched-htb +kmod-ifb
 LUCI_PKGARCH:=all
 
-PKG_VERSION:=2.0.0
-PKG_RELEASE:=20250314
+PKG_VERSION:=1.2.6
+PKG_RELEASE:=20250621
 PKG_MAINTAINER:=sirpdboy <herboy2008@gmail.com>
 
 define Build/Compile
