@@ -75,14 +75,13 @@ return baseclass.extend({
 				date.getUTCSeconds()
 			);
 		}
-
 		var fields = [
 			_('Hostname'),         boardinfo.hostname,
-			_('Model'),            boardinfo.model + cpubench.cpubench,
-			_('Architecture'),     cpuinfo.cpuinfo,
-			_('Target Platform'),  (L.isObject(boardinfo.release) ? boardinfo.release.target : '')  + ( ' - ' + platinfo.platinfo || ' '),
-			_('Firmware Version'), luciversion.description,
-			_('Kernel Version'),   boardinfo.kernel,
+			_('Model'),            boardinfo.model + (cpubench.cpubench || ''),
+			_('Architecture'),     cpuinfo.cpuinfo || '',
+			_('Target Platform'),  (L.isObject(boardinfo.release) ? boardinfo.release.target : '')  + (' - ' + (platinfo.platinfo || '')),
+			_('Firmware Version'), luciversion.description || '',
+			_('Kernel Version'),   boardinfo.kernel || '',
 			_('Local Time'),       datestr,
 			_('Uptime'),           systeminfo.uptime ? '%t'.format(systeminfo.uptime) : null,
 			_('Load Average'),     Array.isArray(systeminfo.load) ? '%.2f, %.2f, %.2f'.format(
@@ -91,16 +90,17 @@ return baseclass.extend({
 				systeminfo.load[2] / 65535.0
 			) : null,
 		];
+		
 		if (tempinfo.tempinfo) {
-			fields.splice(6, 0, _('Temperature'));
-			fields.splice(7, 0, tempinfo.tempinfo);
+			fields.splice(6, 0, _('Temperature'), tempinfo.tempinfo);
 		}
+
 
 		var table = E('table', { 'class': 'table' });
 
 		for (var i = 0; i < fields.length; i += 2) {
 			table.appendChild(E('tr', { 'class': 'tr' }, [
-				E('td', { 'class': 'td right', 'width': '33%' }, [ fields[i] ]),
+				E('td', { 'class': 'td left', 'width': '33%' }, [ fields[i] ]),
 				E('td', { 'class': 'td left' }, [ (fields[i + 1] != null) ? fields[i + 1] : '?' ])
 			]));
 		}
@@ -108,7 +108,7 @@ return baseclass.extend({
             'class': 'tr' 
         }, [
             E('td', { 
-                'class': 'td right',
+                'class': 'td left',
                 'width': '33%'
             }, _('Help')),
             E('td', { 
