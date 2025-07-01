@@ -4270,10 +4270,6 @@ div#file-manager-container #status-bar #status-info {
   display: initial
 }
 
-[data-page="admin-status-overview"] .tr.table-titles>.th:nth-child(1),[data-page="admin-status-overview"] .main #view td:nth-child(1) {
-  text-align: right !important
-}
-
 .Dashboard .dashboard-bg {
   background-color: rgba(var(--primary-rgbm),var(--primary-rgbs-ts));
   background-color: rgba(var(--primary-rgbbody),1)important
