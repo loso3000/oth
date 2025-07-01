@@ -30,7 +30,7 @@ return baseclass.extend({
         var usestatus = E('table', { 'class': 'table' });
         if (fields[0] == _('Online Users')) {
             usestatus.appendChild(E('tr', { 'class': 'tr' }, [
-                E('td', { 'class': 'td', 'width': '33%' }, [fields[0]]),
+                E('td', { 'class': 'td', 'width': '30%' }, [fields[0]]),
                 E('td', { 'class': 'td left' }, [
                     (fields[1] != null) ? fields[1] : '0'
                 ])
