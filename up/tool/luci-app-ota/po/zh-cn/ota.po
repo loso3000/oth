@@ -25,6 +25,9 @@ msgstr "固件已下载"
 msgid "Flash image..."
 msgstr "刷写固件..."
 
+msgid "Flash image"
+msgstr "刷写固件"
+
 msgid "Checking..."
 msgstr "检查中..."
 
@@ -43,20 +46,44 @@ msgstr "下载失败"
 msgid "Upgrade firmware On the Air"
 msgstr "在线升级固件"
 
-msgid "Keep the installed plugins(test)"
-msgstr "保留安装的插件(测试)"
+msgid "Keep settings configuration"
+msgstr "保留配置"
 
-msgid "Check and upgrade firmware from the Internet"
-msgstr "通过网络检查和更新固件"
+msgid "Keep installed plugins(test)"
+msgstr "保留插件(测试)"
+
+msgid "Update firmware instructions: Before expanding and upgrading, use the 【 Expansion Partition 】 mnt to expand. The remaining space is more than 2.2 times that of the expanded firmware. The expansion cannot retain the configuration upgrade. After the expansion operation is completed, wait for 5 minutes before manually restarting."
+msgstr "更新固件说明：扩容升级前先用【扩容分区】mnt扩容，剩余空间是扩容固件的2.2倍以上，扩容不能保留配置升级，扩容操作完等5分钟后再手动重启。"
 
 msgid "The latest firmware"
 msgstr "最新固件"
 
-msgid "The image file does not contain a supported format. Maybe try again later."
-msgstr "镜像文件格式不支持或损坏。也许稍候再试试"
+msgid "The image file does not contain a supported format. try again later."
+msgstr "镜像文件格式不支持或损坏。稍候再试试"
 
 msgid "History Log"
 msgstr "历史更新日志"
 
 msgid "Found downloading firmware, will show progress"
 msgstr "发现下载中的固件，将显示当前进度"
+
+msgid "Firmware expansion size"
+msgstr "固件扩容大小"
+
+msgid "No expansion"
+msgstr "不扩容"
+
+msgid "Expand by 1G"
+msgstr "扩容1G"
+
+msgid "Expand by 2G"
+msgstr "扩容1G"
+
+msgid "Expand by 5G"
+msgstr "扩容5G"
+
+msgid "Expand by 10G"
+msgstr "扩容10G"
+
+msgid "Expand by 20G"
+msgstr "扩容20G"

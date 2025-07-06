@@ -30,9 +30,9 @@
 
 	<h2 name="content"><%:OTA%></h2>
 	<div class="cbi-section state-ctl state-ctl-unchecked">
-		<div class="cbi-section-descr"><%:Check and upgrade firmware from the Internet%></div>
+		<div class="cbi-section-descr"><%:Update firmware instructions: Before expanding and upgrading, use the ¡¾ Expansion Partition ¡¿ mnt to expand. The remaining space is more than 2.2 times that of the expanded firmware. The expansion cannot retain the configuration upgrade. After the expansion operation is completed, wait for 5 minutes before manually restarting.%></div>
 		<% if image_invalid then %>
-			<div class="cbi-section-error"><%:The image file does not contain a supported format. Maybe try again later.%></div>
+			<div class="cbi-section-error"><%:The image file does not contain a supported format. try again later.%></div>
 		<% end %>
 		<div class="cbi-section-node">
 			<div class="state state-unchecked">
@@ -86,19 +86,30 @@
 					<input type="hidden" name="apply" value="1" />
 					<input type="hidden" name="token" value="<%=token%>" />
 					<div class="cbi-value">
-						<label class="cbi-value-title" for="keep"><%:Keep settings and retain the current configuration%></label>
+						<label class="cbi-value-title" for="keep"><%:Keep settings configuration%></label>
 						<div class="cbi-value-field">
 							<input type="checkbox" name="keep" value="1" id="keep" checked="checked" />
 						</div>
-						<label class="cbi-value-title" for="bopkg"><%:Keep the installed plugins(test)%></label>
+						<label class="cbi-value-title" for="bopkg"><%:Keep installed plugins(test)%></label>
 						<div class="cbi-value-field">
 							<input type="checkbox" name="bopkg" value="1" id="bopkg" checked="checked" />
+						</div>
+						<label class="cbi-value-title" for="expsize"><%:Firmware expansion size%></label>
+						<div class="cbi-value-field">
+							<select name="expsize" id="expsize" style="width:auto">
+							<option value="0" selected="selected"><%:No expansion%></option>
+							<option value="1"><%:Expand by 1G%></option>
+							<option value="2"><%:Expand by 2G%></option>
+							<option value="3"><%:Expand by 5G%></option>
+							<option value="4"><%:Expand by 10G%></option>
+							<option value="5"><%:Expand by 20G%></option>
+							</select> 
 						</div>
 					</div>
 					<div class="cbi-value cbi-value-last">
 						<label class="cbi-value-title"><%:Firmware downloaded%></label>
 						<div class="cbi-value-field">
-							<button type="submit" class="cbi-button cbi-input-apply"><%:Flash image%></button>
+							<button type="submit" class="cbi-button cbi-input-apply" name="flashimage"><%:Flash image%></button>
 							<div class="cbi-value-description">Step 3/3: <%:Flash image%></div>
 						</div>
 					</div>
@@ -125,6 +136,7 @@
 			var check = document.querySelector('button[name="check"]');
 			var download = document.querySelector('button[name="download"]');
 			var cancel = document.querySelector('button[name="cancel"]');
+			var flashimage = document.querySelector('button[name="flashimage"]');
 			var state_ctl = document.querySelector('.state-ctl');
 			var check_result = document.querySelector('#check_result');
 			var download_result = document.querySelector('#download_result');
@@ -143,6 +155,7 @@
 				state_ctl.classList.remove("state-ctl-" + from);
 				state_ctl.classList.add("state-ctl-" + to);
 			};
+
 			check.onclick = function(){
 				check.disabled = 'disabled';
 				check_result.innerText = "<%:Checking...%>";
@@ -240,6 +253,7 @@
 					refresh_download_progress_paused = false;
 				});
 			};
+
 		})();
 	</script>
 </div>
