@@ -1,7 +1,7 @@
 #!/bin/sh /etc/rc.common
 
 #
-# Copyright (C) 2021-2025  sirpdboy  <herboy2008@gmail.com> https://github.com/sirpdboy/partexp
+# Copyright (C) 2021-2025  sirpdboy  <herboy2008@gmail.com> https://github.com/sirpdboy/luci-app-partexp
 
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
@@ -335,6 +335,8 @@ fdiskB(){
 			    uci set fstab.@global[0].delay_root="15"
 			    uci commit fstab
 			    log "保留数据overlay扩展/dev/$b成功！"
+			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
+			    echo $MOUNT >> /etc/partexppath
 			    sleep 3
 			    log "设备重启才能生效"
 			    expquit 2
@@ -362,6 +364,8 @@ fdiskB(){
 			    uci set fstab.@global[0].delay_root="15"
 			    uci commit fstab
 			    log "不保留数据overlay扩展/dev/$b成功！"
+			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
+			    echo $MOUNT >> /etc/partexppath
 			    sleep 3
 			    log "设备重启才能生效"
 			    expquit 2
@@ -388,6 +392,8 @@ fdiskB(){
 		#  ln -sf /mnt/$b /overlay
 		if is_disk_mounted "/opt"; then
 		    log "/dev/$b分区扩容和挂载到$target_function成功！"
+			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
+			    echo $MOUNT >> /etc/partexp
 		    log "如果没生效，请重启设备"
 		    expquit 2
 		else
@@ -418,6 +424,8 @@ fdiskB(){
         	    log "目标盘 $ROOT_PART $FSTYPE有剩余空间: $FREE_SPACE Gb"
          	    if [[ "$FREE_SPACE" -gt 2 ]]; then
  	      	   	rootfs_resize
+			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
+			    echo $MOUNT >> /etc/partexppath
  	         	expquit 2
 	     	    else
  	         	log "目标盘 $SYSTEM_DISK $FSTYPE没有足够的剩余空间！"
@@ -450,6 +458,8 @@ fdiskB(){
 		uci commit fstab
 		if is_disk_mounted /mnt/$b ; then
 		    log "/dev/$b分区扩容和挂载到/mnt/$b成功！" 
+			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
+			    echo $MOUNT >> /etc/partexppath
 		    log "如果没生效，请重启设备"
 		    expquit 2
 		else
