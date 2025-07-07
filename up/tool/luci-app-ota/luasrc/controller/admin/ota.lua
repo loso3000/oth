@@ -227,6 +227,12 @@ function action_ota()
 </html>
         ]])
         luci.http.close()
+            -- 验证固件
+	    os.execute("echo 'Extracted image verification' >> /tmp/ezotaflash.log")
+            if not image_supported(image_tmp) then
+                os.execute("echo 'Error: Extracted image verification failed' >> /tmp/ezotaflash.log")
+                return
+            end
 
         -- 启动刷机进程
         if expsize > 0 then
@@ -251,18 +257,13 @@ function action_ota()
             -- 处理分区扩展
             os.execute("echo 'Expanding partition...' >> /tmp/ezotaflash.log")
             local sizes = {0, 1024, 2048, 5120, 10240, 20480}  
-	    os.execute("dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. " 2>/dev/null >&")
+	    os.execute("dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. "  2>/dev/null >2 >/dev/null")
             if os.execute("which sgdisk >/dev/null") ~= 0 then
                  os.execute("opkg update && opkg install sgdisk")
             end
-            os.execute("sgdisk -e " .. image_extracted .. " 2>/dev/null >&")
-            os.execute("echo -e resizepart 2 -1\\nquit | parted " .. image_extracted .. " 2>/dev/null >&")
-            -- 验证固件
-	    os.execute("echo 'Extracted image verification' >> /tmp/ezotaflash.log")
-            if not image_supported(image_extracted) then
-                os.execute("echo 'Error: Extracted image verification failed' >> /tmp/ezotaflash.log")
-                return
-            end
+            os.execute("sgdisk -e " .. image_extracted .. "  2>/dev/null >2 >/dev/null")
+            os.execute("echo -e resizepart 2 -1\\nquit | parted " .. image_extracted .. " 2>/dev/null >2 >/dev/null")
+
 
             -- 使用dd刷写镜像
 	     fork_exec("(echo 'Starting DD flash process...' >> /tmp/ezotaflash.log;sleep 2;echo 'Writing image to flash...' >> /tmp/ezotaflash.log; sleep 1; sync; && dd if=%s of=%s bs=4k conv=fsync &&(echo 'Flashing completed, syncing...' >> /tmp/ezotaflash.log;echo 'Rebooting system...' >> /tmp/ezotaflash.log;sleep 3; echo b > /proc/sysrq-trigger) ) &" %{
