@@ -12,6 +12,7 @@ function index()
     end
 
     entry({"admin", "system", "ota"}, post_on({ apply = "1" }, "action_ota"), _("OTA"), 69)
+    entry({"admin", "system", "flash_progress"}, call("flash_progress")).leaf = true
     entry({"admin", "system", "ota", "check"}, post("action_check"))
     entry({"admin", "system", "ota", "download"}, post("action_download"))
     entry({"admin", "system", "ota", "progress"}, call("action_progress"))
@@ -93,64 +94,7 @@ function get_free_space(path)
     return free_kb * 1024  -- Convert KB to bytes
 end
 
-function validate_partexp_file()
-    if not nixio.fs.access("/etc/partexppath") then
-        return nil, "/etc/partexppath not found"
-    end
-    
-    local path = luci.sys.exec("head -n 1 /etc/partexppath 2>/dev/null | tr -d '\n'")
-    if not path or path == "" then
-        return nil, "Empty partexppath file"
-    end
-    
-    if not path:match("^/") then
-        return nil, "Invalid path format"
-    end
-    
-    if not nixio.fs.stat(path) then
-        return nil, "Target path not exist: "..path
-    end
-    
-    return path
-end
 
-function safe_decompress(src, dst)
-    -- Try gzip first
-    if os.execute(string.format("gzip -t %q 2>/dev/null", src)) == 0 then
-        return os.execute(string.format("gzip -dc %q > %q", src, dst)) == 0
-    end
-    
-    -- Try xz if gzip fails
-    if os.execute(string.format("xz -t %q 2>/dev/null", src)) == 0 then
-        return os.execute(string.format("xz -dc %q > %q", src, dst)) == 0
-    end
-    
-    -- Not compressed, just copy
-    return os.execute(string.format("cp %q %q", src, dst)) == 0
-end
-
-function safe_resize_image(img_path, expand_size_mb)
-    -- Expand image file
-    if os.execute(string.format(
-        "dd if=/dev/zero bs=1M count=%d >> %q 2>/dev/null",
-        expand_size_mb, img_path
-    )) ~= 0 then
-        return false, "dd expansion failed"
-    end
-    
-    -- Fix GPT table
-    if os.execute(string.format("sgdisk -e %q 2>/dev/null", img_path)) ~= 0 then
-        return false, "sgdisk failed"
-    end
-    
-    -- Resize partition
-    local ret = os.execute(string.format(
-        'echo -e "resizepart 2 -1\\nquit" | parted %q',
-        img_path
-    ))
-    
-    return ret == 0, ret == 0 and nil or "parted resize failed"
-end
 function action_ota()
     local image_tmp = "/tmp/firmware.img"
     local http = require "luci.http"
@@ -169,12 +113,11 @@ function action_ota()
         local keep = (http.formvalue("keep") == "1") and "" or "-n"
         local bopkg = (http.formvalue("bopkg") == "1") and "" or "-k"
         local expsize = tonumber(http.formvalue("expsize")) or 0
-
     -- 构建升级命令
         local cmd
         if expsize > 0 then
             local image_extractedpath = luci.sys.exec("head -n 1 /etc/partexppath |awk  '{print $1}' ")
-            local image_extracteddev = luci.sys.exec("head -n 1 /etc/partexppath |awk  '{print $2}' ")
+            local image_extracteddev = luci.sys.exec("echo /dev/`head -n 1 /etc/partexppath |awk  '{print $2}'`")
             local image_extracted = luci.sys.exec("echo `head -n 1 /etc/partexppath |awk  '{print $1}'`/image_extracted.img ") 
 	    
             if not image_extractedpath or image_extractedpath == "" then
@@ -186,7 +129,6 @@ function action_ota()
                 return
             end
 
-        
         -- 清理旧文件
             if nixio.fs.access(image_extracted) then
 	        os.execute("rm -rf " .. image_extracted) 
@@ -211,25 +153,72 @@ function action_ota()
             end
 	    os.execute("sgdisk -e " .. image_extracted .. " 2>/dev/null")
             os.execute("echo -e resizepart 2 -1\\nquit | parted " .. image_extracted)
-	    
-    luci.sys.call(string.format(
-                'logger -t ota_debug： " image_extracteddev=%q "', 
-		image_extracteddev
-    ))
+luci.http.prepare_content("text/html")
     
-        luci.template.render("admin_system/ota_flashing", {
-          title = luci.i18n.translate("Flashing…"),
-          msg   = luci.i18n.translate("The system is flashing now.<br /> DO NOT POWER OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It might be necessary to renew the address of your computer to reach the device again, depending on your settings."),
-          addr = (keep == "") and "192.168.10.1" or nil
-        })
-        fork_exec("sleep 1; killall dropbear uhttpd nginx;  sync; dd if=%s of=/dev/%s" %{ image_extracted,  image_extracteddev }  )
+    -- 强制刷新浏览器缓存并立即渲染页面
+    luci.http.write([[
+<!DOCTYPE html>
+<html>
+<head>
+    <title>]] .. luci.i18n.translate("Flashing…") .. [[</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+    /* 精简后的CSS */
+    body { background:#6a7893; color:#fff; font-family:sans-serif; text-align:center; padding-top:50px; }
+    .container { background:#272727; max-width:600px; margin:0 auto; padding:30px; border-radius:8px; }
+    .spinner { margin:30px auto; width:50px; height:50px; border:5px solid rgba(255,255,255,0.3); 
+               border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>]] .. luci.i18n.translate("Flashing…") .. [[</h1>
+        <p>]] .. luci.i18n.translate("The system is flashing now.<br />DO NOT POWER OFF THE DEVICE!") .. [[</p>
+        <div class="spinner"></div>
+        <p id="status">]] .. luci.i18n.translate("Starting flash process...") .. [[</p>
+    </div>
+    <script>
+    // 实时状态更新
+    function updateStatus() {
+        fetch("/cgi-bin/luci/admin/system/flash_progress")
+            .then(r => r.text())
+            .then(t => {
+                document.getElementById("status").innerHTML = t;
+                if(!t.includes("complete")) setTimeout(updateStatus, 1000);
+            })
+            .catch(e => console.log(e));
+    }
+    setTimeout(updateStatus, 1500);
+    
+    // 备用重连机制
+    setTimeout(() => {
+        window.location.href = "http://]] .. ((keep == "") and "192.168.10.1" or "192.168.1.1") .. [[";
+    }, 30000);
+    </script>
+</body>
+</html>
+    ]])
+    
+    -- 立即刷新输出缓冲区
+    luci.http.close()
+    
+    -- 启动刷机进程（带完整错误处理）
+    os.execute("(sleep 5; killall dropbear uhttpd nginx; "..
+               "dd if="..image_extracted.." of="..image_extracteddev.." bs=4k conv=fsync && "..
+               "sync&& echo b > /proc/sysrq-trigger ) >/tmp/flash.log 2>&1 &")
+ 
+
+
     else
     
         local slist = {}
         if keep ~= "" then table.insert(slist, keep) end
         if bopkg ~= "" then table.insert(slist, bopkg) end
         slist = table.concat(slist, " ")
-    
+
         luci.template.render("admin_system/ota_flashing", {
           title = luci.i18n.translate("Flashing…"),
           msg   = luci.i18n.translate("The system is flashing now.<br /> DO NOT POWER OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It might be necessary to renew the address of your computer to reach the device again, depending on your settings."),
@@ -246,7 +235,22 @@ function action_ota()
     luci.template.render("admin_system/ota")
   end
 end
-
+-- 新增状态检查接口
+function flash_progress()
+    luci.http.prepare_content("text/plain")
+    if nixio.fs.access("/tmp/flash.log") then
+        local log = luci.sys.exec("tail -n 2 /tmp/flash.log")
+        if log:find("error") then
+            luci.http.write(luci.i18n.translate("Flash failed! See /tmp/flash.log"))
+        elseif log:find("bytes copied") then
+            luci.http.write(luci.i18n.translate("Flash complete! Rebooting..."))
+        else
+            luci.http.write(luci.i18n.translate("Flashing in progress..."))
+        end
+    else
+        luci.http.write(luci.i18n.translate("Starting flash process..."))
+    end
+end
 function action_check()
     local r, o, e = ota_exec("ota check")
     local ret = {
