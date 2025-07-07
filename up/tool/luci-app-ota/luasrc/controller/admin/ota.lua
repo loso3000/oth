@@ -175,14 +175,17 @@ function action_ota()
         if expsize > 0 then
             local image_extractedpath = luci.sys.exec("head -n 1 /etc/partexppath |awk  '{print $1}' ")
             local image_extracteddev = luci.sys.exec("head -n 1 /etc/partexppath |awk  '{print $2}' ")
+            local image_extracted = luci.sys.exec("echo `head -n 1 /etc/partexppath |awk  '{print $1}'`/image_extracted.img ") 
+	    
             if not image_extractedpath or image_extractedpath == "" then
+                luci.template.render("admin_system/ota", {image_invalid = true})
                 return
             end
 	    if not image_extracteddev or image_extracteddev == "" then
+                luci.template.render("admin_system/ota", {image_invalid = true})
                 return
             end
 
-            local image_extracted = image_extractedpath.."/image_extracted.img"
         
         -- 清理旧文件
             if nixio.fs.access(image_extracted) then
@@ -190,7 +193,13 @@ function action_ota()
             end
             os.execute("gzip -dc " .. image_tmp .. " > " .. image_extracted) 
         -- Verify image
+    luci.sys.call(string.format(
+                'logger -t ota_debug： "image_extracted=%q  image_extracteddev=%q "',
+                image_extracted,
+		image_extracteddev
+    ))
             if not image_supported(image_extracted) then
+                luci.template.render("admin_system/ota", {image_invalid = true})
                 return
             end
 
@@ -198,11 +207,15 @@ function action_ota()
             local sizes = {0, 1024, 2048, 5120, 10240, 20480}  
 	    os.execute("dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. " 2>/dev/null")
             if os.execute("which sgdisk >/dev/null") ~= 0 then
-                 os.execute("opkg update && opkg install gdisk")
+                 os.execute("opkg update && opkg install sgdisk")
             end
 	    os.execute("sgdisk -e " .. image_extracted .. " 2>/dev/null")
             os.execute("echo -e resizepart 2 -1\\nquit | parted " .. image_extracted)
-        
+	    
+    luci.sys.call(string.format(
+                'logger -t ota_debug： " image_extracteddev=%q "', 
+		image_extracteddev
+    ))
     
         luci.template.render("admin_system/ota_flashing", {
           title = luci.i18n.translate("Flashing…"),

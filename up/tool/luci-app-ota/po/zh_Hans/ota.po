@@ -77,7 +77,7 @@ msgid "Expand by 1G"
 msgstr "扩容1G"
 
 msgid "Expand by 2G"
-msgstr "扩容1G"
+msgstr "扩容2G"
 
 msgid "Expand by 5G"
 msgstr "扩容5G"

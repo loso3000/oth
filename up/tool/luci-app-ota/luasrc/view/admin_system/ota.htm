@@ -1,5 +1,6 @@
 <%#
  Licensed to the public under the Apache License 2.0.
+ Copyright 2024-2025 sirpdboy
 -%>
 
 <%+header%>
@@ -25,7 +26,12 @@
 	{
 		display: inherit !important;
 	}
-
+	.keep-options {
+		display: block;
+	}
+	.hide-keep-options {
+		display: none !important;
+	}
 	</style>
 
 	<h2 name="content"><%:OTA%></h2>
@@ -86,14 +92,6 @@
 					<input type="hidden" name="apply" value="1" />
 					<input type="hidden" name="token" value="<%=token%>" />
 					<div class="cbi-value">
-						<label class="cbi-value-title" for="keep"><%:Keep settings configuration%></label>
-						<div class="cbi-value-field">
-							<input type="checkbox" name="keep" value="1" id="keep" checked="checked" />
-						</div>
-						<label class="cbi-value-title" for="bopkg"><%:Keep installed plugins(test)%></label>
-						<div class="cbi-value-field">
-							<input type="checkbox" name="bopkg" value="1" id="bopkg" checked="checked" />
-						</div>
 						<label class="cbi-value-title" for="expsize"><%:Firmware expansion size%></label>
 						<div class="cbi-value-field">
 							<select name="expsize" id="expsize" style="width:auto">
@@ -106,10 +104,22 @@
 							</select> 
 						</div>
 					</div>
+					<div class="cbi-value keep-options" id="keep-settings">
+						<label class="cbi-value-title" for="keep"><%:Keep settings configuration%></label>
+						<div class="cbi-value-field">
+							<input type="checkbox" name="keep" value="1" id="keep" checked="checked" />
+						</div>
+					</div>
+					<div class="cbi-value keep-options" id="keep-plugins">
+						<label class="cbi-value-title" for="bopkg"><%:Keep installed plugins(test)%></label>
+						<div class="cbi-value-field">
+							<input type="checkbox" name="bopkg" value="1" id="bopkg" checked="checked" />
+						</div>
+					</div>
 					<div class="cbi-value cbi-value-last">
 						<label class="cbi-value-title"><%:Firmware downloaded%></label>
 						<div class="cbi-value-field">
-							<button type="submit" class="cbi-button cbi-input-apply" name="flashimage"><%:Flash image%></button>
+							<button type="submit" class="cbi-button cbi-input-apply" name="flashimage" id="flashimage-btn"><%:Flash image%></button>
 							<div class="cbi-value-description">Step 3/3: <%:Flash image%></div>
 						</div>
 					</div>
@@ -143,6 +153,36 @@
 			var download_progress = document.querySelector('#download_progress');
 			var upgrade_log = document.querySelector('#upgrade_log');
 			var history_log = document.querySelector('#history_log');
+			var expsizeSelect = document.getElementById('expsize');
+			var keepSettings = document.getElementById('keep-settings');
+			var keepPlugins = document.getElementById('keep-plugins');
+			
+			var flashimageBtn = document.getElementById('flashimage-btn');
+    
+    if (flashimageBtn) {
+        flashimageBtn.addEventListener('click', function() {
+            this.innerHTML = '<%:Flash image wait...%>';
+            return true;
+        });
+    }
+			// 初始化显示状态
+			function updateKeepOptionsVisibility() {
+				var selectedValue = expsizeSelect.value;
+				if (selectedValue === "0") {
+					keepSettings.classList.remove('hide-keep-options');
+					keepPlugins.classList.remove('hide-keep-options');
+				} else {
+					keepSettings.classList.add('hide-keep-options');
+					keepPlugins.classList.add('hide-keep-options');
+				}
+			}
+
+			// 监听select变化
+			if (expsizeSelect) {
+				expsizeSelect.addEventListener('change', updateKeepOptionsVisibility);
+				// 初始化时执行一次
+				updateKeepOptionsVisibility();
+			}
 
 			var xhr_post = function(url, data, cb) {
 				data = data || {};
