@@ -56,12 +56,13 @@ local function ota_exec(cmd)
 end
 
 local function image_supported(image)
-  return (os.execute("sysupgrade -T %q >/dev/null" % image) == 0)
+    return (os.execute("sysupgrade -T %q >/dev/null" % image) == 0)
 end
-function fork_exec(command)
+
+local function fork_exec(command)
     local pid = nixio.fork()
     if pid > 0 then
-        return
+        return pid
     elseif pid == 0 then
         nixio.chdir("/")
         local null = nixio.open("/dev/null", "w+")
@@ -77,180 +78,264 @@ function fork_exec(command)
     end
 end
 
-
-function get_file_size(path)
-    local ok, nixio = pcall(require, "nixio")
-    if ok and nixio then
-        local stat = nixio.fs.stat(path)
-        if stat then return stat.size end
-    end
-    return tonumber(luci.sys.exec("ls -l "..path.." | awk '{print $5}' 2>/dev/null")) or 0
-end
-
-function get_free_space(path)
-    local free_kb = tonumber(luci.sys.exec(
-        "df -k "..path.." 2>/dev/null | awk 'NR==2 {print $4}'"
-    )) or 0
-    return free_kb * 1024  -- Convert KB to bytes
-end
-
-
 function action_ota()
     local image_tmp = "/tmp/firmware.img"
     local http = require "luci.http"
+    local nixio = require "nixio"
+    
     if http.formvalue("apply") == "1" then
         if not luci.dispatcher.test_post_security() then
             return
         end
 
-    -- 验证固件文件
+        -- 验证固件文件
         if not image_supported(image_tmp) then
             luci.template.render("admin_system/ota", {image_invalid = true})
             return
         end
 
-    -- 获取参数
+        -- 获取参数
         local keep = (http.formvalue("keep") == "1") and "" or "-n"
         local bopkg = (http.formvalue("bopkg") == "1") and "" or "-k"
         local expsize = tonumber(http.formvalue("expsize")) or 0
-    -- 构建升级命令
-        local cmd
-        if expsize > 0 then
-            local image_extractedpath = luci.sys.exec("head -n 1 /etc/partexppath |awk  '{print $1}' ")
-            local image_extracteddev = luci.sys.exec("echo /dev/`head -n 1 /etc/partexppath |awk  '{print $2}'`")
-            local image_extracted = luci.sys.exec("echo `head -n 1 /etc/partexppath |awk  '{print $1}'`/image_extracted.img ") 
-	    
-            if not image_extractedpath or image_extractedpath == "" then
-                luci.template.render("admin_system/ota", {image_invalid = true})
-                return
-            end
-	    if not image_extracteddev or image_extracteddev == "" then
-                luci.template.render("admin_system/ota", {image_invalid = true})
-                return
-            end
-
-        -- 清理旧文件
-            if nixio.fs.access(image_extracted) then
-	        os.execute("rm -rf " .. image_extracted) 
-            end
-            os.execute("gzip -dc " .. image_tmp .. " > " .. image_extracted) 
-        -- Verify image
-    luci.sys.call(string.format(
-                'logger -t ota_debug： "image_extracted=%q  image_extracteddev=%q "',
-                image_extracted,
-		image_extracteddev
-    ))
-            if not image_supported(image_extracted) then
-                luci.template.render("admin_system/ota", {image_invalid = true})
-                return
-            end
-
-        -- Handle expansion 
-            local sizes = {0, 1024, 2048, 5120, 10240, 20480}  
-	    os.execute("dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. " 2>/dev/null")
-            if os.execute("which sgdisk >/dev/null") ~= 0 then
-                 os.execute("opkg update && opkg install sgdisk")
-            end
-	    os.execute("sgdisk -e " .. image_extracted .. " 2>/dev/null")
-            os.execute("echo -e resizepart 2 -1\\nquit | parted " .. image_extracted)
-luci.http.prepare_content("text/html")
-    
-    -- 强制刷新浏览器缓存并立即渲染页面
-    luci.http.write([[
+        
+        -- 清空日志文件
+        os.execute("echo 'Starting flash process...' > /tmp/ezotaflash.log")
+        os.execute("chmod 644 /tmp/ezotaflash.log")
+        
+        -- 准备响应内容
+        luci.http.prepare_content("text/html")
+        luci.http.write([[
 <!DOCTYPE html>
 <html>
 <head>
-    <title>]] .. luci.i18n.translate("Flashing…") .. [[</title>
+    <title>]] .. luci.i18n.translate("Firmware Upgrade") .. [[</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <style>
-    /* 精简后的CSS */
     body { background:#6a7893; color:#fff; font-family:sans-serif; text-align:center; padding-top:50px; }
     .container { background:#272727; max-width:600px; margin:0 auto; padding:30px; border-radius:8px; }
     .spinner { margin:30px auto; width:50px; height:50px; border:5px solid rgba(255,255,255,0.3); 
                border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite; }
+    .progress-container { width:100%; height:20px; background:#444; border-radius:10px; margin:15px 0; }
+    .progress-bar { height:100%; background:#4CAF50; border-radius:10px; transition:width 0.3s; }
+    .log-output { max-height:200px; overflow-y:auto; background:#222; padding:10px; border-radius:5px; 
+                 margin-top:15px; font-family:monospace; font-size:12px; text-align:left; }
+    .status-message { margin:15px 0; font-size:16px; }
     @keyframes spin { to { transform:rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>]] .. luci.i18n.translate("Flashing…") .. [[</h1>
-        <p>]] .. luci.i18n.translate("The system is flashing now.<br />DO NOT POWER OFF THE DEVICE!") .. [[</p>
+        <h1>]] .. luci.i18n.translate("Firmware Upgrade") .. [[</h1>
+        <div class="status-message">]] .. luci.i18n.translate("Preparing flash process...") .. [[</div>
         <div class="spinner"></div>
-        <p id="status">]] .. luci.i18n.translate("Starting flash process...") .. [[</p>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar" style="width:0%"></div></div>
+        <div id="status-message" class="status-message"></div>
+        <pre id="log-output" class="log-output"></pre>
     </div>
     <script>
-    // 实时状态更新
-    function updateStatus() {
-        fetch("/cgi-bin/luci/admin/system/flash_progress")
-            .then(r => r.text())
-            .then(t => {
-                document.getElementById("status").innerHTML = t;
-                if(!t.includes("complete")) setTimeout(updateStatus, 1000);
-            })
-            .catch(e => console.log(e));
-    }
-    setTimeout(updateStatus, 1500);
+    const maxChecks = 300; // 5分钟超时(每秒检查一次)
+    let checkCount = 0;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 30;
+    const targetIP = "]] .. ((keep == "") and "192.168.10.1" or "192.168.1.1") .. [[";
     
-    // 备用重连机制
-    setTimeout(() => {
-        window.location.href = "http://]] .. ((keep == "") and "192.168.10.1" or "192.168.1.1") .. [[";
-    }, 30000);
+    function updateProgress() {
+        fetch("/cgi-bin/luci/admin/system/flash_progress")
+            .then(r => {
+                if (!r.ok) throw new Error('Network error');
+                return r.json();
+            })
+            .then(data => {
+                checkCount++;
+                
+                // 更新进度条
+                if (data.progress) {
+                    document.getElementById("progress-bar").style.width = data.progress + "%";
+                }
+                
+                // 更新状态信息
+                if (data.message) {
+                    document.getElementById("status-message").innerHTML = data.message;
+                }
+                
+                // 更新日志输出
+                if (data.log) {
+                    const logOutput = document.getElementById("log-output");
+                    logOutput.textContent = data.log;
+                    logOutput.scrollTop = logOutput.scrollHeight;
+                }
+                
+                // 处理完成状态
+                if (data.status === "complete" || data.status === "rebooting") {
+                    document.getElementById("status-message").innerHTML += "<br><br>" + 
+                        "]] .. luci.i18n.translate("Device will reboot shortly. Trying to reconnect...") .. [[";
+                    startReconnect();
+                    return;
+                }
+                
+                // 处理失败状态
+                if (data.status === "failed" || checkCount >= maxChecks) {
+                    if (checkCount >= maxChecks) {
+                        document.getElementById("status-message").innerHTML += "<br><br>" + 
+                            "]] .. luci.i18n.translate("Operation timed out! Please check device connection manually.") .. [[";
+                    }
+                    return;
+                }
+                
+                // 继续检查进度
+                setTimeout(updateProgress, 1000);
+            })
+            .catch(e => {
+                console.error("Progress check error:", e);
+                if (checkCount < maxChecks) {
+                    setTimeout(updateProgress, 2000);
+                }
+            });
+    }
+    
+    function startReconnect() {
+        const checkConnection = () => {
+            reconnectAttempts++;
+            fetch(`http://${targetIP}/cgi-bin/luci`, { 
+                mode: 'no-cors',
+                cache: 'no-store'
+            })
+            .then(() => {
+                window.location.href = `http://${targetIP}`;
+            })
+            .catch(e => {
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    setTimeout(checkConnection, 2000);
+                } else {
+                    document.getElementById("status-message").innerHTML += "<br><br>" + 
+                        "]] .. luci.i18n.translate("Could not reconnect automatically. Please try to access:") .. [[ " + 
+                        targetIP + " " + "]] .. luci.i18n.translate("manually.") .. [[";
+                }
+            });
+        };
+        
+        setTimeout(checkConnection, 5000);
+    }
+    
+    // 初始启动进度检查
+    setTimeout(updateProgress, 1500);
     </script>
 </body>
 </html>
-    ]])
-    
-    -- 立即刷新输出缓冲区
-    luci.http.close()
-    
-    -- 启动刷机进程（带完整错误处理）
-    os.execute("(sleep 5; killall dropbear uhttpd nginx; "..
-               "dd if="..image_extracted.." of="..image_extracteddev.." bs=4k conv=fsync && "..
-               "sync&& echo b > /proc/sysrq-trigger ) >/tmp/flash.log 2>&1 &")
- 
+        ]])
+        luci.http.close()
+
+        -- 启动刷机进程
+        if expsize > 0 then
+            -- 分区扩展刷机模式
+            local image_extractedpath = luci.sys.exec("head -n 1 /etc/partexppath | awk '{print $1}' 2>/dev/null")
+            local image_extracteddev = luci.sys.exec("echo /dev/`head -n 1 /etc/partexppath | awk '{print $2}'` 2>/dev/null")
+            local image_extracted = luci.sys.exec("echo `head -n 1 /etc/partexppath |awk  '{print $1}'`/image_extracted.img ") 
+
+            if not image_extractedpath or image_extractedpath == "" or not image_extracteddev or image_extracteddev == "" then
+                os.execute("echo 'Error: Could not determine expansion path or device' >> /tmp/ezotaflash.log")
+                return
+            end
+
+            -- 清理旧文件并解压固件
+            os.execute("echo 'Preparing extracted image...' >> /tmp/ezotaflash.log")
+            if nixio.fs.access(image_extracted) then
+	        os.execute("rm -rf " .. image_extracted) 
+            end
+            os.execute("gzip -dc " .. image_tmp .. " > " .. image_extracted) 
 
 
-    else
-    
-        local slist = {}
-        if keep ~= "" then table.insert(slist, keep) end
-        if bopkg ~= "" then table.insert(slist, bopkg) end
-        slist = table.concat(slist, " ")
+            -- 处理分区扩展
+            os.execute("echo 'Expanding partition...' >> /tmp/ezotaflash.log")
+            local sizes = {0, 1024, 2048, 5120, 10240, 20480}  
+	    os.execute("dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. " 2>/dev/null >&")
+            if os.execute("which sgdisk >/dev/null") ~= 0 then
+                 os.execute("opkg update && opkg install sgdisk")
+            end
+            os.execute("sgdisk -e " .. image_extracted .. " 2>/dev/null >&")
+            os.execute("echo -e resizepart 2 -1\\nquit | parted " .. image_extracted .. " 2>/dev/null >&")
+            -- 验证固件
+	    os.execute("echo 'Extracted image verification' >> /tmp/ezotaflash.log")
+            if not image_supported(image_extracted) then
+                os.execute("echo 'Error: Extracted image verification failed' >> /tmp/ezotaflash.log")
+                return
+            end
 
-        luci.template.render("admin_system/ota_flashing", {
-          title = luci.i18n.translate("Flashing…"),
-          msg   = luci.i18n.translate("The system is flashing now.<br /> DO NOT POWER OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It might be necessary to renew the address of your computer to reach the device again, depending on your settings."),
-        addr = (keep == "") and "192.168.10.1" or nil
+            -- 使用dd刷写镜像
+	     fork_exec("(echo 'Starting DD flash process...' >> /tmp/ezotaflash.log;sleep 2;echo 'Writing image to flash...' >> /tmp/ezotaflash.log; sleep 1; sync; && dd if=%s of=%s bs=4k conv=fsync &&(echo 'Flashing completed, syncing...' >> /tmp/ezotaflash.log;echo 'Rebooting system...' >> /tmp/ezotaflash.log;sleep 3; echo b > /proc/sysrq-trigger) ) &" %{
+        image_extracted, image_extracteddev
         })
-        fork_exec("sleep 1; killall dropbear uhttpd nginx; sleep 1; sync; /sbin/sysupgrade %s %q" %{ slist, image_tmp } )
-    end
-    luci.sys.call(string.format(
-                "logger -t ota_debug slist=%s",
-                slist
-    ))
-    
-  else
-    luci.template.render("admin_system/ota")
-  end
-end
--- 新增状态检查接口
-function flash_progress()
-    luci.http.prepare_content("text/plain")
-    if nixio.fs.access("/tmp/flash.log") then
-        local log = luci.sys.exec("tail -n 2 /tmp/flash.log")
-        if log:find("error") then
-            luci.http.write(luci.i18n.translate("Flash failed! See /tmp/flash.log"))
-        elseif log:find("bytes copied") then
-            luci.http.write(luci.i18n.translate("Flash complete! Rebooting..."))
+
         else
-            luci.http.write(luci.i18n.translate("Flashing in progress..."))
+            -- 标准sysupgrade模式
+            local slist = {}
+            if keep ~= "" then table.insert(slist, keep) end
+            if bopkg ~= "" then table.insert(slist, bopkg) end
+            slist = table.concat(slist, " ")
+
+            os.execute("(echo 'Starting sysupgrade process...' >> /tmp/ezotaflash.log; "..
+                     "sleep 1; killall dropbear uhttpd nginx >>/tmp/ezotaflash.log 2>&1; "..
+                     "sleep 1; sync; "..
+                     "echo 'Running sysupgrade command' >> /tmp/ezotaflash.log; "..
+                     "(/sbin/sysupgrade "..slist.." "..image_tmp.." 2>&1 | tee -a /tmp/ezotaflash.log)) >>/tmp/ezotaflash.log 2>&1 &")
         end
     else
-        luci.http.write(luci.i18n.translate("Starting flash process..."))
+        luci.template.render("admin_system/ota")
     end
 end
+
+function flash_progress()
+    luci.http.prepare_content("application/json")
+    
+    local response = {
+        status = "running",
+        message = luci.i18n.translate("Starting flash process..."),
+        progress = 0,
+        log = ""
+    }
+    
+    if nixio.fs.access("/tmp/ezotaflash.log") then
+        -- 读取完整日志
+        response.log = luci.sys.exec("cat /tmp/ezotaflash.log 2>/dev/null") or ""
+        
+        -- 检测刷机状态
+        if response.log:find("Rebooting system") or response.log:find("Upgrade completed") then
+            response.status = "complete"
+            response.message = luci.i18n.translate("Flash complete! Rebooting...")
+            response.progress = 100
+        elseif response.log:find("Writing image to flash") or response.log:find("Running sysupgrade command") then
+            response.status = "flashing"
+            -- 尝试从dd命令获取进度
+            local percent = response.log:match("(%d+)%%")
+            if percent then
+                response.progress = tonumber(percent)
+                response.message = string.format("%s (%d%%)", luci.i18n.translate("Flashing in progress"), response.progress)
+            else
+                -- 尝试从sysupgrade获取进度
+                local step = 0
+                if response.log:find("Switching to ramdisk") then step = 70
+                elseif response.log:find("Creating ramdisk") then step = 50
+                elseif response.log:find("Saving config files") then step = 30 end
+                
+                if step > 0 then
+                    response.progress = step
+                    response.message = luci.i18n.translate("System upgrade step: ") .. step .. "%"
+                else
+                    response.message = luci.i18n.translate("Flashing in progress")
+                end
+            end
+        elseif response.log:find("error") or response.log:find("failed") then
+            response.status = "failed"
+            response.message = luci.i18n.translate("Flash failed! Check log for details")
+        end
+    end
+    
+    luci.http.write_json(response)
+end
+ 
 function action_check()
     local r, o, e = ota_exec("ota check")
     local ret = {
