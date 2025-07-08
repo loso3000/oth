@@ -100,8 +100,8 @@ msgstr "系统现在正在升级。<br/>请勿关闭设备电源！"
 msgid "Don't worry, prepare first"
 msgstr "别急，先准备一下"
 
-# msgid "Flash complete! Rebooting..."
-# msgstr "升级完成！重启中..."
+# msgid "Flash complete! Rebooting"
+# msgstr "升级完成！重启中"
 
 # msgid "Flashing progress:"
 # msgstr "升级进度："
@@ -109,17 +109,20 @@ msgstr "别急，先准备一下"
 # msgid "Flashing:"
 # msgstr "写入数："
 
-msgid "Flashing in progress..."
+msgid "Flashing in progress"
 msgstr "正在升级"
 
 msgid "Firmware Upgrade"
 msgstr "固件升级"
 
-msgid "Starting flash process..."
-msgstr "开始刷机..."
+msgid "Starting flash process"
+msgstr "开始刷机进度"
 
-msgid "Preparing flash process..."
-msgstr "准备升级..."
+msgid "Starting flash firmware"
+msgstr "开始刷机"
+
+msgid "Preparing flash process"
+msgstr "刷机进度"
 
 msgid "Flash failed! Check log for details"
 msgstr "升级失败了！查看日志以了解详细信息"
@@ -127,7 +130,7 @@ msgstr "升级失败了！查看日志以了解详细信息"
 msgid "Could not reconnect automatically. Please try to access:"
 msgstr "无法自动重新连接。请尝试访问："
 
-msgid "Preparing extracted image..."
+msgid "Preparing extracted image"
 msgstr "提取固件镜像"
 
 msgid "Error: Extracted image verification failed"
@@ -136,8 +139,8 @@ msgstr "错误：提取的固件镜像验证失败"
 msgid "Operation timed out! Please check device connection manually."
 msgstr "操作超时！请手动检查设备连接"
 
-msgid "Device will reboot shortly. Trying to reconnect..."
-msgstr "设备将很快重新启动。正在尝试重新连接..."
+msgid "Device will reboot shortly. Trying to reconnect"
+msgstr "设备将很快重新启动。正在尝试重新连接"
 
 msgid "manually."
 msgstr "手动。"
@@ -145,32 +148,32 @@ msgstr "手动。"
 msgid "Error: Could not determine expansion path or device"
 msgstr "错误：无法确定扩展路径或设备"
 
-msgid "Expanding partition..."
-msgstr "扩展固件分区..."
+msgid "Expanding partition"
+msgstr "扩展固件分区"
 
-msgid "Starting DD flash process..."
-msgstr "开始DD刷机..."
+msgid "Starting DD flash process"
+msgstr "开始DD刷机"
 
-msgid "Flashing completed, syncing..."
+msgid "Flashing completed, syncing"
 msgstr "刷机完成，刷新中"
 
-msgid "Rebooting system..."
+msgid "Rebooting system"
 msgstr "重启系统"
 
-msgid "Starting sysupgrade process..."
-msgstr "标准系统升级..."
+msgid "Starting sysupgrade process"
+msgstr "标准系统升级"
 
 msgid "Running sysupgrade command"
 msgstr "运行系统升级,完成后自动重启"
 
-msgid "Writing image to flash..."
-msgstr "开始写入固件..."
+msgid "Writing image to flash"
+msgstr "开始写入固件"
 
 msgid "Extracted image verification"
 msgstr "校验扩容的固件"
 
-msgid ""
-msgstr ""
+msgid "Flash complete! Rebooting"
+msgstr "升级完成，重启设备"
 
 msgid ""
 msgstr ""
