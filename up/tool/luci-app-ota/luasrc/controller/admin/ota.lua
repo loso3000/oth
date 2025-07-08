@@ -68,6 +68,8 @@ function action_ota()
         end
 
         -- 验证固件文件
+	
+        os.execute("echo 'Verify firmware files...' >> /etc/ezotaflash.log")
         if not image_supported(image_tmp) then
               luci.template.render("admin_system/ota", {image_invalid = true})
               return
@@ -88,13 +90,13 @@ function action_ota()
         luci.template.render("admin_system/ota_flashing", {
                   title = luci.i18n.translate("Flashing…"),
                   msg   = luci.i18n.translate("The system is flashing now.<br /> DO NOT POWER OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It might be necessary to renew the address of your computer to reach the device again, depending on your settings."),
-                  addr = (#keep > 0) and "192.168.10.1" or nil
+                  addr = (#keep == "") and "192.168.10.1" or nil
                   })
 		  
         if expsize > 0 then
-            local image_extractedpath = luci.sys.exec("head -n 1 /etc/partexppath | awk '{print $1}' 2>/dev/null")
-            local image_extracteddev = luci.sys.exec("echo /dev/`head -n 1 /etc/partexppath | awk '{print $2}'` 2>/dev/null")
-            local image_extracted = luci.sys.exec("echo `head -n 1 /etc/partexppath |awk  '{print $1}'`/image_extracted.img ") 
+            local image_extractedpath = luci.sys.exec("head -n 1 /etc/partexppath | awk '{print $1}' 2>/dev/null | tr -d '\n'")
+            local image_extracteddev = luci.sys.exec("echo -n /dev/`head -n 1 /etc/partexppath | awk '{print $2}'` | tr -d '\n'")
+            local image_extracted = luci.sys.exec("echo -n `head -n 1 /etc/partexppath |awk  '{print $1}'`/image_extracted.img | tr -d '\n'")
 
             if not image_extractedpath or image_extractedpath == "" or not image_extracteddev or image_extracteddev == "" then
                 os.execute("echo 'Error: Could not determine expansion path or device' >> /etc/ezotaflash.log")
@@ -102,41 +104,42 @@ function action_ota()
             end
 
             -- 清理旧文件并解压固件
-            os.execute("echo 'Preparing extracted image...' >> /etc/ezotaflash.log")
+            os.execute("echo 'echo gzip extracted image  >> /etc/ezotaflash.log' >> /tmp/otaflash.sh")
             if nixio.fs.access(image_extracted) then
 	        os.execute("rm -rf " .. image_extracted) 
             end
-            os.execute("gzip -dc " .. image_tmp .. " > " .. image_extracted) 
-
+	     os.execute(string.format(
+                "echo -e  '#!/bin/sh\n" ..
+                "gzip -dc %s > %s  ' > /tmp/otaflash.sh",
+                image_tmp,
+                image_extracted
+            ))
             -- 处理分区扩展
-            os.execute("echo 'Expanding partition...' >> /etc/ezotaflash.log")
+            os.execute("echo 'echo Additional expansion capacity   >> /etc/ezotaflash.log' >> /tmp/otaflash.sh")
             local sizes = {0, 1024, 2048, 5120, 10240, 20480}  
-	    os.execute("dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. " >>/dev/null 2>&1 ")
+	    os.execute("echo 'dd if=/dev/zero bs=1M count=" .. sizes[expsize + 1] .. " >> " .. image_extracted.. " >>/dev/null 2>&1' >> /tmp/otaflash.sh")
             if os.execute("which sgdisk >/dev/null") ~= 0 then
                  os.execute("opkg update && opkg install sgdisk")
             end
 	    
-	    fork_exec("(sgdisk -e " .. image_extracted .. " >/dev/null 2>&1; true)")
-	    fork_exec("(echo -e 'resizepart 2 -1\\nquit' | parted " .. image_extracted .. "  >/dev/null 2>&1; true)")
+            os.execute("echo 'echo Fix GPT expansion partition   >> /etc/ezotaflash.log' >> /tmp/otaflash.sh")
+	    os.execute("echo '(sgdisk -e " .. image_extracted .. " >/dev/null 2>&1; true)' >> /tmp/otaflash.sh")
+            os.execute("echo 'echo Expand partition   >> /etc/ezotaflash.log' >> /tmp/otaflash.sh")
+	    os.execute("echo '(echo -e 'resizepart 2 -1\\nquit' | parted " .. image_extracted .. "  >/dev/null 2>&1; true)' >> /tmp/otaflash.sh")
 	         
-            local script = string.format([[
-            #!/bin/sh
-	    sleep 1
-            echo "[$(date)] Starting DD flash ..." >> /etc/ezotaflash.log
-	    sleep 2
-            killall -9 dropbear uhttpd nginx
-	    sleep 1
-            dd if=%s of=%s bs=4k conv=fsync status=progress >> /etc/ezotaflash.log 2>&1
-            sync
-            echo "[$(date)] END DD flash" >> /etc/ezotaflash.log
-	    sleep 3
-            echo b > /proc/sysrq-trigger
-            ]], image_extracted, image_extracteddev)
- 
-            local f = io.open("/tmp/otaflash.sh", "w")
-            f:write(script)
-            f:close()
-            os.execute("chmod 755 /tmp/otaflash.sh")
+	    os.execute(string.format(
+                "echo -e '\necho Start DD flashing >> /etc/ezotaflash.log\n " ..
+                "killall dropbear uhttpd nginx\n" ..
+                "dd if=%s of=%s bs=4k conv=fsync >/dev/null 2>&1 \n" ..
+                "echo Complete DD flashing >> /etc/ezotaflash.log \n"..
+                "sync\n" ..
+                "echo Machine restart >> /etc/ezotaflash.log \n"..
+                "echo b > /proc/sysrq-trigger' >> /tmp/otaflash.sh && " ..
+                "chmod +x /tmp/otaflash.sh",
+                image_extracted,
+                image_extracteddev
+            ))
+
 
             fork_exec("/bin/sh /tmp/otaflash.sh")
 

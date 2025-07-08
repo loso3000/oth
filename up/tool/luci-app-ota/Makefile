@@ -5,7 +5,7 @@ LUCI_TITLE:=LuCI for OTA upgrade
 LUCI_PKGARCH:=all
 
 LUCI_DEPENDS:=+jq +curl +gdisk +parted +sgdisk
-PKG_VERSION:=1.4.6
+PKG_VERSION:=1.4.7
 PKG_RELEASE:=1
 PKG_MAINTAINER:=jjm2473 <jjm2473@gmail.com>
 
