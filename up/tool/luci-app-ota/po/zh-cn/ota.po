@@ -148,8 +148,8 @@ msgstr "错误：无法确定扩展路径或设备"
 msgid "Expanding partition"
 msgstr "扩展固件分区"
 
-msgid "Starting DD flash process"
-msgstr "开始DD刷机"
+msgid "Could not reconnect automatically. Please try to access one of these addresses manually:"
+msgstr "不能自动连接，请手动输入访问地址："
 
 msgid "Flashing completed, syncing"
 msgstr "刷机完成，刷新中"
@@ -157,26 +157,26 @@ msgstr "刷机完成，刷新中"
 msgid "Rebooting system"
 msgstr "重启系统"
 
-msgid "Starting sysupgrade process"
-msgstr "标准系统升级"
+msgid "Starting upgrade process"
+msgstr "开始系统升级"
 
 msgid "Running sysupgrade command"
 msgstr "运行系统升级,完成后自动重启"
 
 msgid "Writing image to flash"
-msgstr "开始写入固件"
+msgstr "写入固件"
 
 msgid "Extracted image verification"
 msgstr "校验扩容的固件"
 
 msgid "Flash complete! Rebooting"
-msgstr "升级完成，重启设备"
+msgstr "刷写完成，重启设备"
 
-msgid ""
-msgstr ""
+msgid "Flash complete!"
+msgstr "刷写完成"
 
-msgid ""
-msgstr ""
+msgid "Flash failed: "
+msgstr "写入失败:"
 
-msgid ""
-msgstr ""
+msgid "Preparing upgrade environment"
+msgstr "准备升级环境"

@@ -294,7 +294,7 @@ luci.http.write([[
                 table.concat(slist, " "),
                 image_tmp
             ))
-	    os.execute("echo 'Starting sysupgrade process' >> /tmp/ezotaflash.log")
+	    os.execute("echo 'Starting upgrade process' >> /tmp/ezotaflash.log")
         end
 
         fork_exec("/bin/sh /tmp/otaflash.sh")
