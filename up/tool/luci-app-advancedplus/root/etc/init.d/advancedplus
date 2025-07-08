@@ -179,11 +179,13 @@ fi
 
 set_login() {
     if [ "x$(uci -q get advancedplus.@basic[0].set_login)" = "x1" ] ; then
-        sed -i "/exec /d" /usr/libexec/login.sh
-	echo 'exec /bin/login' >> /usr/libexec/login.sh
+        # sed -i "/exec /d" /usr/libexec/login.sh
+	# echo 'exec /bin/login' >> /usr/libexec/login.sh
+	sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
     else
-        sed -i "/exec /d" /usr/libexec/login.sh
-	echo 'exec /bin/sh -l' >> /usr/libexec/login.sh
+        # sed -i "/exec /d" /usr/libexec/login.sh
+	# echo 'exec /bin/sh -l' >> /usr/libexec/login.sh
+	sed -i '$ s|exec /bin/sh -l$|exec /bin/login|' /usr/libexec/login.sh
     fi
 }
 
