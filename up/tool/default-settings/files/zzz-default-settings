@@ -420,9 +420,8 @@ uci set firewall.@defaults[0].input='DROP'
 [ x$debug = x1 ] && echo $ver
 }
 
-#login 
-sed -i "/exec /d" /usr/libexec/login.sh
-echo 'exec /bin/sh -l' >> /usr/libexec/login.sh
+#no login 
+sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
 
 uci -q set base_config.@base[0].ver=$ver
 uci -q commit base_config
