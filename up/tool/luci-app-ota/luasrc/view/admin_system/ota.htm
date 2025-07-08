@@ -36,7 +36,7 @@
 
 	<h2 name="content"><%:OTA%></h2>
 	<div class="cbi-section state-ctl state-ctl-unchecked">
-		<div class="cbi-section-descr"><%:Update firmware instructions: Before expanding and upgrading; use the[Expansion Partition] mnt to expand;The remaining space is more than 2.2 times that of the expanded firmware;The expansion cannot retain the configuration upgrade. After the expansion operation is completed, wait for 5 minutes before manually restarting.%></div>
+		<div class="cbi-section-descr"><%:Online firmware update instructions: Before expanding and upgrading, use the [Expand Partition]to expand the mnt partition; The remaining space is more than twice that of the firmware expansion; Expansion firmware DD does not retain configuration flashing; Not expanding to the default flashing mode of the system can retain configuration upgrades%></div>
 		<% if image_invalid then %>
 			<div class="cbi-section-error"><%:The image file does not contain a supported format. try again later.%></div>
 		<% end %>
