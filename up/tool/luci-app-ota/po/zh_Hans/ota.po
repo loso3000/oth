@@ -100,9 +100,6 @@ msgstr "系统现在正在升级。<br/>请勿关闭设备电源！"
 msgid "Don't worry, prepare first"
 msgstr "别急，先准备一下"
 
-# msgid "Flash complete! Rebooting"
-# msgstr "升级完成！重启中"
-
 # msgid "Flashing progress:"
 # msgstr "升级进度："
 
@@ -122,7 +119,7 @@ msgid "Starting flash firmware"
 msgstr "开始刷机"
 
 msgid "Preparing flash process"
-msgstr "刷机进度"
+msgstr "正在刷新系统"
 
 msgid "Flash failed! Check log for details"
 msgstr "升级失败了！查看日志以了解详细信息"
@@ -145,7 +142,7 @@ msgstr "设备将很快重新启动。正在尝试重新连接"
 msgid "manually."
 msgstr "手动。"
 
-msgid "Error: Could not determine expansion path or device"
+msgid "error: Could not determine expansion path or device"
 msgstr "错误：无法确定扩展路径或设备"
 
 msgid "Expanding partition"
