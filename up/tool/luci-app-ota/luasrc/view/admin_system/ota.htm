@@ -92,7 +92,7 @@
 					<input type="hidden" name="apply" value="1" />
 					<input type="hidden" name="token" value="<%=token%>" />
 					<div class="cbi-value">
-						<label class="cbi-value-title" for="expsize"><%:Firmware expansion size%></label>
+						<label class="cbi-value-title" for="expsize"><%:Select expansion mode%></label>
 						<div class="cbi-value-field">
 							<select name="expsize" id="expsize" style="width:auto">
 							<option value="0" selected="selected"><%:No expansion%></option>
@@ -104,6 +104,7 @@
 							</select> 
 						</div>
 					</div>
+
 					<div class="cbi-value keep-options" id="keep-settings">
 						<label class="cbi-value-title" for="keep"><%:Keep settings configuration%></label>
 						<div class="cbi-value-field">
@@ -161,7 +162,7 @@
     
     if (flashimageBtn) {
         flashimageBtn.addEventListener('click', function() {
-            this.innerHTML = '<%:Starting flash process...%>';
+            this.innerHTML = '<%:Don't worry, prepare first%>';
             return true;
         });
     }

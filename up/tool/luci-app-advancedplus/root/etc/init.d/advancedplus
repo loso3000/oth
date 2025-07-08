@@ -177,13 +177,14 @@ if [ -n $wanwan ] ; then
 fi
 }
 
-set_ttyd() {
-    if [ "x$(uci -q get advancedplus.@basic[0].set_ttyd)" = "x1" ] ; then
-        uci -q delete ttyd.@ttyd[0].interface
+set_login() {
+    if [ "x$(uci -q get advancedplus.@basic[0].set_login)" = "x1" ] ; then
+        sed -i "/exec /d" /usr/libexec/login.sh
+	echo 'exec /bin/login' >> /usr/libexec/login.sh
     else
-        uci -q set ttyd.@ttyd[0].interface='@lan'
+        sed -i "/exec /d" /usr/libexec/login.sh
+	echo 'exec /bin/sh -l' >> /usr/libexec/login.sh
     fi
-    uci commit ttyd
 }
 
 dhcp_domain() {
@@ -211,7 +212,7 @@ advancedset(){
     [ ! $dev ] && dev=` uci -q get network.wan.ifname ` || dev=` uci -q get network.wan.device ` 
     [ ! $dev ] && dev=br-lan
     setnetwizard
-    # set_ttyd
+    set_login
     # set_firewall_wan
     tsoset
     sed -i "\/bin\/zsh/d" /etc/profile

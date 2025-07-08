@@ -52,11 +52,8 @@ msgstr "保留配置"
 msgid "Keep installed plugins(test)"
 msgstr "保留插件(测试)"
 
-msgid "Update firmware instructions: Before expanding and upgrading; use the[Expansion Partition] mnt to expand;The remaining space is more than 2.2 times that of the expanded firmware;The expansion cannot retain the configuration upgrade. After the expansion operation is completed, wait for 5 minutes before manually restarting."
-msgstr "更新固件说明：扩容升级前先用【扩容分区】mnt扩容;剩余空间是扩容固件的2.2倍以上;扩容不能保留配置升级，扩容操作完等5分钟后再手动重启。"
-
-msgid "Resize image..."
-msgstr "扩容镜像中..."
+msgid "Online firmware update instructions: Before expanding and upgrading, use the 【 Expand Partition 】 to expand the mnt partition; The remaining space is more than twice that of the firmware expansion; Expansion firmware DD does not retain configuration flashing; Not expanding to the default flashing mode of the system can retain configuration upgrades"
+msgstr "在线更新固件说明：扩容升级前先用【扩容分区】扩容mnt分区;剩余空间是扩容固件的2倍以上;扩容固件DD不保留配置刷机;不扩容为系统默认刷机模式可保留配置升级"
 
 msgid "The latest firmware"
 msgstr "最新固件"
@@ -70,8 +67,11 @@ msgstr "历史更新日志"
 msgid "Found downloading firmware, will show progress"
 msgstr "发现下载中的固件，将显示当前进度"
 
-msgid "Firmware expansion size"
-msgstr "固件扩容大小"
+msgid "Select expansion mode"
+msgstr "选择扩容模式"
+
+msgid "Not expanding to the default flashing mode of the system can retain the configuration, while expanding firmware DD does not retain the configuration for flashing"
+msgstr "不扩容为系统默认刷机模式可保留配置，扩容固件DD不保留配置刷机"
 
 msgid "No expansion"
 msgstr "不扩容"
@@ -97,9 +97,8 @@ msgstr "系统现在正在升级。<br/>请勿关闭设备电源！"
 # msgid "Device will reboot shortly. You may need to renew your IP address."
 # msgstr "设备将很快重新启动。您可能需要重输固件IP地址。"
 
-# msgid "Checking progress..."
-# msgstr "检测进度..."
-
+msgid "Don't worry, prepare first"
+msgstr "别急，先准备一下"
 
 # msgid "Flash complete! Rebooting..."
 # msgstr "升级完成！重启中..."
