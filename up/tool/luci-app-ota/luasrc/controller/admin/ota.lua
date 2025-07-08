@@ -267,9 +267,9 @@ luci.http.write([[
                 "echo -e '\necho Writing image to flash >> /tmp/ezotaflash.log\n " ..
                 "killall dropbear uhttpd nginx\n" ..
                 "sync\n" ..
-                "(dd if=%s of=%s bs=4k conv=fsync ) && " ..
-                "echo Rebooting system>> /tmp/ezotaflash.log && "..
-                "echo b > /proc/sysrq-trigger' >> /tmp/otaflash.sh && " ..
+                "(dd if=%s of=%s bs=4k conv=fsync  >/dev/null 2>&1) &&echo b > /proc/sysrq-trigger\n " ..
+                "echo Rebooting system>> /tmp/ezotaflash.log \n "..
+                "sleep 2' >> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
                 image_extracted,
                 image_extracteddev
