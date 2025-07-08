@@ -267,7 +267,7 @@ luci.http.write([[
                 "echo -e '\necho Writing image to flash >> /tmp/ezotaflash.log\n " ..
                 "killall dropbear uhttpd nginx\n" ..
                 "sync\n" ..
-                "(dd if=%s of=%s bs=4k conv=fsync  >/dev/null 2>&1) &&echo b > /proc/sysrq-trigger\n " ..
+                "(dd if=%s of=%s bs=4k conv=fsync >> /tmp/ezotaflash.log 2>&1) &&echo b > /proc/sysrq-trigger\n " ..
                 "echo Rebooting system>> /tmp/ezotaflash.log \n "..
                 "sleep 2' >> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
@@ -284,11 +284,11 @@ luci.http.write([[
 	    if bopkg ~= "" then table.insert(slist, bopkg) end
   
 	    os.execute(string.format(
-                "echo -e 'sleep 1\necho Starting sysupgrade process >> /tmp/ezotaflash.log\n" ..
+                "echo -e 'sleep 1\necho Starting upgrade >> /tmp/ezotaflash.log\n" ..
                 "killall dropbear uhttpd nginx\n" ..
                 "sleep 1\nsync\n" ..
                 "echo Running sysupgrade command >> /tmp/ezotaflash.log \n"..
-                "/sbin/sysupgrade %s %s >/tmp/ezotaflash.log 2>&1 \n" ..
+                "/sbin/sysupgrade %s %s >>/tmp/ezotaflash.log 2>&1 \n" ..
                 "echo Upgrade completed >> /tmp/ezotaflash.log' >> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
                 table.concat(slist, " "),
