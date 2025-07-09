@@ -266,12 +266,9 @@ function k_themenetwork(){
 }
 
 function is_vip() {
-     DISTRIB_FREE=$(cat /etc/openwrt_release | grep "Vip" | cut -d "'" -f 2 | cut -d "-" -f 1)
-    if [ "$DISTRIB_FREE" = "Vip" ]; then
-        return 0
-    else
-        return 1
-    fi
+    local ezver
+    ezver=$(grep -o "EZVER=\S*" /etc/ezopenwrt_version 2>/dev/null | cut -d'=' -f2)
+    [[ "${ezver^^}" =~ VIP ]]
 }
 
 function k_poweroff() {
