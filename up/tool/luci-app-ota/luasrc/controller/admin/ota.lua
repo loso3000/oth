@@ -94,7 +94,7 @@ function action_ota()
         os.execute("echo '#!/bin/sh' > /tmp/otaflash.sh")
         -- 验证固件文件
 	
-        os.execute("echo 'echo Verify firmware files >> /tmp/ezotaflash.log && sleep 5' >> /tmp/otaflash.sh") 
+        os.execute("echo 'echo Verify firmware files >> /tmp/ezotaflash.log && sleep 5' >> /tmp/otaflash.sh  && chmod +x /tmp/otaflash.sh") 
         if not image_supported(image_tmp) then
               luci.template.render("admin_system/ota", {image_invalid = true})
               return
@@ -286,8 +286,7 @@ luci.http.write([[
                 "killall dropbear uhttpd nginx\n" ..
                 "sleep 1\nsync\n" ..
                 "(dd if=%s of=%s bs=4k conv=fsync >> /tmp/ezotaflash.log && echo Rebooting system>> /tmp/ezotaflash.log && sleep 20 && echo b > /proc/sysrq-trigger ) &\n" ..
-                "echo Rebooting system>> /tmp/ezotaflash.log ' >> /tmp/otaflash.sh && " ..
-                "chmod +x /tmp/otaflash.sh",
+                "echo Rebooting system>> /tmp/ezotaflash.log ' >> /tmp/otaflash.sh ",
                 image_extracted,
                 image_extracteddev
             ))
@@ -298,15 +297,14 @@ luci.http.write([[
 	    if keep ~= "" then table.insert(slist, keep) end
 	    if bopkg ~= "" then table.insert(slist, bopkg) end
   
-            os.execute("echo 'echo Running sysupgrade command >> /tmp/ezotaflash.log && sleep 3' >> /tmp/otaflash.sh") 
+            os.execute("echo 'echo Running sysupgrade command >> /tmp/ezotaflash.log && sleep 5' >> /tmp/otaflash.sh") 
 	    os.execute(string.format(
                 "echo -e 'sleep 2\n" ..
                 "killall dropbear uhttpd nginx\n" ..
-                "sleep 2\nsync\n" ..
+                "echo Upgrade completed >> /tmp/ezotaflash.log && sleep 5 \nsync\n" ..
                 "(/sbin/sysupgrade -v %s %s >> /tmp/ezotaflash.log && echo Upgrade completed >> /tmp/ezotaflash.log && sleep 20) &\n" ..
 
-                "echo Upgrade completed >> /tmp/ezotaflash.log '>> /tmp/otaflash.sh && " ..
-                "chmod +x /tmp/otaflash.sh",
+                "sleep 5'>> /tmp/otaflash.sh",
                 table.concat(slist, " "),
                 image_tmp
             ))
