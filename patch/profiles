@@ -680,8 +680,8 @@ function k_rebootpoweroff() {
     while :; do
         read -p " 输入功能编号(Enter the function number): " CHOOSES
         case $CHOOSES in
-            1) k_reboot ;;
-            2) k_poweroff ;;
+            1)  reboot -f ;;
+            2)  poweroff -f ;;
             0|Q|q) 
 	        pwait
               . /etc/profiles ;;
