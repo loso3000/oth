@@ -94,7 +94,7 @@ function action_ota()
         os.execute("echo '#!/bin/sh' > /tmp/otaflash.sh")
         -- 验证固件文件
 	
-        os.execute("echo 'echo Verify firmware files >> /tmp/ezotaflash.log && sleep 3' >> /tmp/otaflash.sh") 
+        os.execute("echo 'echo Verify firmware files >> /tmp/ezotaflash.log && sleep 5' >> /tmp/otaflash.sh") 
         if not image_supported(image_tmp) then
               luci.template.render("admin_system/ota", {image_invalid = true})
               return
@@ -285,8 +285,8 @@ luci.http.write([[
                 "echo -e 'sleep 1\n" ..
                 "killall dropbear uhttpd nginx\n" ..
                 "sleep 1\nsync\n" ..
-                "(dd if=%s of=%s bs=4k conv=fsync >> /tmp/ezotaflash.log ) && echo Rebooting system>> /tmp/ezotaflash.log && sleep 20 && echo b > /proc/sysrq-trigger\n" ..
-                "echo Rebooting system>> /tmp/ezotaflash.log \n && sleep 10 ' >> /tmp/otaflash.sh && " ..
+                "(dd if=%s of=%s bs=4k conv=fsync >> /tmp/ezotaflash.log && echo Rebooting system>> /tmp/ezotaflash.log && sleep 20 && echo b > /proc/sysrq-trigger ) &\n" ..
+                "echo Rebooting system>> /tmp/ezotaflash.log ' >> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
                 image_extracted,
                 image_extracteddev
@@ -300,12 +300,12 @@ luci.http.write([[
   
             os.execute("echo 'echo Running sysupgrade command >> /tmp/ezotaflash.log && sleep 3' >> /tmp/otaflash.sh") 
 	    os.execute(string.format(
-                "echo -e 'sleep 3\n" ..
+                "echo -e 'sleep 2\n" ..
                 "killall dropbear uhttpd nginx\n" ..
                 "sleep 2\nsync\n" ..
-                "(/sbin/sysupgrade -v %s %s >> /tmp/ezotaflash.log && echo Upgrade completed >> /tmp/ezotaflash.log && sleep 20) & \n" ..
+                "(/sbin/sysupgrade -v %s %s >> /tmp/ezotaflash.log && echo Upgrade completed >> /tmp/ezotaflash.log && sleep 20) &\n" ..
 
-                "sleep 5 && echo Upgrade completed >> /tmp/ezotaflash.log'>> /tmp/otaflash.sh && " ..
+                "echo Upgrade completed >> /tmp/ezotaflash.log '>> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
                 table.concat(slist, " "),
                 image_tmp
@@ -345,7 +345,7 @@ function flash_progress()
             response.message = luci.i18n.translate("Writing firmware to flash")
             response.status = "flashing"
         elseif response.log:find("Running sysupgrade command") then
-            local step = 20
+            local step = 30
             if response.log:find("Switching to ramdisk") then 
                 step = 80
                 response.message = luci.i18n.translate("Switching to ramdisk mode")
@@ -353,7 +353,7 @@ function flash_progress()
                 step = 60
                 response.message = luci.i18n.translate("Creating ramdisk")
             elseif response.log:find("Saving config files") then 
-                step = 30
+                step = 50
                 response.message = luci.i18n.translate("Saving configuration files")
             end
             response.progress = step
@@ -362,13 +362,13 @@ function flash_progress()
         elseif response.log:find("Starting flash firmware") then
             local step = 5
             if response.log:find("Fix GPT expansion partition") then 
-                step = 15
+                step = 25
                 response.message = luci.i18n.translate("Fix GPT expansion partition")
             elseif response.log:find("Preparing extracted image") then 
-                step = 10
+                step = 15
                 response.message = luci.i18n.translate("Preparing extracted image")
             elseif response.log:find("Verify firmware") then 
-                step = 8
+                step = 10
                 response.message = luci.i18n.translate("Verify firmware files")
             end
             response.progress = step
