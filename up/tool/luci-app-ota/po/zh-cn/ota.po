@@ -53,7 +53,7 @@ msgid "Keep installed plugins(test)"
 msgstr "保留插件(测试)"
 
 msgid "Online firmware update instructions: Before expanding and upgrading, use the [Expand Partition]to expand the mnt partition; The remaining space is more than twice that of the firmware expansion; Expansion firmware DD does not retain configuration flashing; Not expanding to the default flashing mode of the system can retain configuration upgrades"
-msgstr "在线更新固件说明：扩容升级前先用【扩容分区】扩容mnt分区;剩余空间是扩容固件的2倍以上;扩容固件DD不保留配置刷机;不扩容为系统默认刷机模式可保留配置升级"
+msgstr "在线更新固件说明：扩容升级前先用【扩容分区】扩容mnt分区;剩余空间是扩容固件的2倍以上;扩容固件刷机不保留配置刷机;不扩容为系统默认刷机模式可保留配置升级"
 
 msgid "The latest firmware"
 msgstr "最新固件"
@@ -157,11 +157,8 @@ msgstr "刷机完成，刷新中"
 msgid "Rebooting system"
 msgstr "重启系统"
 
-msgid "Starting upgrade process"
-msgstr "开始系统升级"
-
 msgid "Running sysupgrade command"
-msgstr "运行系统升级,完成后自动重启"
+msgstr "运行upgrade系统升级"
 
 msgid "Writing image to flash"
 msgstr "写入固件"
@@ -179,4 +176,19 @@ msgid "Flash failed: "
 msgstr "写入失败:"
 
 msgid "Preparing upgrade environment"
-msgstr "准备升级环境"
+msgstr "修复更新环境"
+
+msgid "Verify firmware files"
+msgstr "校验固件完整性"
+
+msgid "Fix GPT expansion partition"
+msgstr "修复扩展分区"
+
+msgid "Saving configuration files"
+msgstr "存储配置信息"
+
+msgid "Creating ramdisk"
+msgstr "建立虚拟盘"
+
+msgid "Switching to ramdisk mode"
+msgstr "切换到虚拟盘模式"

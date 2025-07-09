@@ -93,7 +93,8 @@ function action_ota()
         -- 初始化脚本
         os.execute("echo '#!/bin/sh' > /tmp/otaflash.sh")
         -- 验证固件文件
-        os.execute("echo Verify firmware files >> /tmp/ezotaflash.log")
+	
+        os.execute("echo 'echo Verify firmware files >> /tmp/ezotaflash.log && sleep 3' >> /tmp/otaflash.sh") 
         if not image_supported(image_tmp) then
               luci.template.render("admin_system/ota", {image_invalid = true})
               return
@@ -101,9 +102,25 @@ function action_ota()
         -- 获取参数
         local keep = (http.formvalue("keep") == "1") and "" or "-n"
         local bopkg = (http.formvalue("bopkg") == "1") and "" or "-k"
-  
         local expsize = tonumber(http.formvalue("expsize")) or 0
 	
+        local current_ip = luci.http.getenv("SERVER_ADDR") or "192.168.10.1"  -- 默认 fallback
+        local fallback_ip = "192.168.10.1"  -- 如果 JSON 解析失败时的备用 IP
+	local target_ip = fallback_ip
+	if http.formvalue("keep") == "1" and expsize == 0 then
+ 	   target_ip = current_ip  -- keep=1 时使用当前设备的 IP
+	else
+ 	   local json = require "luci.jsonc"
+ 	   local file = "/tmp/run/ezota/ezota.json"
+ 	   local ok, data = pcall(function()
+  	      return json.parse(io.readfile(file))
+  	   end)
+  	   if ok and data and data.x86_64 and #data.x86_64 > 0 and data.x86_64[1].ip then
+  	      target_ip = data.x86_64[1].ip
+  	   end
+	end
+
+        os.execute("echo WEB IP Address:".. target_ip .." >> /tmp/ezotaflash.log")
         -- 准备响应内容
 luci.http.prepare_content("text/html; charset=UTF-8")
 luci.http.write([[
@@ -141,7 +158,7 @@ luci.http.write([[
     let checkCount = 0;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 30;
-    const targetIP = "]] .. ((keep == "") and "192.168.10.1" or "192.168.1.1") .. [[";
+    const targetIP = "]] .. target_ip .. [[";
     
     function updateProgress() {
         fetch("/cgi-bin/luci/admin/system/flash_progress")
@@ -241,7 +258,7 @@ luci.http.write([[
             end
 
             -- 清理旧文件并解压固件
-            os.execute("echo 'echo gzip extracted image  >> /tmp/ezotaflash.log' >> /tmp/otaflash.sh")
+            os.execute("echo 'echo Preparing extracted image  >> /tmp/ezotaflash.log' >> /tmp/otaflash.sh")
 	    os.execute(string.format(
                 "echo 'gzip -dc %s > %s' >> /tmp/otaflash.sh",
                 image_tmp,
@@ -263,19 +280,17 @@ luci.http.write([[
 	    os.execute("echo '(sgdisk -e " .. image_extracted .. " >/dev/null 2>&1; true)' >> /tmp/otaflash.sh")
             os.execute("echo 'echo Expand partition   >> /tmp/ezotaflash.log' >> /tmp/otaflash.sh")
 	    os.execute("echo 'echo -e \"resizepart 2 -1\\nq\" | parted " .. image_extracted .. " >/dev/null 2>&1' >> /tmp/otaflash.sh")
+            os.execute("echo 'echo Writing image to flash >> /tmp/ezotaflash.log' >> /tmp/otaflash.sh")
 	    os.execute(string.format(
-                "echo -e '\necho Writing image to flash >> /tmp/ezotaflash.log\n " ..
+                "echo -e 'sleep 1\n" ..
                 "killall dropbear uhttpd nginx\n" ..
-                "sync\n" ..
-                "(dd if=%s of=%s bs=4k conv=fsync >> /tmp/ezotaflash.log 2>&1) &&echo b > /proc/sysrq-trigger\n " ..
-                "echo Rebooting system>> /tmp/ezotaflash.log \n "..
-                "sleep 2' >> /tmp/otaflash.sh && " ..
+                "sleep 1\nsync\n" ..
+                "(dd if=%s of=%s bs=4k conv=fsync >> /tmp/ezotaflash.log ) && echo Rebooting system>> /tmp/ezotaflash.log && sleep 20 && echo b > /proc/sysrq-trigger\n" ..
+                "echo Rebooting system>> /tmp/ezotaflash.log \n && sleep 10 ' >> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
                 image_extracted,
                 image_extracteddev
             ))
-
-
 
         else
             -- 标准sysupgrade模式
@@ -283,18 +298,18 @@ luci.http.write([[
 	    if keep ~= "" then table.insert(slist, keep) end
 	    if bopkg ~= "" then table.insert(slist, bopkg) end
   
+            os.execute("echo 'echo Running sysupgrade command >> /tmp/ezotaflash.log && sleep 3' >> /tmp/otaflash.sh") 
 	    os.execute(string.format(
-                "echo -e 'sleep 1\necho Starting upgrade >> /tmp/ezotaflash.log\n" ..
+                "echo -e 'sleep 3\n" ..
                 "killall dropbear uhttpd nginx\n" ..
-                "sleep 1\nsync\n" ..
-                "echo Running sysupgrade command >> /tmp/ezotaflash.log \n"..
-                "/sbin/sysupgrade %s %s >>/tmp/ezotaflash.log 2>&1 \n" ..
-                "echo Upgrade completed >> /tmp/ezotaflash.log' >> /tmp/otaflash.sh && " ..
+                "sleep 2\nsync\n" ..
+                "(/sbin/sysupgrade -v %s %s >> /tmp/ezotaflash.log && echo Upgrade completed >> /tmp/ezotaflash.log && sleep 20) & \n" ..
+
+                "sleep 5 && echo Upgrade completed >> /tmp/ezotaflash.log'>> /tmp/otaflash.sh && " ..
                 "chmod +x /tmp/otaflash.sh",
                 table.concat(slist, " "),
                 image_tmp
             ))
-	    os.execute("echo 'Starting upgrade process' >> /tmp/ezotaflash.log")
         end
 
         fork_exec("/bin/sh /tmp/otaflash.sh")
@@ -314,34 +329,66 @@ function flash_progress()
     if nixio.fs.access("/tmp/ezotaflash.log") then
         -- 读取完整日志
         response.log = luci.sys.exec("cat /tmp/ezotaflash.log 2>/dev/null") or ""
-        -- 检测刷机状态
-        if response.log:find("Rebooting system") or response.log:find("Upgrade completed") then
-            response.status = "complete"
+        
+        -- 更精确的进度检测逻辑
+        if response.log:find("Rebooting system") then
+            response.status = "rebooting"
             response.message = luci.i18n.translate("Flash complete! Rebooting")
             response.progress = 100
-        elseif response.log:find("Writing image to flash") or response.log:find("Running sysupgrade command") then
+        elseif response.log:find("Upgrade completed") then
+            response.status = "complete"
+            response.message = luci.i18n.translate("Flash complete!")
+            response.progress = 100
+        elseif response.log:find("Writing image to flash") then
+
+            response.progress = 50  -- 默认进度
+            response.message = luci.i18n.translate("Writing firmware to flash")
             response.status = "flashing"
-            -- 尝试从dd命令获取进度
-            local percent = response.log:match("(%d+)%%")
-            if percent then
-                response.progress = tonumber(percent)
-                response.message = string.format("%s (%d%%)", luci.i18n.translate("Flashing in progress"), response.progress)
-            else
-                -- 尝试从sysupgrade获取进度
-                local step = 0
-                if response.log:find("Switching to ramdisk") then step = 70
-                elseif response.log:find("Creating ramdisk") then step = 50
-                elseif response.log:find("Saving config files") then step = 30 end
-                if step > 0 then
-                    response.progress = step
-                    response.message = luci.i18n.translate("System upgrade step: ") .. step .. "%"
-                else
-                    response.message = luci.i18n.translate("Flashing in progress")
-                end
+        elseif response.log:find("Running sysupgrade command") then
+            local step = 20
+            if response.log:find("Switching to ramdisk") then 
+                step = 80
+                response.message = luci.i18n.translate("Switching to ramdisk mode")
+            elseif response.log:find("Creating ramdisk") then 
+                step = 60
+                response.message = luci.i18n.translate("Creating ramdisk")
+            elseif response.log:find("Saving config files") then 
+                step = 30
+                response.message = luci.i18n.translate("Saving configuration files")
             end
-        elseif response.log:find("error") or response.log:find("failed") then
+            response.progress = step
+	    response.message = luci.i18n.translate("Running sysupgrade command")
+            response.status = "upgrading"
+        elseif response.log:find("Starting flash firmware") then
+            local step = 5
+            if response.log:find("Fix GPT expansion partition") then 
+                step = 15
+                response.message = luci.i18n.translate("Fix GPT expansion partition")
+            elseif response.log:find("Preparing extracted image") then 
+                step = 10
+                response.message = luci.i18n.translate("Preparing extracted image")
+            elseif response.log:find("Verify firmware") then 
+                step = 8
+                response.message = luci.i18n.translate("Verify firmware files")
+            end
+            response.progress = step
+            response.status = "upgrading"
+        elseif response.log:lower():find("error") or response.log:lower():find("fail") then
             response.status = "failed"
             response.message = luci.i18n.translate("Flash failed! Check log for details")
+            -- 从日志中提取错误信息
+            local err = response.log:match("error: (.+)") or 
+                       response.log:match("fail: (.+)") or
+                       response.log:match("ERROR: (.+)")
+            if err then
+                response.message = luci.i18n.translate("Flash failed: ") .. err
+            end
+        end
+        
+        -- 如果进度长时间卡住，尝试更新状态
+        if response.status == "running" and response.log ~= "" then
+            response.progress = 5
+            response.message = luci.i18n.translate("Preparing upgrade environment")
         end
     end
     
