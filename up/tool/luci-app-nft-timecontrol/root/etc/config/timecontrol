@@ -3,7 +3,7 @@ config timecontrol
 	option enabled '0'
 	option control_mode 'blacklist'
 	option list_type 'blacklist'
-	option chain 'forward'
+	option chain 'input'
 	
 config device
 	option timestart '00:00'
