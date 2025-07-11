@@ -77,7 +77,7 @@ m:append(Template("socat/list_status"))
 
 m.apply_on_parse = true
 m.on_after_apply = function(self,map)
-	luci.sys.exec("/etc/init.d/luci_socat start>/dev/null 2>&1")
+	luci.sys.exec("/etc/init.d/luci_socat restart>/dev/null 2>&1")
 end
 return m
 
