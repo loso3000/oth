@@ -3,7 +3,7 @@ local e = luci.model.uci.cursor()
 
 m = Map("socat")
 m.title = translate("Socat")
-m.description = translate("Socat is a relay for bidirectional data transfer between two independent data channels.")
+m.description = translate("Socat is a versatile networking tool named after 'Socket CAT', which can be regarded as an N-fold enhanced version of NetCat")
 
 s = m:section(NamedSection, "global", "global")
 s.anonymous = true
@@ -73,6 +73,11 @@ o = s:option(Flag, "firewall_accept", translate("Open firewall port"))
 o.default = "1"
 o.rmempty = false
 
-m:append(Template("socat/list_status"))
+m:append(Template("socat/list_status")) 
+
+m.apply_on_parse = true
+m.on_after_apply = function(self,map)
+	luci.sys.exec("/etc/init.d/luci_socat start>/dev/null 2>&1")
+end
 return m
 

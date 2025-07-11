@@ -75,8 +75,43 @@ o = s:option(Value, "dest_port", translate("Destination port"))
 o.datatype = "portrange"
 o.rmempty = false
 
+o = s:option(Value, "max_children", translate("Max children processes"))
+o.datatype = "uinteger"
+o.default = "100"
+o.rmempty = false
+
+o = s:option(Value, "udp_timeout", translate("UDP timeout period"))
+o.datatype = "uinteger"
+o.default = "60"
+o.rmempty = false
+o:depends({ proto = "udp"})
+
+o = s:option(ListValue, "proxy", translate("Proxy"))
+o:value("", translate("None"))
+o:value("socks4/4a", "Socks4/4a")
+o:value("http", "HTTP")
+o:depends({ proto = "tcp", dest_proto = "tcp4" })
+
+o = s:option(Value, "proxy_server", translate("Proxy Server"))
+o.placeholder = "127.0.0.1"
+o.default = o.placeholder
+o:depends("proxy", "socks4/4a")
+o:depends("proxy", "http")
+
+o = s:option(Value, "proxy_port", translate("Proxy Port"))
+o.datatype = "port"
+o.placeholder = "1080"
+o.default = o.placeholder
+o:depends("proxy", "socks4/4a")
+o:depends("proxy", "http")
+
 o = s:option(Flag, "firewall_accept", translate("Open firewall port"))
 o.default = "1"
 o.rmempty = false
+
+m.apply_on_parse = true
+m.on_after_apply = function(self,map)
+	luci.sys.exec("/etc/init.d/luci_socat start>/dev/null 2>&1")
+end
 
 return m
