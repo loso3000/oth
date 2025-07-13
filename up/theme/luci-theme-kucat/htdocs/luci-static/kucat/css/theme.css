@@ -1,9 +1,4 @@
-﻿@media (pointer: coarse) {
-    input, select, button {
-        min-height: 44px; 
-    }
-}
-
+﻿
 @supports (-webkit-touch-callout: none) {
     body {
         -webkit-touch-callout: none;

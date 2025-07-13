@@ -1027,11 +1027,11 @@ span[data-indicator="uci-changes"],span[data-indicator="poll-status"],.pdboy-qlo
 
 .pdboy-light:before {
   content: "\e91b";
-  color: #aaa !important;
 }
 
 .pdboy-dark:before {
   content: "\e912";
+  color: #aaa !important;
 }
 
 .pdboy-dark:before,
@@ -1174,8 +1174,6 @@ span[data-indicator="uci-changes"],span[data-indicator="poll-status"],.pdboy-qlo
 }
 
 .main .main-left .nav>li>a:first-child {
-  display: block;
-  font-size: var(--font-d);
   color: var(--menu-fontcolor);
   padding: .7rem 0rem .7rem 3rem;
   margin-bottom: 1px;
@@ -1192,8 +1190,6 @@ span[data-indicator="uci-changes"],span[data-indicator="poll-status"],.pdboy-qlo
 .main .main-left .nav>li .slide-menu>li>a {
   display: block;
   padding: .5rem 1.4rem .5rem 3rem;
-  text-decoration: none;
-  white-space: nowrap;
   margin-bottom: 1px;
   font-weight: 500;
   width: 100%;
@@ -2107,16 +2103,18 @@ button:hover,.btn:hover,.cbi-button:hover {
 }
 
 .cbi-dynlist>.item {
-  display: inline-flex;
+display: inline-flex;
   flex-wrap: nowrap;
   position: relative;
-  max-width: 25rem;
+  max-width: 27.5rem;
+  min-width: 27.5rem;
   pointer-events: auto;
   margin-top: 0.2rem;
   color: var(--inputtext-color);
   outline: 0;
   cursor: move;
-  user-select: text
+  user-select: text;
+
 }
 
 .cbi-dynlist>.item.drag-over {
@@ -2195,8 +2193,8 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-dynlist>.item>span {
   display: block;
   padding: 0.5rem 0.75rem;
-  min-width: 17.5rem;
-  width: 17.5rem;
+  min-width: 28.5rem;
+  width: 28.5;
   transition: box-shadow .15s ease;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2211,7 +2209,7 @@ button:hover,.btn:hover,.cbi-button:hover {
   border-bottom: 1px solid var(--inputborder-color);
   background-color: var(--inputbg-color);
   border-radius: var(--radius2) 0 0 var(--radius2);
-  box-sizing: border-box
+  box-sizing: border-box;
 }
 
 .cbi-dynlist>.add-item {
@@ -4758,7 +4756,7 @@ div#file-manager-container #status-bar #status-info {
   }
 
   .cbi-value-field .cbi-dropdown,.cbi-value-field .cbi-input-select,.cbi-value input[type="text"],.cbi-value input[type="password"] {
-    width: 16rem;
+    width: 19rem;
     min-width: 8rem
   }
   .cbi-dynlist>.add-item:not([ondrop])>input,.cbi-dynlist>.item>span,.cbi-dynlist>.add-item input {
@@ -4767,7 +4765,7 @@ div#file-manager-container #status-bar #status-info {
   }
 
   .cbi-input-textarea,textarea {
-    min-width: 16rem
+    min-width: 19rem
   }
   .cbi-value-title,.cbi-value-field {
     display: inline-block;
