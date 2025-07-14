@@ -10,26 +10,30 @@ function index()
 end
 
 function get_theme()
-    local kucat
+    local kucat = nil
+    local bgqs = '0'
+    local config_exists = false
+
     if fs.access("/etc/config/advancedplus") then
-       kucat = "advancedplus"
-       config_exists = true
+        kucat = "advancedplus"
+        config_exists = true
     elseif fs.access("/etc/config/kucat") then
-       kucat = "kucat"
-       config_exists = true
+        kucat = "kucat"
+        config_exists = true
     end
-    if (config_exists) then
-        local section = uci:get(kucat, "@basic[0]") or {}
+
+    if config_exists then
         bgqs = uci:get(kucat, "@basic[0]", "bgqs") or '0'
     end
-    local bgqs = section.bgqs or '0'
+
     http.prepare_content("application/json")
-    http.write(json.stringify({
-        success = true,
-        config_section = kucat,
+    http.write_json({
+        success = config_exists, 
+        config_section = kucat, 
         bgqs = bgqs
-    }))
+    })
 end
+
 
 function set_theme()
     local kucat

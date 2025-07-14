@@ -1,5 +1,5 @@
  <%#
-    Copyright (C) 2019-2025 The Sirpdboy Team <herboy2008@gmail.com> 
+    Copyright (C) 2019-2025The Sirpdboy Team <herboy2008@gmail.com>
 	luci-theme-material: 
 	Copyright 2015 Lutty Yang <lutty@wcan.in>
 	luci-theme-bootstrap:
@@ -8,7 +8,7 @@
 	Copyright 2012 David Menting <david@nut-bolt.nl>
 
 	MUI:
-	https://github.com/muicss/mui
+	https://github.com/muicss/mui 
 
 	Licensed to the public under the Apache License 2.0
 -%>
@@ -61,7 +61,6 @@ local background, bkuse, bklock, fontd, fontz, fontx
 
 if config_exists then
     config = uci:get_all(kucat, "@basic[0]") or {}
-    
     primary_rgbbody = config.primary_rgbbody or '248,248,248'
     primary_rgbm = config.primary_rgbm or '45,102,147'
     primary_rgbm_ts = config.primary_rgbm_ts or '0.8'
@@ -199,8 +198,8 @@ local loginbk_use = 'background: linear-gradient(0deg, rgba(var(--primary-rgbm),
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.5, viewport-fit=cover">
 
-    <meta name="theme-color" content="<%=(mode == 'dark' and '#1a1a1a' or '#ffffff')%>" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="<%=(mode == 'dark' and '#1a1a1a' or '#1a1a1a')%>" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="<%=(mode == 'dark' and '#1a1a1a' or '#ffffff')%>" media="(prefers-color-scheme: <%= mode %>)">
+    <meta name="theme-color" content="<%=(mode == 'dark' and '#1a1a1a' or '#1a1a1a')%>" media="(prefers-color-scheme: <%= mode %>)">
     <meta name="color-scheme" content="light dark">
     <meta name="msapplication-TileColor" content="<%=(mode == 'dark' and '#1a1a1a' or '#ffffff')%>">
 
@@ -256,7 +255,6 @@ local loginbk_use = 'background: linear-gradient(0deg, rgba(var(--primary-rgbm),
 		--font-z: <%=fontz%>;
 		--font-x: <%=fontx%>;
 		--ufilter: <%=ufilter%>;
-
 	<%if bgqs == '0' then %> 
 		--ufilter: <%=ufilter%>;
 		--bgqs-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
@@ -268,9 +266,16 @@ local loginbk_use = 'background: linear-gradient(0deg, rgba(var(--primary-rgbm),
 		<% else %>
 		--menu-fontcolor: #f5f5f5f5;
 		<% end -%>
-	}
 
 	<% else %>
+		<% if mode == 'dark'  then %>
+		--menu-fontcolor: #ddd;
+		<% else %>
+		--menu-fontcolor: #4d4d5d;
+		<% end -%>
+
+	}
+
      @media screen and (max-width: 1152px) {
       	.main .main-left {
       	  background-color:rgba(var(--primary-rgbbody), 1);
@@ -410,7 +415,7 @@ async function syncgetUci() {
                 'Accept': 'application/json'
             }
         });
-        return data;
+        return await response.json(); ;
     } catch (error) {
         return {
             success: false,
@@ -419,32 +424,39 @@ async function syncgetUci() {
         };
     }
 }
-
 async function updateThemeVariables(theme) {
     const root = document.documentElement;
     const isDark = theme === 'dark';
     
     try {
         const themeConfig = await syncgetUci();
-        console.log('Current theme config:', themeConfig);
-        
-        const bgqsValue = themeConfig.bgqs;
-        
-        if (bgqsValue === '0') {
-            const vars = {
-                '--menu-fontcolor': isDark ? '#ddd' : '#f5f5f5f5',
+        const primaryRgbbody = isDark ? '33,45,60' : '248,248,248';
+        const bgqsValue = themeConfig.bgqs || "0"; 
+        let vars = {};
+
+        if (bgqsValue === "0") {
+            vars = {
+                '--menu-fontcolor': isDark ? '#ddd' : '#f5f5f5',
+				'--primary-rgbbody': primaryRgbbody,
                 '--bgqs-image': '-webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent)',
-                '--menu-bgcolor': 'rgba(var(--primary-rgbm), var(--primary-rgbm-ts))',
+                '--menu-bgcolor': 'rgba(<%=primary_rgbm%>, <%=primary_rgbm_ts%>)',
                 '--menu-item-hover-bgcolor': 'rgba(248,248,248, 0.22)',
                 '--menu-item-active-bgcolor': 'rgba(248,248,248, 0.3)',
             };
-
-            requestAnimationFrame(() => {
-                Object.entries(vars).forEach(([key, value]) => {
-                    root.style.setProperty(key, value);
-                });
-            });
+        } else {
+            vars = {
+                '--menu-fontcolor': isDark ? '#ddd' : '#4d4d5d',
+				'--primary-rgbbody': primaryRgbbody,
+                '--bgqs-image': 'none',
+                '--menu-bgcolor': `rgba(${primaryRgbbody},<%=primary_rgbm_ts%>)`,
+                '--menu-item-hover-bgcolor': 'rgba(<%=primary_rgbm%>,0.8)',
+                '--menu-item-active-bgcolor': 'rgba(<%=primary_rgbm%>,<%=primary_rgbm_ts%>)',
+            };
         }
+        
+        Object.entries(vars).forEach(([key, value]) => {
+            root.style.setProperty(key, value);
+        });
         
         if (window.LuciForm) {
             LuciForm.refreshVisibility();
@@ -453,6 +465,7 @@ async function updateThemeVariables(theme) {
         console.error('Error updating theme variables:', error);
     }
 }
+
 
 document.getElementById('themeToggle').addEventListener('click', function() {
     const switcher = this;

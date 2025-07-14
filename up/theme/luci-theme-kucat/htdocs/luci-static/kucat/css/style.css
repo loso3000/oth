@@ -277,25 +277,19 @@
   --radius1: 0.375rem;
   --radius2: 0.25rem;
   --primary-solid: #fd8c73;
-  --bgqs-image: none;
-  --menu-item-hover-bgcolor: rgba(var(--primary-rgbm), 0.8);
-  --menu-item-active-bgcolor:  rgba(var(--primary-rgbm), var(--primary-rgbm-ts));
   --menu-barbgcolor: rgba(var(--primary-rgbm),var(--primary-rgbm-ts));
-  --menu-hover-barbgcolor: rgba(255,255,255,0.3);
   --font-apple: -apple-system,"Google Sans","Microsoft Yahei","WenQuanYi Micro Hei","sans-serif";
   --font-sans: "Google Sans","Microsoft Yahei","WenQuanYi Micro Hei","sans-serif","Helvetica Neue","Helvetica","Hiragino Sans GB";
+  --menu-hover-barbgcolor: rgba(255,255,255,0.3)
 
 }
 
 [data-theme='light'] {
-  --primary-rgbbody: 248,248,248;                                                            
-  --menu-fontcolor:#4d4d5d;
   --primarytextcolor: #677087;
   --primary-title-color: #4d4d5d;
   --menu-color: #ddd;
   --menu-hover-color: #fff;
   --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.22);
-  --menu-bgcolor: rgba(var(--primary-rgbbody), var(--primary-rgbm-ts));
   --title-color: #65656b;
   --body-color: #65656b;
   --body-hover-bgcolor: rgba(50,50,50,0.05);
@@ -310,14 +304,11 @@
 }
 
 [data-theme="dark"] {
-  --primary-rgbbody: 33,45,60;
-  --menu-fontcolor:#ddd;
   --primarytextcolor: #bbb;
   --primary-title-color: #ccc;
   --menu-color: #ccc;
   --menu-hover-color: #f5f5f5f5;
   --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.5);
-  --menu-bgcolor: rgba(var(--primary-rgbbody), var(--primary-rgbm-ts));
   --title-color: #ddd;
   --body-color: #bbb;
   --body-hover-bgcolor: rgba(255,255,255,0.05);
@@ -3867,15 +3858,15 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 .chat_window {
-  background-color: rgba(255,255,255,0.1) !important
+  background-color: rgba(var(--primary-rgbm), 0.2)!important
 }
 
-.top_menu {
-  background-color: rgba(255,255,255,0.12) !important
+.chat_window>.mainContent>.top_menu {
+  background-color: rgba(var(--primary-rgbm), 0.12)!important
 }
 
 #chatlog .response {
-  background-color: rgba(255,255,255,0.1) !important
+  background-color: rgba(255,255,255,0.2) !important
 }
 
 [data-page="admin-status-usage-details"] .cbi-value-title {
@@ -4399,7 +4390,7 @@ div#file-manager-container #status-bar #status-info {
   width: 30rem;
 }
 
-.cbi-input-textarea, textarea, .cbi-value-description, .cbi-value-field, .cbi-value-field .cbi-dropdown, .cbi-value-field .cbi-input-select, .cbi-value input[type="text"], .cbi-value input[type="password"] {
+.cbi-input-textarea, textarea, .cbi-value-description, .cbi-value-field,  .cbi-value-field .cbi-input-select, .cbi-value input[type="text"], .cbi-value input[type="password"] {
     width: 30rem;
     text-align: left;
     min-width: 8rem;
