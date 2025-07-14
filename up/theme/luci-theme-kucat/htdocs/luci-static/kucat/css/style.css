@@ -1175,6 +1175,7 @@ span[data-indicator="uci-changes"],span[data-indicator="poll-status"],.pdboy-qlo
 }
 
 .main .main-left .nav>li>a:first-child {
+  font-size: var(--font-d);
   color: var(--menu-fontcolor);
   padding: .7rem 0rem .7rem 3rem;
   margin-bottom: 1px;
@@ -2685,12 +2686,14 @@ select,input {
 [data-page="admin-system-flash"] .modal>.right>.btn {
   color: #f8f8f8
 }
-}
+
+
 /* docker */
 #dialog_reslov .dialog_box {
   width: 90%!important;
   background-color: rgba(var(--primary-rgbbody),1);
 }
+
 body.modal-overlay-active {
   overflow: hidden;
   height: 100vh
@@ -4390,20 +4393,24 @@ div#file-manager-container #status-bar #status-info {
 .Dashboard .devices-list .devices-info,.Dashboard .router-status-wifi .wifi-info>hr:last-child {
   margin-top: 0.575rem
 }
+
 .cbi-dynlist>.add-item:not([ondrop])>input,.cbi-dynlist>.item>span,.cbi-dynlist>.add-item input {
   min-width: 16rem;
   width: 30rem;
 }
+
 .cbi-input-textarea, textarea, .cbi-value-description, .cbi-value-field, .cbi-value-field .cbi-dropdown, .cbi-value-field .cbi-input-select, .cbi-value input[type="text"], .cbi-value input[type="password"] {
     width: 30rem;
     text-align: left;
     min-width: 8rem;
     margin: 0;
 }
+
 .cbi-dropdown[open]>ul.dropdown {
   overflow-y: auto;
   max-width: 100%;
-  }
+}
+  
 @keyframes anim-fade-in {
   100% {
     opacity: 1
@@ -4753,8 +4760,8 @@ div#file-manager-container #status-bar #status-info {
     min-width: 8rem;
     margin: 0
   }
+  
   .cbi-dynlist>.add-item:not([ondrop])>input,.cbi-dynlist>.item>span,.cbi-dynlist>.add-item input {
-
     width: 100%;
   }
   
@@ -4769,10 +4776,12 @@ div#file-manager-container #status-bar #status-info {
   .cbi-input-textarea,textarea {
     min-width: 19rem
   }
+  
   .cbi-dynlist>.add-item,
   .cbi-dynlist {
   width: 100%;
   }
+  
   .modal {
     padding: 0.5rem;
     overflow-x: auto;
