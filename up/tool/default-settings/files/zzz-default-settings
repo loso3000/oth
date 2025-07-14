@@ -414,22 +414,17 @@ set snmpd.default_settings.agentaddress='udp:127.0.0.1,udp6:[::1]:161'
 EOF
 fi
 
-
 uci set firewall.@defaults[0].synflood_protect='1'
 uci set firewall.@defaults[0].input='DROP'
 [ x$debug = x1 ] && echo $ver
 }
-
-#no login 
 sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
-
 uci -q set base_config.@base[0].ver=$ver
 uci -q commit base_config
 [ -f '/etc/init.d/miniupnpd' ] &&/etc/init.d/miniupnpd restart
 [ -f '/etc/init.d/turboacc' ] &&/etc/init.d/turboacc restart
 [ -f '/etc/init.d/ttyd' ] &&/etc/init.d/ttyd restart
 [ -f '/etc/init.d/mwan3' ] &&/etc/init.d/mwan3 restart
-[ -f '/etc/init.d/watchdog' ] &&/etc/init.d/watchdog restart
 /etc/init.d/system restart
 /etc/init.d/network restart
 /etc/init.d/dnsmasq restart
