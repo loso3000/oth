@@ -246,7 +246,6 @@ local loginbk_use = 'background: linear-gradient(0deg, rgba(var(--primary-rgbm),
 		<%= css %>
 	<% end %> 
 	:root {
-		--primary-rgbbody:<%=primary_rgbbody%>;
 		--primary-rgbm: <%=primary_rgbm%>;
 		--primary-rgbm-ts: <%=primary_rgbm_ts%>;
 		--primary-rgbs: <%=primary_rgbs%>;
@@ -447,10 +446,7 @@ async function updateThemeVariables(theme) {
             vars = {
                 '--menu-fontcolor': isDark ? '#ddd' : '#4d4d5d',
 				'--primary-rgbbody': primaryRgbbody,
-                '--bgqs-image': 'none',
                 '--menu-bgcolor': `rgba(${primaryRgbbody},<%=primary_rgbm_ts%>)`,
-                '--menu-item-hover-bgcolor': 'rgba(<%=primary_rgbm%>,0.8)',
-                '--menu-item-active-bgcolor': 'rgba(<%=primary_rgbm%>,<%=primary_rgbm_ts%>)',
             };
         }
         

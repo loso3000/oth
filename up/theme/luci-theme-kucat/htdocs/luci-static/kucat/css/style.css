@@ -281,7 +281,9 @@
   --font-apple: -apple-system,"Google Sans","Microsoft Yahei","WenQuanYi Micro Hei","sans-serif";
   --font-sans: "Google Sans","Microsoft Yahei","WenQuanYi Micro Hei","sans-serif","Helvetica Neue","Helvetica","Hiragino Sans GB";
   --menu-hover-barbgcolor: rgba(255,255,255,0.3)
-
+  --bgqs-image: none;
+  --menu-item-hover-bgcolor: rgba(var(--primary-rgbm), 0.8);
+  --menu-item-active-bgcolor:  rgba(var(--primary-rgbm), var(--primary-rgbm-ts));
 }
 
 [data-theme='light'] {
@@ -290,6 +292,7 @@
   --menu-color: #ddd;
   --menu-hover-color: #fff;
   --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.22);
+  --primary-rgbbody:248,248,248;
   --title-color: #65656b;
   --body-color: #65656b;
   --body-hover-bgcolor: rgba(50,50,50,0.05);
@@ -309,6 +312,8 @@
   --menu-color: #ccc;
   --menu-hover-color: #f5f5f5f5;
   --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.5);
+
+  --primary-rgbbody:33,45,60;
   --title-color: #ddd;
   --body-color: #bbb;
   --body-hover-bgcolor: rgba(255,255,255,0.05);
