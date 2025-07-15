@@ -1,3 +1,4 @@
+
 config basic
 	option gouser 'advancedplus'
 	option gohome 'overview'
@@ -7,9 +8,9 @@ config basic
 	option gossr 'passwall'
 	option dayword '0'
 	option background '0'
-	option bklock '1'
+	option bklock '0'
 	option mode 'dark'
-	option bkuse '1'
+	option bkuse '0'
 	option primary_rgbs_ts '0.1'
 	option primary_rgbbody '248,248,248'
 	option primary_opacity '0'
@@ -28,8 +29,8 @@ config theme
 	option primary_rgbs '76,157,69'
 	option remarks '隔栏经典蓝色'
 	option primary_opacity '0'
-	option primary_rgbm_ts '0.9'
-	option bkuse '1'
+	option primary_rgbm_ts '0.8'
+	option bkuse '0'
 	option primary_rgbs_ts '0.1'
 	option mode 'auto'
 	option use '1'
@@ -44,7 +45,7 @@ config theme
 	option remarks '无隔栏清爽绿'
 	option primary_rgbs_ts '0'
 	option mode 'dark'
-	option use '1'
+	option use '0'
 	option primary_rgbm 'green'
 
 config theme
