@@ -4395,13 +4395,17 @@ div#file-manager-container #status-bar #status-info {
   width: 30rem;
 }
 
-.cbi-input-textarea, textarea, .cbi-value-description, .cbi-value-field,  .cbi-value-field .cbi-input-select, .cbi-value input[type="text"], .cbi-value input[type="password"] {
+.cbi-input-textarea, textarea, .cbi-value-description, .cbi-value-field .cbi-input-select, .cbi-value input[type="text"], .cbi-value input[type="password"] {
     width: 30rem;
     text-align: left;
     min-width: 8rem;
     margin: 0;
 }
 
+.cbi-value-field,.cbi-value-field .cbi-dropdown {
+    min-width: 8rem;
+    margin: 0;
+}
 .cbi-dropdown[open]>ul.dropdown {
   overflow-y: auto;
   max-width: 100%;
