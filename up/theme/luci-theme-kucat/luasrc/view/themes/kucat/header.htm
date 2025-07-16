@@ -55,27 +55,24 @@ elseif fs.access("/etc/config/kucat") then
 end
 
 local config = {}
-local primary_rgbbody, primary_rgbm, primary_rgbm_ts, primary_opacity, primary_rgbs, primary_rgbs_ts, mode
+local primary_rgbm, primary_rgbm_ts, primary_opacity, primary_rgbs, primary_rgbs_ts, mode
 local gohome, gouser, gossr, bgqs, setbar, dayword
 local background, bkuse, bklock, fontd, fontz, fontx
 
 if config_exists then
     config = uci:get_all(kucat, "@basic[0]") or {}
-    primary_rgbbody = config.primary_rgbbody or '248,248,248'
     primary_rgbm = config.primary_rgbm or '45,102,147'
     primary_rgbm_ts = config.primary_rgbm_ts or '0.8'
     primary_opacity = config.primary_opacity or '0'
     primary_rgbs = config.primary_rgbs or '132,188,218'
     primary_rgbs_ts = config.primary_rgbs_ts or '0.1'
     mode = config.mode or 'light'
-    
     gohome = bar .. "status/" .. (config.gohome or "")
     gouser = bar .. "system/" .. (config.gouser or "")
     gossr = bar .. "services/" .. (config.gossr or "")
     bgqs = config.bgqs or '0'
     setbar = config.setbar or '1'
     dayword = config.dayword or '0'
-    
     background = config.background or '0'
     bkuse = config.bkuse or '0'
     bklock = config.bklock or '1'
@@ -83,21 +80,18 @@ if config_exists then
     fontz = config.font_z or '0.92rem'
     fontx = config.font_x or '0.875rem'
 else
-    primary_rgbbody = '248,248,248'
     primary_rgbm = '45,102,147'
     primary_rgbm_ts = '0.8'
     primary_opacity = '0'
     primary_rgbs = '132,188,218'
     primary_rgbs_ts = '0.1'
     mode = 'light'
-    
     gohome = bar .. "status/"
     gouser = bar .. "system/"
     gossr = bar .. "services/"
     bgqs = '1'
     setbar = '1'
     dayword = '0'
-    
     background = '0'
     bkuse = '0'
     bklock = '1'
@@ -259,18 +253,9 @@ local loginbk_use = 'background: linear-gradient(0deg, rgba(var(--primary-rgbm),
 		--menu-bgcolor: rgba(var(--primary-rgbm), var(--primary-rgbm-ts));
 		--menu-item-hover-bgcolor: rgba(248,248,248, 0.22);
 		--menu-item-active-bgcolor: rgba(248,248,248, 0.3);
-		<% if mode == 'dark'  then %>
-		--menu-fontcolor: #ddd;
-		<% else %>
-		--menu-fontcolor: #f5f5f5f5;
-		<% end -%>
 
 	<% else %>
-		<% if mode == 'dark'  then %>
-		--menu-fontcolor: #ddd;
-		<% else %>
-		--menu-fontcolor: #4d4d5d;
-		<% end -%>
+
 
 	}
 
@@ -338,7 +323,7 @@ local loginbk_use = 'background: linear-gradient(0deg, rgba(var(--primary-rgbm),
 	    </div>
         <div class="main-left">
             <div class="sidenav-header d-flex align-items-center">
-                <a class="brand" href="/"><%=boardinfo.hostname or "?"%></a> 
+                <a class="brand" href="/"><%=boardinfo.hostname or "?"%></a>
             </div>
         	<div class="mainmenu" id="mainmenu" style="display:none"></div>
     	</div>

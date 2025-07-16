@@ -289,7 +289,7 @@
 [data-theme='light'] {
   --primarytextcolor: #677087;
   --primary-title-color: #4d4d5d;
-  --menu-color: #ddd;
+  --menu-color: #eee;
   --menu-hover-color: #fff;
   --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.22);
   --title-color: #65656b;
@@ -302,13 +302,12 @@
   --input-boxcolor: rgba(0,0,0,0.12);
   --input-boxhovercolor: rgba(0,0,0,0.22);
   --input-checkcolor: rgba(var(--primary-rgbm),1);
-
 }
 
 [data-theme="dark"] {
   --primarytextcolor: #bbb;
   --primary-title-color: #ccc;
-  --menu-color: #ccc;
+  --menu-color: #ddd;
   --menu-hover-color: #f5f5f5f5;
   --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.5);
   --title-color: #ddd;
@@ -763,8 +762,8 @@ small {
 }
 
 .container-bar-right .labelbar:hover::before,.container-bar-left .labelbar:hover::before {
-  color: var(--menu-hover-color);
   color: #fff;
+  color: var(--menu-hover-color);
   text-decoration: none
 }
 
@@ -1036,23 +1035,6 @@ span[data-indicator="uci-changes"],span[data-indicator="poll-status"],.pdboy-qlo
   border-radius: var(--radius1);
 }
 
-.status,.pd-primary .container>span,
-.theme-switcher span {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.status,.pd-primary .container>span:hover,
-.status :hover,
-.theme-switcher :hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.theme-switcher span:not(.active) {
-  opacity: 0;
-  transform: scale(0.9);
-  position: absolute;
-}
 
 .theme-switcher .active {
   display: inline-block;
@@ -1663,8 +1645,7 @@ table>tbody>tr:first-child>td,table>tfoot>tr:first-child>td,table>thead>tr:first
   color: var(--menu-hover-color);
   background-color: #008b89;
   box-shadow: 0 0.3rem 0.8rem var(--input-boxcolor);
-  transform: translate(1) translate(0,0);
-  transition: transform 225ms,box-shadow 225ms;
+
   border-radius: var(--radius2);
   background-image: var(--bgqs-image)
 }
@@ -1772,14 +1753,12 @@ table table,.table .table,.cbi-value-field table,.cbi-value-field .table,td>tabl
 }
 
 button:hover,.btn:hover,.cbi-button:hover {
-  transform: scale(1.05) translate(0,-0.15rem);
   box-shadow: 0 0.5rem 1rem var(--input-boxhovercolor);
   -webkit-box-shadow: 0 0.5rem 1rem var(--input-boxhovercolor);
   -moz-box-shadow: 0 0.5rem 1rem var(--input-boxhovercolor)
 }
 
 .btn:active,.cbi-button:active,button:active {
-  transform: scale(1) translate(0,0.15rem);
   box-shadow: 0 0 6px var(--input-boxhovercolor);
   -webkit-box-shadow: 0 0 6px var(--input-boxhovercolor);
   -moz-box-shadow: 0 0 6px var(--input-boxhovercolor)
@@ -1852,14 +1831,12 @@ button:hover,.btn:hover,.cbi-button:hover {
 .tabs li[class~="active"] {
   border-right: 0.18751rem solid var(--primary-solid) !important;
   border-left: 0.18751rem solid var(--primary-solid) !important;
-  transform: scale(1.05) translate(0,-0.1rem);
   box-shadow: 0 0.5rem 1rem var(--input-boxhovercolor);
   background-color: rgba(var(--primary-rgbm),0.7)
 }
 
 .tabs>li:hover {
   background: rgba(var(--primary-rgbm),0.7);
-  transform: scale(1.05) translate(0,-0.15rem);
   box-shadow: 0 0.5rem 1rem var(--input-boxhovercolor)
 }
 
@@ -1883,6 +1860,7 @@ button:hover,.btn:hover,.cbi-button:hover {
   border-right: 0.18751rem solid rgba(255,255,255,0);
   letter-spacing: 1px;
   padding: 0.3rem 1rem;
+  white-space: nowrap; 
   margin-bottom: 0.5rem;
   overflow-x: auto
 }
@@ -1894,9 +1872,7 @@ button:hover,.btn:hover,.cbi-button:hover {
   border-right: 0.18751rem solid var(--menu-item-titlebg-color) !important;
   border-radius: var(--radius2);
   padding: 0.5rem 0rem;
-  transform: scale(1) translate(0,0);
   box-shadow: 0 0.5rem 1rem var(--input-boxcolor);
-  transition: transform 225ms,box-shadow 225ms;
   background: var(--menu-item-titlebg-color);
   margin: 0.2rem 0rem 0.2rem 0.4rem !important
 }
@@ -1910,7 +1886,6 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-tabmenu>li:hover {
   color: var(--menu-hover-color);
   background: rgba(var(--primary-rgbm),0.7);
-  transform: scale(1.05) translate(0,-0.15rem);
   box-shadow: 0 0.5rem 1rem var(--input-boxhovercolor);
   margin-bottom: 0
 }
@@ -1922,7 +1897,6 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-tabmenu>li[class~="cbi-tab"] {
   border-right: 0.18751rem solid var(--primary-solid) !important;
   border-left: 0.18751rem solid var(--primary-solid) !important;
-  transform: scale(1.05) translate(0,-0.1rem);
   box-shadow: 0 0.5rem 1rem var(--input-boxcolor);
   background-color: rgba(var(--primary-rgbm),0.6)
 }
@@ -3196,9 +3170,8 @@ label[data-index][data-depends] {
 [data-page="admin-network-diagnostics"] .table {
   box-shadow: none
 }
-
 [data-page="admin-network-network"] .ifacebox .ifacebox-head {
-  color: var(--title-color)
+  color: #4d4d5d
 }
 
 input[name="ping"],input[name="traceroute"],input[name="nslookup"] {
@@ -3265,12 +3238,6 @@ body.lang_pl.node-main-login .cbi-value-title {
   -o-background-size: cover;
   background-size: cover;
   background-repeat: no-repeat
-}
-
-.node-main-login>.main>.main-right>.login-bg.blur {
-  transform: scale(1.05);
-  -webkit-filter: blur(5px);
-  filter: blur(5px)
 }
 
 .node-main-login>.main .container .cbi-section-node .cbi-value:hover {
@@ -3359,12 +3326,6 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 
-.node-main-login>.main>.main-right #maincontent>.container:active {
-  -webkit-transform: scale(0.95) rotateZ(1.2deg);
-  -ms-transform: scale(0.95) rotate(1.2deg);
-  transform: scale(0.95) rotateZ(1.2deg)
-}
-
 .node-main-login>.main .container h2 {
   width: 80px;
   height: 80px;
@@ -3398,7 +3359,6 @@ body.lang_pl.node-main-login .cbi-value-title {
   transition: all .15s ease;
   letter-spacing: .2em;
   text-transform: none;
-  will-change: transform;
   border-radius: var(--radius1);
   min-width: 14rem
 }
@@ -4072,8 +4032,7 @@ pre.command-output {
 [data-page^="admin-services-openclash-client"] .oc .myip-section-title,
 [data-page^="admin-services-openclash-client"] .oc .card-title
 {
-  color: #ddd !important;
-  color: var(--menu-fontcolor)!important;
+  color: var(--primary-title-color)!important;
 }
 
 [data-page^="admin-services-openclash"] #tab-content .dom {
