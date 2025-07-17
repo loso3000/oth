@@ -79,6 +79,7 @@ uci -q delete wireless.default_${r}
     uci -q set wireless.${NETWORKID}_${r}.key="${SSID_PASSWD}"
     uci -q commit wireless
 }
+
 setup_network()
 {
     ifname=$(uci -q get network.lan.ifname) 
@@ -135,10 +136,9 @@ test $ver -lt 1 && {
     echo "lcp-echo-interval 200" >>  /etc/ppp/options
 [ x$debug = x1 ] && echo $ver
 }
+
 #ssh link
 test $ver -lt 2 && {
-frmware=`cat /etc/ezopenwrt_version | awk -F '-' '{printf $2}'`
-
 [ -f '/usr/lib/lua/luci/view/admin_status/index/ddns.htm' ] &&rm -f /usr/lib/lua/luci/view/admin_status/index/ddns.htm
 [ -f '/usr/lib/lua/luci/view/admin_status/index/minidlna.htm' ] &&rm -f /usr/lib/lua/luci/view/admin_status/index/minidlna.htm
 [ -f '/usr/lib/lua/luci/view/admin_status/index/mwan.htm' ] &&rm -f /usr/lib/lua/luci/view/admin_status/index/mwan.htm
@@ -149,154 +149,6 @@ uci -q set system.@system[0].hostname='EzOpWrt'
 uci -q commit system
 sed -i 's/root.*/root::0:0:99999:7:::/g' /etc/shadow
 
-uci -q batch <<-EOF
-set system.@system[0].timezone=CST-8
-set system.@system[0].zonename=Asia/Shanghai
-set system.@system[0].ttylogin='1'
-delete system.ntp.server
-add_list system.ntp.server='time1.cloud.tencent.com'
-add_list system.ntp.server='ntp1.aliyun.com'
-add_list system.ntp.server='ntp.ntsc.ac.cn'
-add_list system.ntp.server='cn.ntp.org.cn'
-set dhcp.@dnsmasq[0].min_ttl='3600'
-set dhcp.@dnsmasq[0].filter_aaaa='0'
-set dhcp.@dnsmasq[0].localservice='0'
-set dhcp.@dnsmasq[0].nonwildcard='0'
-set dhcp.@dnsmasq[0].port='53'
-set fstab.@global[0].anon_mount=1
-set fstab.@global[0].check_fs=1
-set vsftpd.@listen[0].enable4='0'
-set upnpd.config.enabled='0'
-set upnpd.config.igdv1='1'
-set mwan3.wan.enabled='0'
-EOF
-
-if [ $frmware = Plus ] ;then
-uci -q batch <<-EOF
-set dhcp.lan.ndp=''
-set dhcp.lan.ra='hybrid'
-set dhcp.lan.dhcpv6='hybrid'
-set dhcp.lan.ignore='0'
-set dhcp.lan.ra_management='1'
-set dhcp.lan.ra_default='1'
-set dhcp.lan.force='1'
-set network.lan.delegate='0'
-set network.wan.mtu=1420
-set network.wan.metric='41'
-set network.wan.delegate='0'
-set network.wan.ipv6='auto'
-set turboacc.config.fullcone_nat='1'
-set turboacc.config.bbr_cca='0'
-set turboacc.config.sfe_flow='0'
-set turboacc.config.hw_flow='0'
-set turboacc.config.sw_flow='0'
-
-EOF
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/aria2.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/view/aria2/overview_status.htm
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/hd_idle.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/minidlna.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/transmission.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/mjpg-streamer.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/p910nd.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/usb_printer.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/xunlei.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/cifs.lua
-sed -i 's/services/nas/g'  /usr/lib/lua/luci/view/minidlna_status.htm
-sed -i 's/services/vpn/g' /usr/lib/lua/luci/controller/zerotier.lua   #zerotier
-sed -i 's/services/vpn/g' /usr/lib/lua/luci/view/zerotier/zerotier_status.htm   #zerotier
-sed -i 's/services/vpn/g' /usr/share/luci/menu.d/luci-app-zerotier.json
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/samba4.lua
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-samba4.json
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-gowebdav.json
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-qbittorrent.json
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/alist.lua
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-alist.json
-sed -i 's/services/nas/g' /usr/lib/lua/luci/view/alist/alist_status.htm
-sed -i 's/services/nas/g' /usr/lib/lua/luci/view/alist/admin_info.htm
-
-elif  [ $frmware = Bypass ] ;then
-uci -q batch <<-EOF
-set dhcp.lan.ra=''
-set dhcp.lan.ndp=''
-set dhcp.lan.dhcpv6=''
-set dhcp.lan.ignore='0'
-set dhcp.lan.ra_management='1'
-set dhcp.lan.ra_default='1'
-set dhcp.lan.force='1'
-set network.lan.delegate='0'
-set network.lan.proto='static'
-del dhcp.lan.ignore
-del dhcp.lan.dynamicdhcp
-set dhcp.lan.force='1'
-delete network.wan
-delete network.wan6
-set turboacc.config.sw_flow='0'
-EOF
-
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/aria2.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/view/aria2/overview_status.htm
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/hd_idle.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/minidlna.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/transmission.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/mjpg-streamer.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/p910nd.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/usb_printer.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/xunlei.lua
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/cifs.lua
-sed -i 's/services/nas/g'  /usr/lib/lua/luci/view/minidlna_status.htm
-sed -i 's/services/vpn/g' /usr/lib/lua/luci/controller/zerotier.lua   #zerotier
-sed -i 's/services/vpn/g' /usr/lib/lua/luci/view/zerotier/zerotier_status.htm   #zerotier
-sed -i 's/services/vpn/g' /usr/share/luci/menu.d/luci-app-zerotier.json
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/samba4.lua
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-samba4.json
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-gowebdav.json
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-qbittorrent.json
-sed -i 's/services/nas/g' /usr/lib/lua/luci/controller/alist.lua
-sed -i 's/services/nas/g' /usr/share/luci/menu.d/luci-app-alist.json
-sed -i 's/services/nas/g' /usr/lib/lua/luci/view/alist/alist_status.htm
-sed -i 's/services/nas/g' /usr/lib/lua/luci/view/alist/admin_info.htm
-else
-
-uci -q batch <<-EOF
-set dhcp.lan.ra='hybrid'
-set dhcp.lan.dhcpv6='hybrid'
-set dhcp.lan.ndp=''
-set dhcp.lan.ignore='0'
-set dhcp.lan.ra_management='1'
-set dhcp.lan.ra_default='1'
-set dhcp.lan.force='1'
-set network.lan.delegate='0'
-set network.wan.mtu=1420
-set network.wan.metric='41'
-set network.wan.delegate='0'
-set network.wan.ipv6='auto'
-set turboacc.config.sw_flow='0'
-EOF
-sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/cifs.lua
-sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/zerotier.lua   #zerotier
-sed -i 's/nas/services/g' /usr/lib/lua/luci/view/zerotier/zerotier_status.htm   #zerotier
-sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-zerotier.json
-sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
-sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-samba4.json
-sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-gowebdav.json
-sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-qbittorrent.json
-sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/alist.lua
-sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-alist.json
-sed -i 's/nas/services/g' /usr/lib/lua/luci/view/alist/alist_status.htm
-sed -i 's/nas/services/g' /usr/lib/lua/luci/view/alist/admin_info.htm
-fi
-uci -q commit vsftpd
-uci -q commit luci
-uci -q commit fstab
-uci -q commit upnpd
-uci -q commit dhcp
-uci -q commit fstab
-uci -q commit turboacc
-uci -q commit network
-uci -q commit system
-uci -q commit firewall
-uci -q commit mwan3
 [ x$debug = x1 ] && echo $ver
 }
 
@@ -348,7 +200,6 @@ uci -q commit dhcp
 test $ver -lt 4 && { 
 ver=4
 
-echo "src/gz is_store https://istore.linkease.com/repo/all/store" >/etc/opkg/customfeeds.conf
 [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
 
 [ x$debug = x1 ] && echo $ver
@@ -418,6 +269,7 @@ uci set firewall.@defaults[0].synflood_protect='1'
 uci set firewall.@defaults[0].input='DROP'
 [ x$debug = x1 ] && echo $ver
 }
+#no login 
 sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
 uci -q set base_config.@base[0].ver=$ver
 uci -q commit base_config
@@ -425,6 +277,7 @@ uci -q commit base_config
 [ -f '/etc/init.d/turboacc' ] &&/etc/init.d/turboacc restart
 [ -f '/etc/init.d/ttyd' ] &&/etc/init.d/ttyd restart
 [ -f '/etc/init.d/mwan3' ] &&/etc/init.d/mwan3 restart
+[ -f '/etc/init.d/watchdog' ] &&/etc/init.d/watchdog restart
 /etc/init.d/system restart
 /etc/init.d/network restart
 /etc/init.d/dnsmasq restart
