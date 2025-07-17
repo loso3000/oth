@@ -281,9 +281,6 @@
   --font-apple: -apple-system,"Google Sans","Microsoft Yahei","WenQuanYi Micro Hei","sans-serif";
   --font-sans: "Google Sans","Microsoft Yahei","WenQuanYi Micro Hei","sans-serif","Helvetica Neue","Helvetica","Hiragino Sans GB";
   --menu-hover-barbgcolor: rgba(255,255,255,0.3);
-  --bgqs-image: none;
-  --menu-item-hover-bgcolor: rgba(var(--primary-rgbm), 0.8);
-  --menu-item-active-bgcolor:  rgba(var(--primary-rgbm), var(--primary-rgbm-ts));
 }
 
 [data-theme='light'] {
@@ -302,6 +299,7 @@
   --input-boxcolor: rgba(0,0,0,0.12);
   --input-boxhovercolor: rgba(0,0,0,0.22);
   --input-checkcolor: rgba(var(--primary-rgbm),1);
+
 }
 
 [data-theme="dark"] {
@@ -1662,7 +1660,7 @@ table>tbody>tr:first-child>td,table>tfoot>tr:first-child>td,table>thead>tr:first
 }
 
 .cbi-section-table-row>.cbi-value-field .cbi-dropdown,.cbi-section-table-row>.cbi-value-field .cbi-input-select,.cbi-section-table-row>.cbi-value-field .cbi-input-text,.cbi-section-table-row>.cbi-value-field .cbi-input-password {
-  min-width: 7rem;
+  min-width: 8rem;
   max-width: 12rem
 }
 
@@ -1982,10 +1980,6 @@ button:hover,.btn:hover,.cbi-button:hover {
 
 .cbi-value ul {
   line-height: 1.25
-}
-
-.cbi-value-field .cbi-dropdown,.cbi-value-field .cbi-input-select,.cbi-value input[type="text"],.cbi-value input[type="password"] {
-  min-width: 8rem;
 }
 
 .cbi-value input[type="text"],.cbi-value input[type="password"] {
@@ -2704,7 +2698,8 @@ body.modal-overlay-active #modal_overlay {
   -webkit-box-align: center;
   -ms-flex-align: center;
   -webkit-box-pack: center;
-  -ms-flex-pack: center
+  -ms-flex-pack: center;
+
 }
 
 .hidden {
@@ -3989,31 +3984,31 @@ pre.command-output {
 [data-page^="admin-services-openclash"] .cbi-tabmenu>li:last-child {
   margin-right: 0 !important
 }
-[data-page^="admin-services-openclash-client"] .select-popup-header,
-[data-page^="admin-services-openclash-client"] .oc,
-[data-page^="admin-services-openclash-client"] .oc .main-cards-container   {
+[data-page^="admin-services-openclash"]  .select-popup-header,
+[data-page^="admin-services-openclash"]  .oc,
+[data-page^="admin-services-openclash"]  .oc .main-cards-container   {
    background-color: rgba(255,255,255,0) !important;
 }
 
-[data-page^="admin-services-openclash-client"] .select-popup {
+[data-page^="admin-services-openclash"]  .select-popup {
    background-color: rgba(255,255,255,1) !important;
 }
 
-[data-page^="admin-services-openclash-client"] .select-class {
+[data-page^="admin-services-openclash"]  .select-class {
    background-color: rgba(255,255,255,0) !important;
    padding: 0 20px 0 10px!important;
 }
 
-[data-page^="admin-services-openclash-client"] .oc .myip-ip-item, .oc .myip-check-item {
+[data-page^="admin-services-openclash"]  .oc .myip-ip-item, .oc .myip-check-item {
    background-color: rgba(255,255,255,0.1) !important;
    background-color: rgba(var(--primary-rgbbody),0.1) !important;
    border: 1px solid rgba(255, 255, 255, 0.15) !important;
    border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
 }
 
-[data-page^="admin-services-openclash-client"] .oc .developer-container,
-[data-page^="admin-services-openclash-client"] .oc .myip-main-card,
-[data-page^="admin-services-openclash-client"] .oc .sub-card  {
+[data-page^="admin-services-openclash"]  .oc .developer-container,
+[data-page^="admin-services-openclash"]  .oc .myip-main-card,
+[data-page^="admin-services-openclash"]  .oc .sub-card  {
   background-color: rgba(255,255,255,0.1) !important;
   background-color: rgba(var(--primary-rgbm),0.1) !important;
   border: 1px solid rgba(255,255,255,0.15) !important;
@@ -4021,18 +4016,22 @@ pre.command-output {
   
 }
 
-[data-page^="admin-services-openclash-client"] .oc .main-card {
+[data-page^="admin-services-openclash"]  .oc .main-card {
   background-color: rgba(255,255,255,0) !important;
   border: 1px solid rgba(255,255,255,0.15) !important;
   border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
 }
 
-[data-page^="admin-services-openclash-client"] .oc .ip-result,.oc .ip-geo,
-[data-page^="admin-services-openclash-client"] .oc .ip-title, .oc .ip-state_title,
-[data-page^="admin-services-openclash-client"] .oc .myip-section-title,
-[data-page^="admin-services-openclash-client"] .oc .card-title
+[data-page^="admin-services-openclash"]  .oc .ip-result,.oc .ip-geo,
+[data-page^="admin-services-openclash"]  .oc .ip-title, .oc .ip-state_title,
+[data-page^="admin-services-openclash"]  .oc .myip-section-title,
+[data-page^="admin-services-openclash"]  .oc .card-title
 {
   color: var(--primary-title-color)!important;
+}
+
+#tool_label .tool_label_span {
+  color: var(--inputtext-color);
 }
 
 [data-page^="admin-services-openclash"] #tab-content .dom {
@@ -4426,7 +4425,6 @@ div#file-manager-container #status-bar #status-info {
 
   .th.cbi-value-field,.td.cbi-value-field,.th.cbi-section-table-cell,.td.cbi-section-table-cell {
     flex-basis: auto;
-    padding-top: 1rem
   }
 
   #cbi-firewall-zone .cbi-input-select {

@@ -27,17 +27,16 @@ async function syncgetUci() {
     }
 }
 async function updateThemeVariables(theme) {
-    const root = document.documentElement;
-    const isDark = theme === 'dark';
-    
-    try {
+  const root = document.documentElement;
+  const isDark = theme === 'dark';
+  try {
     const config = await syncgetUci();
+    // root.removeAttribute('style');
     const primaryRgbbody = isDark ? '33,45,60' : '248,248,248';
     const bgqsValue = config.bgqs; 
     const rgbmValue = config.primaryrgbm; 
     const rgbmtsValue = config.primaryrgbmts;
         let vars = {};
-
         if (bgqsValue === "0") {
             vars = {
                 '--menu-fontcolor': isDark ? '#ddd' : '#f5f5f5',
@@ -54,19 +53,16 @@ async function updateThemeVariables(theme) {
                 '--menu-bgcolor': `rgba(${primaryRgbbody},${rgbmtsValue})`,
             };
         }
-        
         Object.entries(vars).forEach(([key, value]) => {
-            root.style.setProperty(key, value);
-        });
-        
+        root.style.setProperty(key, value);
+      });
         if (window.LuciForm) {
             LuciForm.refreshVisibility();
         }
-    } catch (error) {
+  } catch (error) {
         console.error('Error updating theme variables:', error);
-    }
+  }
 }
-
 
 document.getElementById('themeToggle').addEventListener('click', function() {
     const switcher = this;
@@ -101,8 +97,8 @@ window.addEventListener('DOMContentLoaded', async function() {
         switcher.querySelector('.pdboy-dark').classList.remove('active');
     }
     
-    syncToUci(savedTheme);
     await updateThemeVariables(savedTheme);
+    syncToUci(savedTheme);
 });
 
 /* ]]> */
