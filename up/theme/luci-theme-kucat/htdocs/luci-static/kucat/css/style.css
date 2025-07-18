@@ -1042,9 +1042,6 @@ span[data-indicator="uci-changes"],span[data-indicator="poll-status"],.pdboy-qlo
   display: none;
 }
 
-[data-theme="dark"] .pdboy-dark {
-  display: inline-block !important;
-}
 
 .showWord:before {
   padding: 1rem;
@@ -2691,6 +2688,7 @@ body.modal-overlay-active #modal_overlay {
   bottom: 0;
   left: .2em;
   width: 32px;
+  color: var(--body-color);
   content: "";
   background: url(../../resources/icons/loading.svg) no-repeat center;
   background-size: 20px;
