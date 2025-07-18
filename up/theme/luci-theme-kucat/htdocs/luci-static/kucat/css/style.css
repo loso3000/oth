@@ -694,13 +694,11 @@ footer>a {
 }
 
 .footend {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(255,255,255,0);
-    padding: 10px;
-    display: none; 
+  position: relative;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0);
+  display: none;
 }
 small {
   font-size: 90%;
@@ -1932,7 +1930,7 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-value-description {
   font-size: small;
   padding: 0 0 0.6rem 0;
-  opacity: .7
+  opacity: .8
 }
 
 .cbi-value-title {
@@ -3996,10 +3994,16 @@ pre.command-output {
    background-color: rgba(255,255,255,0) !important;
    padding: 0 20px 0 10px!important;
 }
-
+[data-page^="admin-services-openclash"] .oc .version-display,
+[data-page^="admin-services-openclash"] .oc .value-indicator,
+[data-page^="admin-services-openclash"] .oc .cbi-button-group{
+  background-color: rgba(255,255,255,0.9) !important;
+  border: 0px solid rgba(255,255,255,0.3) !important;
+  
+}
 [data-page^="admin-services-openclash"]  .oc .myip-ip-item, .oc .myip-check-item {
    background-color: rgba(255,255,255,0.1) !important;
-   background-color: rgba(var(--primary-rgbbody),0.1) !important;
+   background-color: rgba(var(--primary-rgbbody),0.2) !important;
    border: 1px solid rgba(255, 255, 255, 0.15) !important;
    border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
 }
@@ -4008,9 +4012,9 @@ pre.command-output {
 [data-page^="admin-services-openclash"]  .oc .myip-main-card,
 [data-page^="admin-services-openclash"]  .oc .sub-card  {
   background-color: rgba(255,255,255,0.1) !important;
-  background-color: rgba(var(--primary-rgbm),0.1) !important;
+  background-color: rgba(var(--primary-rgbm),0.2) !important;
   border: 1px solid rgba(255,255,255,0.15) !important;
-  border: 1px solid rgba(var(--primary-rgbm),0.2) !important;
+  border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
   
 }
 
@@ -4370,6 +4374,8 @@ div#file-manager-container #status-bar #status-info {
 .cbi-value-field,.cbi-value-field .cbi-dropdown {
     min-width: 8rem;
     margin: 0;
+  width: 100%;
+  width: 30rem;
 }
 .cbi-dropdown[open]>ul.dropdown {
   overflow-y: auto;
@@ -4654,7 +4660,8 @@ div#file-manager-container #status-bar #status-info {
   }
   
   .footend {
-    display: inline
+    padding-bottom: 6rem;
+    display: block
   }
 
   .node-main-login footer {
