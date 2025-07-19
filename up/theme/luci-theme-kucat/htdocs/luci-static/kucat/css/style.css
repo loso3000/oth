@@ -2067,8 +2067,7 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-dynlist {
   line-height: 1.3;
   flex-direction: column;
-
-  width: 30rem;
+  min-height: 30px;
   cursor: text
 }
 
@@ -2372,6 +2371,7 @@ button:hover,.btn:hover,.cbi-button:hover {
   z-index: 1100;
   display: block;
   width: 100%;
+  min-width: 100%;
   max-width: 30rem;
   box-shadow: 0 0 4px var(--inputborder-color);
   border-radius: var(--radius2);
@@ -2433,11 +2433,19 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-dynlist,.cbi-dropdown {
   position: relative;
   display: inline-flex;
+  width: 30rem;
+  align-items: center;
   min-height: 1.8rem
 }
 
 .cbi-dropdown {
   padding: .2rem
+}
+
+.cbi-page-actions>.cbi-dropdown.btn,
+.diag-action .cbi-dropdown.btn {
+  padding: .2rem;
+  width: auto;
 }
 
 .cbi-dropdown[open]>ul.dropdown>li>input.create-item-input:first-child:last-child {
@@ -2578,6 +2586,7 @@ select,input {
 .notice {
   background-color: #b98413 !important;
   background-color: rgba(var(--primary-rgbm),1) !important;
+  padding: 2rem 1rem;
   color: #eee
 }
 
@@ -4378,8 +4387,9 @@ div#file-manager-container #status-bar #status-info {
   width: 30rem;
 }
 .cbi-dropdown[open]>ul.dropdown {
-  overflow-y: auto;
+  overflow: auto;
   max-width: 100%;
+  width: 30rem;
 }
   
 @keyframes anim-fade-in {
@@ -4737,8 +4747,7 @@ div#file-manager-container #status-bar #status-info {
   }
   
 .cbi-dropdown[open]>ul.dropdown {
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: auto;
   max-width: 100%;
   margin: auto;
   padding: 0 !important;
@@ -4749,7 +4758,7 @@ div#file-manager-container #status-bar #status-info {
   }
   
   .cbi-dynlist>.add-item,
-  .cbi-dynlist {
+  .cbi-dynlist, .cbi-dropdown {
   width: 100%;
   }
   
