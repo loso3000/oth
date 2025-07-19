@@ -2787,7 +2787,7 @@ td>.ifacebadge,.td>.ifacebadge {
 .ifacebadge>em,.ifacebadge>img {
   display: inline-block;
   float: right;
-  width: 20px !important;
+  width: auto !important;
   height: 20px !important;
   margin: 0 0.7rem
 }
@@ -2799,6 +2799,7 @@ td>.ifacebadge,.td>.ifacebadge {
 .nft-rules .ifacebadge {
   margin: 0.125em;
   box-shadow: none;
+  height: 20px !important;
   background-color: rgba(255,255,255,0)
 }
 
