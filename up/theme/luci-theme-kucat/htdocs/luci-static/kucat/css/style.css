@@ -4007,9 +4007,8 @@ pre.command-output {
 [data-page^="admin-services-openclash"] .oc .version-display,
 [data-page^="admin-services-openclash"] .oc .value-indicator,
 [data-page^="admin-services-openclash"] .oc .cbi-button-group{
-  background-color: rgba(255,255,255,0.9) !important;
-  border: 0px solid rgba(255,255,255,0.3) !important;
-  
+border: 0px solid rgba(255,255,255,0.3) !important;
+ /* background-color: var(--input-bgcolor) !important; */
 }
 [data-page^="admin-services-openclash"]  .oc .myip-ip-item, .oc .myip-check-item {
    background-color: rgba(255,255,255,0.1) !important;
@@ -4025,7 +4024,6 @@ pre.command-output {
   background-color: rgba(var(--primary-rgbm),0.2) !important;
   border: 1px solid rgba(255,255,255,0.15) !important;
   border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
-  
 }
 
 [data-page^="admin-services-openclash"]  .oc .main-card {
