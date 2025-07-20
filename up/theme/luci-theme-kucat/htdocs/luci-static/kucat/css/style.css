@@ -3234,7 +3234,7 @@ body.lang_pl.node-main-login .cbi-value-title {
   transition: all 0.1s;
   background-position: top center;
   -webkit-background-size: cover;
-  background: fixed;
+  /* background: fixed; */
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
