@@ -163,6 +163,7 @@
     if (flashimageBtn) {
         flashimageBtn.addEventListener('click', function() {
             this.innerHTML = '<%:Don't worry, prepare first%>';
+			flashimageBtn.disabled = 'disabled';
             return true;
         });
     }

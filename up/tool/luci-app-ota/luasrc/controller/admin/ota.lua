@@ -7,7 +7,7 @@ require "luci.util"
 module("luci.controller.admin.ota", package.seeall)
 
 function index()
-    if luci.sys.call("ota >/dev/null 2>&1") ~= 0 then
+     if not nixio.fs.access("/bin/ota") then
         return
     end
 
