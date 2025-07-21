@@ -82,7 +82,7 @@ get_target_info() {
     elif echo "$target" | grep -qE '^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$'; then
         table="bridge"
         addr_type="ether_addr"
-    elif echo "$target" | grep -qE '^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}(/[0-9]{1,3})?$'; then
+    elif echo "$target" | grep -qE '^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$'; then
         table="ip6"
         addr_type="ipv6_addr"
     else
@@ -115,8 +115,7 @@ stop_timecontrol() {
     /etc/init.d/firewall restart 2>/dev/null
 
     echo "" > "$IDLIST"
-    echolog "Time control stopped"
-    echolog "Firewall has been restarted."
+    echolog "All Firewall rules have been cleared."
 }
 
 init_timecontrol() {
@@ -178,8 +177,7 @@ timedel() {
     if [ -n "$nftables_ver" ]; then
         dbg_nft delete element "$table" filter "${list_type}_list" { "$target" } 2>/dev/null
     elif  [ -n "$iptables_ver" ]; then
-        # 对于IP范围，尝试从两种ipset中删除
-        ipset del $ipset_name "$target" 2>/dev/null
+        ipset list ${ipset_name} >/dev/null 2>&1 && ipset del ${ipset_name} ${target} >/dev/null 2>&1
         ipset del "${ipset_name}_range" "$target" 2>/dev/null
     fi
 }
@@ -190,10 +188,7 @@ timeadd() {
     [ -z "$target" ] && return
     
     local target_info=$(get_target_info "$target")
-    [ $? -ne 0 ] && {
-        echolog "Invalid target format: $target"
-        return
-    }
+    [ $? -ne 0 ] && return
     
     read -r table addr_type target <<< "$target_info"
     
@@ -228,39 +223,47 @@ timeadd() {
             echolog "Added $target to $list_type. Only traffic to/from $target is allowed."
         fi
     elif  [ -n "$iptables_ver" ]; then
-            ipset add $ipset_name $target
-        echolog "Added $target to $ipset_name (iptables)"
+        if ! ipset test $ipset_name $target 2>/dev/null; then
+            ipset add $ipset_name $target >/dev/null 2>&1
+            echolog "Added $target to $ipset_name (iptables)"
+	fi
     fi
 
+}
+
+check_time() {
+    local start=$1
+    local end=$2
+    local current=$(date +%H%M)
+    local start_min=$((10#${start:0:2}*60 + 10#${start:3:2}))
+    local end_min=$((10#${end:0:2}*60 + 10#${end:3:2}))
+    local current_min=$((10#${current:0:2}*60 + 10#${current:2:2}))
+    
+    if [[ $start_min -lt $end_min ]]; then
+        [[ $current_min -ge $start_min && $current_min -lt $end_min ]]
+    else
+        [[ $current_min -ge $start_min || $current_min -lt $end_min ]]
+    fi
 }
 
 check_list() {
- local i=$1
-    local checkid='0'
+    local i=$1
     local start_time=$(config_t_get device timestart $i)
     local end_time=$(config_t_get device timeend $i)
     local wweek=$(config_t_get device week $i)
-    local current_time=$(date +%H:%M)
     local current_weekday=$(date +%u)
-
-    if [ "$start_time" != "$end_time" ]; then
-        if [[ "$start_time" < "$end_time" ]]; then
-            [[ "$current_time" > "$start_time" ]] && [[ "$current_time" < "$end_time" ]] || return 1
-        else
-            [[ "$current_time" < "$start_time" ]] && [[ "$current_time" > "$end_time" ]] || return 1
-        fi
+    
+    # Check if current time is within the specified range
+    check_time "$start_time" "$end_time" || return 1
+    
+    # Check if current day is in the allowed days
+    if [ "$wweek" != "0" ]; then
+        echo "$wweek" | grep -qw "$current_weekday" || return 1
     fi
-
-    for ww in $(echo "$wweek" | sed 's/,/ /g'); do
-        if [ "$current_weekday" = "$ww" ] || [ "$ww" = "0" ]; then
-            checkid='1'
-            break
-        fi
-    done
-
-    [ "$checkid" = '1' ] && return 0 || return 1
-
+    
+    return 0
 }
+
 
 IDLIST="/var/$NAME.idlist"
 TMPID="/var/$NAME.tmpid"
