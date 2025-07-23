@@ -190,14 +190,18 @@ ethlist() {
     first=1
     for iface in $interfaces; do
         [[ "x$first" == "x0" ]] && echo -n ","
-
         ifstatus=$(ubus call network.interface dump | jsonfilter -e "@.interface[@.device='$iface']")
-        
         iftype="-"
         if [ -n "$ifstatus" ]; then
-           iftype=$(echo "$ifstatus" | jsonfilter -e "@.interface")
+            ifname=$(echo "$ifstatus" | jsonfilter -e "@.interface")
+            # iftype=`echo $ifname | awk '{print toupper($0)}'`
+            iftype=$ifname
+        else
+             name=$(uci show network | grep "$iface" | head -n1 | awk -F '.' '{print $2}' | awk -F '_' '{print $1}')
+            if [ "x$name" == "x@device[0]" ] && [ "$iftype" == "-" ]; then
+                  iftype="lan"
+            fi
         fi
-
         carrier=$(cat /sys/class/net/"$iface"/carrier 2>/dev/null)
         [[ "$carrier" == "1" ]] && status="yes" || status="no"
 
