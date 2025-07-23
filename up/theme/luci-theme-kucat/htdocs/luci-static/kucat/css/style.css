@@ -1614,7 +1614,7 @@ table>tbody>tr:first-child>td,table>tfoot>tr:first-child>td,table>thead>tr:first
   margin: 0.25rem 0.1rem;
   background-color: var(--inputbg-color);
   color: var(--inputtext-color);
-  border: 1px solid var(--inputborder-color);
+  border: 1px solid var(--inputborder-color)!important;
   transition: box-shadow .25s ease;
   border-radius: var(--radius2);
   cursor: pointer;
