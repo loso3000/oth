@@ -101,5 +101,9 @@ msgstr "工具"
 msgid "Vendor name"
 msgstr "厂商名称"
 
-#~ msgid "Merge the same physical interface"
-#~ msgstr "合并相同的物理接口"
+msgid "DROP ARP"
+msgstr "禁用ARP"
+
+msgid "DROP PING"
+msgstr "禁用PING"
+

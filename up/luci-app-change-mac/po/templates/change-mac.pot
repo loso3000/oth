@@ -89,3 +89,9 @@ msgstr ""
 #: applications/luci-app-change-mac/htdocs/luci-static/resources/view/change-mac.js:165
 msgid "Vendor name"
 msgstr ""
+
+msgid "DROP ARP"
+msgstr ""
+
+msgid "DROP PING"
+msgstr ""

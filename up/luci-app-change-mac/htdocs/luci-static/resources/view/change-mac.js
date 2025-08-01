@@ -121,10 +121,17 @@ return view.extend({
 		o.inputstyle = 'apply';
 		o.onclick = L.bind(this.handleAction, o, 'change');
 
+		o = s.option(form.Flag, 'arp_drop', _('DROP ARP'));
+		o.rmempty = false;
+
+		o = s.option(form.Flag, 'ping_drop', _('DROP PING'));
+		o.rmempty = false;
+		
 		o = s.option(form.Button, '_restore_sel', _('Restore selected interfaces'));
 		o.inputtitle = _('Restore');
 		o.inputstyle = 'apply';
 		o.onclick = L.bind(this.handleAction, o, 'restore');
+
 
 		s = m.section(form.TypedSection, '_utilities');
 		s.render = L.bind(function(view, section_id) {

@@ -79,11 +79,52 @@ start_service() {
 	local action="$1"
 
 	config_load "$CONFIG_NAME"
+	pingarp  "$CONFIG_NAME" ${TYPEDSECTION} 
 	eval "enabled=\$CONFIG_${CONFIG_SECTIONS%% *}_enabled"
 	[ "${enabled:-0}" -gt "0" -o -n "$action" ] || return 1
 
 	config_foreach validate_section "$TYPEDSECTION" "${action:=change_mac}"
 }
+
+pingarp() {
+    local config_name="$1"
+    local section_type="$2"
+    local interfaces=$(uci -q get "${config_name}.@${section_type}[0].interface" || echo eth0)
+    local arp_drop=$(uci -q get "${config_name}.@${section_type}[0].arp_drop" || echo 0)
+    local ping_drop=$(uci -q get "${config_name}.@${section_type}[0].ping_drop" || echo 0)
+
+    for iface in $interfaces; do
+    if [ "$arp_drop" -eq 1 ]; then
+        echo "Disabling ARP on interface $iface"
+        uci set system.sysctl.conf.net.ipv4.conf."$iface".arp_ignore=1
+        uci set system.sysctl.conf.net.ipv4.conf."$iface".arp_announce=2
+    else
+        echo "Restoring default ARP on interface $iface"
+        uci set system.sysctl.conf.net.ipv4.conf."$iface".arp_ignore=0
+        uci set system.sysctl.conf.net.ipv4.conf."$iface".arp_announce=0
+    fi
+    done
+    
+    if [ "$ping_drop" -eq 1 ]; then
+        echo "Blocking ICMP PING from WAN"
+        uci -q delete firewall.$(uci -q show firewall | grep "Block-PING" | cut -d'=' -f1 | head -1)
+        uci add firewall rule >/dev/null
+        uci set firewall.@rule[-1].name='Block-PING'
+        uci set firewall.@rule[-1].src='wan'
+        uci set firewall.@rule[-1].proto='icmp'
+        uci set firewall.@rule[-1].icmp_type='echo-request'
+        uci set firewall.@rule[-1].target='REJECT'
+    else
+        echo "Allowing ICMP PING"
+        uci -q delete firewall.$(uci -q show firewall | grep "Block-PING" | cut -d'=' -f1 | head -1)
+    fi
+    
+    uci commit system
+    uci commit firewall
+    /etc/init.d/system restart 2>/dev/null
+    /etc/init.d/firewall restart 2>/dev/null
+}
+
 
 stop_service() {
 	uci set ${CONFIG_NAME}.@${TYPEDSECTION}[0].enabled='0'

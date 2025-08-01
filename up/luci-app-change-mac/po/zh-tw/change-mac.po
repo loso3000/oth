@@ -103,3 +103,9 @@ msgstr "廠商名稱"
 
 #~ msgid "Merge the same physical interface"
 #~ msgstr "合併相同的物理介面"
+
+msgid "DROP ARP"
+msgstr "禁用ARP"
+
+msgid "DROP PING"
+msgstr "禁用PING"
