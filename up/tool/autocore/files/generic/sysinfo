@@ -209,15 +209,19 @@ ethlist() {
         [ -z "$mac" ] && mac="-"
 
         speed=$(cat /sys/class/net/"$iface"/speed 2>/dev/null)
-        if [ -z "$speed" ] || [ "$speed" = "-1" ]; then
-            speed="-"
-        else
-            if [ "$speed" -ge 1000 ]; then
-                speed="$((speed/1000)) Gb/s"
-            else
-                speed="${speed} Mb/s"
-            fi
-        fi
+  	if [ -z "$speed" ] || [ "$speed" = "-" ]; then
+ 	       speed="-"
+  	else
+   	         if [ "$speed" -ge 1000 ]; then
+   	             if [ "$speed" -eq 2500 ]; then
+   	                 speed="2.5 Gb/s"
+   	             else
+   	                 speed=$(awk -v s=$speed 'BEGIN {printf "%.0f Gb/s", s/1000}')
+  	              fi
+  	          else
+  	              speed="${speed} Mb/s"
+   	         fi
+ 	fi
 
         duplex=$(cat /sys/class/net/"$iface"/duplex 2>/dev/null)
         case "$duplex" in
@@ -225,9 +229,11 @@ ethlist() {
             "half") duplex="Half" ;;
             *) duplex="-" ;;
         esac
-
-        [[ "$iface" == "eth0" && "$duplex" == "Half" ]] && speed="10 Gb/s"
-
+        [[ "$iface" == "eth0" && "$duplex" == "Half" ]] && {
+		# ethtool -s eth0 autoneg off duplex full speed 10000
+		ethtool -s eth0 autoneg on
+	        speed="10 Gb/s"
+	 }	 
         echo -n "{\"name\": \"$iftype[$iface]\", \"status\": \"$status\", \"duplex\": \"$duplex\", \"speed\": \"$speed\", \"mac\": \"$mac\"}"
         first=0
     done
