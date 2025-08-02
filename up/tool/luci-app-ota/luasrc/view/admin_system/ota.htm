@@ -160,13 +160,6 @@
 			
 			var flashimageBtn = document.getElementById('flashimage-btn');
     
-    if (flashimageBtn) {
-        flashimageBtn.addEventListener('click', function() {
-            this.innerHTML = '<%:Don't worry, prepare first%>';
-			flashimageBtn.disabled = 'disabled';
-            return true;
-        });
-    }
 			// 初始化显示状态
 			function updateKeepOptionsVisibility() {
 				var selectedValue = expsizeSelect.value;
