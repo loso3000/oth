@@ -20,7 +20,7 @@ msgid "Enabled interfaces"
 msgstr "已启用的接口"
 
 msgid "MAC address randomizer"
-msgstr "MAC地址随机化"
+msgstr "MAC随机化"
 
 msgid "Multi-interface MAC random mode"
 msgstr "多接口 MAC 随机模式"

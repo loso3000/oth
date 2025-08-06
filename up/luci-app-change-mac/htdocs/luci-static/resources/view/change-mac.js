@@ -8,7 +8,6 @@
 return view.extend({
 	load: function() {
 		return Promise.all([
-			uci.changes(),
 			uci.load('change-mac')
 		]);
 	},

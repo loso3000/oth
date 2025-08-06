@@ -1,4 +1,9 @@
 #!/bin/sh
+
+# SPDX-License-Identifier: MIT
+#
+# Copyright (C) 2025 by sirpdboy <sirpdboy@qq.com>
+
 generate_mac() {
     od -An -N6 -tx1 /dev/urandom | awk '{
         printf("02:%02x:%02x:%02x:%02x:%02x\n", 

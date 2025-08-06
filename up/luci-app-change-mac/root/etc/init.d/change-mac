@@ -1,5 +1,7 @@
 #!/bin/sh /etc/rc.common
 
+# Copyright (C) 2025 by sirpdboy <sirpdboy@qq.com>
+
 START=99
 USE_PROCD=1
 
