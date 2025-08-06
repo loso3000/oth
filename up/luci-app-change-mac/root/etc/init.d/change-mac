@@ -1,0 +1,70 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+USE_PROCD=1
+
+PROG=/usr/sbin/change-mac
+TMPMAC=/tmp/tmpchange-mac.tmp
+NAME="change-mac"
+SECTION=".basic."
+
+changemac() {
+enabled=$(uci -q get "${NAME}${SECTION}enabled" || echo 0)
+interfaces=$(uci -q get "${NAME}${SECTION}interface" || echo eth0)
+[ "x$enabled" == "x1" ] && $PROG  $nets > $TMPMAC
+
+}
+
+boot(){
+
+	delaytime=$(uci -q get "${NAME}${SECTION}delaytime")
+	sleep $delaytime
+	start_service
+}
+
+
+start_service() {
+	[ ! -s $TMPMAC ] && changemac
+	pingarps
+}
+
+pingarps() {
+    local interfaces=$(uci -q get "${NAME}${SECTION}interface" || echo eth0)
+    local arp_drop=$(uci -q get "${NAME}${SECTION}arp_drop" || echo 0)
+    local ping_drop=$(uci -q get "${NAME}${SECTION}ping_drop" || echo 0)
+for iface in $interfaces; do
+    if [ "$arp_drop" -eq 1 ]; then
+        echo "Disabling ARP on interface $iface"
+        sed -i "/net.ipv4.conf.$iface.arp_ignore/d" /etc/sysctl.conf
+        sed -i "/net.ipv4.conf.$iface.arp_announce/d" /etc/sysctl.conf
+        echo "net.ipv4.conf.$iface.arp_ignore=1" >> /etc/sysctl.conf
+        echo "net.ipv4.conf.$iface.arp_announce=2" >> /etc/sysctl.conf
+	
+        echo 1 > /proc/sys/net/ipv4/conf/$iface/arp_ignore
+        echo 2 > /proc/sys/net/ipv4/conf/$iface/arp_announce
+    else
+        echo "Restoring default ARP on interface $iface"
+        sed -i "/net.ipv4.conf.$iface.arp_ignore/d" /etc/sysctl.conf
+        sed -i "/net.ipv4.conf.$iface.arp_announce/d" /etc/sysctl.conf
+	
+        echo 0 > /proc/sys/net/ipv4/conf/$iface/arp_ignore
+        echo 0 > /proc/sys/net/ipv4/conf/$iface/arp_announce
+    fi
+done
+    
+    uci -q delete firewall.$(uci -q show firewall | grep "Block-PING" | cut -d'.' -f2| head -1)
+    if [ "$ping_drop" -eq 1 ]; then
+        echo "Blocking ICMP PING from WAN"
+        uci add firewall rule >/dev/null
+        uci set firewall.@rule[-1].name='Block-PING'
+        uci set firewall.@rule[-1].src='wan'
+        uci set firewall.@rule[-1].proto='icmp'
+        uci set firewall.@rule[-1].icmp_type='echo-request'
+        uci set firewall.@rule[-1].target='REJECT'
+    fi
+    
+    sysctl -p /etc/sysctl.conf
+    uci commit firewall
+    /etc/init.d/firewall restart 2>/dev/null
+}
+

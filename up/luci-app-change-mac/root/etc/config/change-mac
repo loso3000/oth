@@ -1,0 +1,6 @@
+config change-mac 'basic'
+	option delaytime '4'
+	option enabled '0'
+	option ping_drop '0'
+	list interface 'eth0'
+	option arp_drop '0'
