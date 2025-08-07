@@ -25,17 +25,17 @@ for nic in "$@"; do
 done
 
 for nic in "$@"; do
-    newmac=$(rgmac)
+    newmac="02:$(od -An -N5 -tx1 /dev/urandom | awk '{printf "%s:%s:%s:%s:%s", $1, $2, $3, $4, $5}')"
+    [ "$newmac" == "" ] && newmac=$(rgmac)
     [ "$newmac" == "" ] && newmac=$(hexdump -n6 -e '/1 "%02x:"' /dev/urandom | sed 's/:$//')
-    [ "$newmac" == "" ] && newmac="02:$(od -An -N5 -tx1 /dev/urandom | awk '{printf "%s:%s:%s:%s:%s", $1, $2, $3, $4, $5}')"
     waneth=`uci -q get network.wan.device`
     if [ "$nic" = "$waneth" ] ;then
     
+       ip link set dev "$nic" down
        ifdown wan 
-       eval "uci set network.wan.macaddr=$(echo \"\${newmac}\")"
-     
        ip link set dev "$nic" down
        ip link set dev "$nic" address "$newmac" 
+       eval "uci set network.wan.macaddr=$(echo \"\${newmac}\")"
        ip link set dev "$nic" up 
        ifup wan
     else
