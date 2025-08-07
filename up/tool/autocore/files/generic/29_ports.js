@@ -263,10 +263,20 @@ function renderNetworkBadge(network, zonename) {
 	]);
 
 	if (l3dev)
-		span.appendChild(E('img', {
-			'title': l3dev.getI18n(),
-			'src': L.resource('icons/%s%s.svg'.format(l3dev.getType(), l3dev.isUp() ? '' : '_disabled'))
-		}));
+
+    var img = E('img', {
+        'title': l3dev.getI18n(),
+        'src': L.resource('icons/' + iconName + '.svg')
+    });
+
+    img.onerror = function() {
+        this.src = L.resource('icons/' + iconName + '.gif');
+        this.onerror = function() {
+            this.src = L.resource('icons/fallback.png'); 
+        };
+    };
+
+    span.appendChild(img);
 	else
 		span.appendChild(E('em', _('(no interfaces attached)')));
 
@@ -358,9 +368,18 @@ return baseclass.extend({
 			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;min-width:7rem;max-width:10rem' }, [
 				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.netdev.getName() ]),
 				E('div', { 'class': 'ifacebox-body' }, [
-					E('img', { 'src': L.resource('icons/port_%s.svg').format(carrier ? 'up' : 'down') }),
-					E('br'),
-					formatSpeed(carrier, speed, duplex)
+    (function() {
+        var img = E('img', { 
+            'src': L.resource('icons/port_%s.svg').format(carrier ? 'up' : 'down') 
+        });
+         
+        img.onerror = function() {
+            this.src = L.resource('icons/port_%s.gif').format(carrier ? 'up' : 'down');
+        };
+        return img;
+    })(),
+    E('br'),
+    formatSpeed(carrier, speed, duplex)
 				]),
 				E('div', { 'class': 'ifacebox-head cbi-tooltip-container', 'style': 'display:flex' }, [
 					E([], pzones.map(function(zone) {
