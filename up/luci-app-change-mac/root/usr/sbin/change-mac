@@ -4,14 +4,16 @@
 #
 # Copyright (C) 2025 by sirpdboy <sirpdboy@qq.com>
 
-generate_mac() {
-    od -An -N6 -tx1 /dev/urandom | awk '{
-        printf("02:%02x:%02x:%02x:%02x:%02x\n", 
-        and($1, 0xFE), $2, $3, $4, $5, $6) }'
+getodmac() {
+  mac="02:$(od -An -N5 -tx1 /dev/urandom | awk '{printf "%s:%s:%s:%s:%s", $1, $2, $3, $4, $5}')"
+  echo $mac
 }
+
 getmac() {
-hexdump -n6 -e '/1 "%02x:"' /dev/urandom | sed 's/:$//'
+  mac="02:$(hexdump -n5 -e '/1 "%02x:"' /dev/urandom | sed 's/:$//')"
+  echo $mac
 }
+
 if [ $# -eq 0 ]; then
     echo "Usage: ${0##*/} <INTERFACE>..."
     echo "Example: ${0##*/} eth0 eth1"
@@ -25,28 +27,24 @@ for nic in "$@"; do
 done
 
 for nic in "$@"; do
-    newmac="02:$(od -An -N5 -tx1 /dev/urandom | awk '{printf "%s:%s:%s:%s:%s", $1, $2, $3, $4, $5}')"
-    [ "$newmac" == "" ] && newmac=$(rgmac)
-    [ "$newmac" == "" ] && newmac=$(hexdump -n6 -e '/1 "%02x:"' /dev/urandom | sed 's/:$//')
+    newmac=$(getmac)
+    [ "$newmac" == "" ] && newmac=$(getodmac)
     waneth=`uci -q get network.wan.device`
     if [ "$nic" = "$waneth" ] ;then
-    
-       ip link set dev "$nic" down
        ifdown wan 
        ip link set dev "$nic" down
        ip link set dev "$nic" address "$newmac" 
-       eval "uci set network.wan.macaddr=$(echo \"\${newmac}\")"
+       # eval "uci set network.wan.macaddr=$(echo \"\${newmac}\")"
        ip link set dev "$nic" up 
        ifup wan
     else
        ip link set dev "$nic" down
        ip link set dev "$nic" address "$newmac" 
        ip link set dev "$nic" up
-       _section=$(uci show network | sed -En "/@device\[.*\]\.name='$nic'/ {s|\.name=.*$|| p}")
-       [ "$_section" == "" ] && _section="network.$(uci add network device)" && uci set ${_section}.name="$nic"
-       eval "uci set ${_section}.macaddr=$(echo \"\${newmac}\")"
+       # _section=$(uci show network | sed -En "/@device\[.*\]\.name='$nic'/ {s|\.name=.*$|| p}")
+       # [ "$_section" == "" ] && _section="network.$(uci add network device)" && uci set ${_section}.name="$nic"
+       # eval "uci set ${_section}.macaddr=$(echo \"\${newmac}\")"
     fi
-
     echo "Changed $nic MAC to $newmac"
 done
 uci commit network
