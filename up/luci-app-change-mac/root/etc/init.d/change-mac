@@ -1,9 +1,9 @@
 #!/bin/sh /etc/rc.common
 
 # Copyright (C) 2025 by sirpdboy <sirpdboy@qq.com>
-START=17
-#STOP=90
-#USE_PROCD=1
+
+START=99
+USE_PROCD=1
 
 PROG=/usr/sbin/change-mac
 TMPMAC=/tmp/tmpchange-mac.tmp
@@ -21,19 +21,12 @@ boot() {
 
 	delaytime=$(uci -q get "${NAME}${SECTION}delaytime")
 	sleep $delaytime
-	start
+	start_service
 }
 
-start() {
+start_service() {
 	[ ! -s $TMPMAC ] && changemac
 	pingarps
-}
-restart() {
-	return 0
-}
-
-stop() {
-	return 0
 }
 
 pingarps() {
