@@ -4,11 +4,11 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_NAME:=luci-app-change-mac
-PKG_VERSION:=0.0.2
-PKG_RELEASE:=20250806
+PKG_VERSION:=0.0.3
+PKG_RELEASE:=20250807
 
 LUCI_TITLE:=LuCI for MAC address randomizer
-LUCI_DEPENDS:=+rgmac +coreutils-od +gawk
+LUCI_DEPENDS:=
 
 LUCI_DESCRIPTION:=Assign a random MAC address to the designated interface on every time boot.
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 
-"Assign a random MAC address to the designated interface on every time boot"
+msgid "Assign a random MAC address to the designated interface on every time boot"
 msgstr "每次启动时, 将随机 MAC 地址分配给指定的接口"
 
 msgid "Change MAC now"

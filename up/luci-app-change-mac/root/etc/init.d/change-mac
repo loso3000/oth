@@ -13,21 +13,27 @@ SECTION=".basic."
 changemac() {
 enabled=$(uci -q get "${NAME}${SECTION}enabled" || echo 0)
 interfaces=$(uci -q get "${NAME}${SECTION}interface" || echo eth0)
-[ "x$enabled" == "x1" ] && $PROG  $nets > $TMPMAC
+[ "x$enabled" == "x1" ] && $PROG  $interfaces > $TMPMAC
 
 }
 
-boot(){
+boot() {
 
 	delaytime=$(uci -q get "${NAME}${SECTION}delaytime")
 	sleep $delaytime
-	start_service
+	start
 }
 
-
-start_service() {
+start() {
 	[ ! -s $TMPMAC ] && changemac
 	pingarps
+}
+restart() {
+	return 0
+}
+
+stop() {
+	return 0
 }
 
 pingarps() {
@@ -70,3 +76,8 @@ done
     /etc/init.d/firewall restart 2>/dev/null
 }
 
+restore() {
+	for _net in $(uci get ${NAME}${SECTION}network); do uci delete network.$_net.macaddr 2>/dev/null; done
+	uci commit network
+	/etc/init.d/network restart
+}

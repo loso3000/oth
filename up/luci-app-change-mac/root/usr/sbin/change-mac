@@ -9,6 +9,9 @@ generate_mac() {
         printf("02:%02x:%02x:%02x:%02x:%02x\n", 
         and($1, 0xFE), $2, $3, $4, $5, $6) }'
 }
+getmac() {
+hexdump -n6 -e '/1 "%02x:"' /dev/urandom | sed 's/:$//'
+}
 if [ $# -eq 0 ]; then
     echo "Usage: ${0##*/} <INTERFACE>..."
     echo "Example: ${0##*/} eth0 eth1"
@@ -22,20 +25,8 @@ for nic in "$@"; do
 done
 
 for nic in "$@"; do
-    new_mac=$(generate_mac)
+    new_mac=$(hexdump -n6 -e '/1 "%02x:"' /dev/urandom | sed 's/:$//')
     [ "$new_mac" == "" ] && new_mac=$(rgmac)
-    ip link set dev "$nic" down || {
-        echo "Error: Failed to bring down $nic" >&2
-    }
-    
-    ip link set dev "$nic" address "$new_mac" || {
-        echo "Error: Failed to set MAC for $nic" >&2
-        ip link set dev "$nic" up
-    }
-    
-    ip link set dev "$nic" up || {
-        echo "Error: Failed to bring up $nic" >&2
-    }
     _section=$(uci show network | sed -En "/@device\[.*\]\.name='$nic'/ {s|\.name=.*$|| p}")
     [ "$_section" == "" ] && _section="network.$(uci add network device)" && uci set ${_section}.name="$nic"
     eval "uci set ${_section}.macaddr=$(echo \"\${new_mac}\")"
