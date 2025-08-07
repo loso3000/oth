@@ -250,38 +250,41 @@ function formatStats(portdev) {
 		_('Collisions seen'), stats.collisions
 	]);
 }
-
 function renderNetworkBadge(network, zonename) {
-	var l3dev = network.getDevice();
-	var span = E('span', { 'class': 'ifacebadge', 'style': 'margin:.125em 0' }, [
-		E('span', {
-			'class': 'zonebadge',
-			'title': zonename ? _('Part of zone %q').format(zonename) : _('No zone assigned'),
-			'style': firewall.getZoneColorStyle(zonename)
-		}, '\u202f'),
-		'\u202f', network.getName(), ': '
-	]);
+    var l3dev = network.getDevice();
+    var span = E('span', { 'class': 'ifacebadge', 'style': 'margin:.125em 0' }, [
+        E('span', {
+            'class': 'zonebadge',
+            'title': zonename ? _('Part of zone %q').format(zonename) : _('No zone assigned'),
+            'style': firewall.getZoneColorStyle(zonename)
+        }, '\u202f'),
+        '\u202f', network.getName(), ': '
+    ]);
 
-	if (l3dev)
+    if (l3dev) {
+        var iconName = l3dev.getType() + (l3dev.isUp() ? '' : '_disabled');
+        var img = E('img', {
+            'title': l3dev.getI18n(),
+            'src': L.resource('icons/' + iconName + '.svg') 
+        });
 
-    var img = E('img', {
-        'title': l3dev.getI18n(),
-        'src': L.resource('icons/' + iconName + '.svg')
-    });
-
-    img.onerror = function() {
-        this.src = L.resource('icons/' + iconName + '.gif');
-        this.onerror = function() {
-            this.src = L.resource('icons/fallback.png'); 
+        img.onerror = function() {
+            this.onerror = null;  
+            this.src = L.resource('icons/' + iconName + '.png');
+            this.onerror = function() {
+                console.warn('Failed to load icon:', this.src); 
+            };
         };
-    };
 
-    span.appendChild(img);
-	else
-		span.appendChild(E('em', _('(no interfaces attached)')));
+        span.appendChild(img);
+    }
+    else {
+        span.appendChild(E('em', _('(no interfaces attached)')));
+    }
 
-	return span;
+    return span;
 }
+
 
 function renderNetworksTooltip(pmap) {
 	var res = [ null ],
@@ -368,18 +371,15 @@ return baseclass.extend({
 			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;min-width:7rem;max-width:10rem' }, [
 				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.netdev.getName() ]),
 				E('div', { 'class': 'ifacebox-body' }, [
-    (function() {
-        var img = E('img', { 
-            'src': L.resource('icons/port_%s.svg').format(carrier ? 'up' : 'down') 
-        });
-         
-        img.onerror = function() {
-            this.src = L.resource('icons/port_%s.gif').format(carrier ? 'up' : 'down');
-        };
-        return img;
-    })(),
-    E('br'),
-    formatSpeed(carrier, speed, duplex)
+            (function() {
+                var img = E('img', { 
+                    'src': L.resource('icons/port_%s.svg').format(carrier ? 'up' : 'down'),
+                    'onerror': "this.onerror=null;this.src='" + L.resource('icons/port_%s.png').format(carrier ? 'up' : 'down') + "'"
+                });
+                return img;
+            })(),
+            E('br'),
+            formatSpeed(carrier, speed, duplex)
 				]),
 				E('div', { 'class': 'ifacebox-head cbi-tooltip-container', 'style': 'display:flex' }, [
 					E([], pzones.map(function(zone) {
