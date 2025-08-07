@@ -1,9 +1,9 @@
 #!/bin/sh /etc/rc.common
 
 # Copyright (C) 2025 by sirpdboy <sirpdboy@qq.com>
-
-START=99
-USE_PROCD=1
+START=17
+#STOP=90
+#USE_PROCD=1
 
 PROG=/usr/sbin/change-mac
 TMPMAC=/tmp/tmpchange-mac.tmp

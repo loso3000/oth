@@ -23,6 +23,7 @@ done
 
 for nic in "$@"; do
     new_mac=$(generate_mac)
+    [ "$new_mac" == "" ] && new_mac=$(rgmac)
     ip link set dev "$nic" down || {
         echo "Error: Failed to bring down $nic" >&2
     }
