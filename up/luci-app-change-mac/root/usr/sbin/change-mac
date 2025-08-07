@@ -34,16 +34,16 @@ for nic in "$@"; do
        ifdown wan 
        ip link set dev "$nic" down
        ip link set dev "$nic" address "$newmac" 
-       # eval "uci set network.wan.macaddr=$(echo \"\${newmac}\")"
+       eval "uci set network.wan.macaddr=$(echo \"\${newmac}\")"
        ip link set dev "$nic" up 
        ifup wan
     else
        ip link set dev "$nic" down
        ip link set dev "$nic" address "$newmac" 
        ip link set dev "$nic" up
-       # _section=$(uci show network | sed -En "/@device\[.*\]\.name='$nic'/ {s|\.name=.*$|| p}")
-       # [ "$_section" == "" ] && _section="network.$(uci add network device)" && uci set ${_section}.name="$nic"
-       # eval "uci set ${_section}.macaddr=$(echo \"\${newmac}\")"
+       _section=$(uci show network | sed -En "/@device\[.*\]\.name='$nic'/ {s|\.name=.*$|| p}")
+       [ "$_section" == "" ] && _section="network.$(uci add network device)" && uci set ${_section}.name="$nic"
+       eval "uci set ${_section}.macaddr=$(echo \"\${newmac}\")"
     fi
     echo "Changed $nic MAC to $newmac"
 done

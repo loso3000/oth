@@ -53,12 +53,21 @@ for iface in $interfaces; do
     fi
 done
     
-    uci -q delete firewall.$(uci -q show firewall | grep "Block-PING" | cut -d'.' -f2| head -1)
+    uci -q delete firewall.$(uci -q show firewall | grep "Block-wan-PING" | cut -d'.' -f2| head -1)
+    uci -q delete firewall.$(uci -q show firewall | grep "Block-lan-PING" | cut -d'.' -f2| head -1)
     if [ "$ping_drop" -eq 1 ]; then
         echo "Blocking ICMP PING from WAN"
         uci -q add firewall rule  2>/dev/null
-        uci -q set firewall.@rule[-1].name='Block-PING'
+        uci -q set firewall.@rule[-1].name='Block-wan-PING'
         uci -q set firewall.@rule[-1].src='wan'
+        uci -q set firewall.@rule[-1].proto='icmp'
+        uci -q set firewall.@rule[-1].icmp_type='echo-request'
+        uci -q set firewall.@rule[-1].target='REJECT'
+	
+	echo "Blocking ICMP PING from lan"
+        uci -q add firewall rule  2>/dev/null
+        uci -q set firewall.@rule[-1].name='Block-lan-PING'
+        uci -q set firewall.@rule[-1].src='lan'
         uci -q set firewall.@rule[-1].proto='icmp'
         uci -q set firewall.@rule[-1].icmp_type='echo-request'
         uci -q set firewall.@rule[-1].target='REJECT'
