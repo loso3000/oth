@@ -30,9 +30,9 @@ start_service() {
 }
 
 pingarps() {
-    local interfaces=$(uci -q get "${NAME}${SECTION}interface" || echo eth0)
-    local arp_drop=$(uci -q get "${NAME}${SECTION}arp_drop" || echo 0)
-    local ping_drop=$(uci -q get "${NAME}${SECTION}ping_drop" || echo 0)
+    interfaces=$(uci -q get "${NAME}${SECTION}interface" || echo eth0)
+    arp_drop=$(uci -q get "${NAME}${SECTION}arp_drop" || echo 0)
+    ping_drop=$(uci -q get "${NAME}${SECTION}ping_drop" || echo 0)
 for iface in $interfaces; do
     if [ "$arp_drop" -eq 1 ]; then
         echo "Disabling ARP on interface $iface"
@@ -40,14 +40,12 @@ for iface in $interfaces; do
         sed -i "/net.ipv4.conf.$iface.arp_announce/d" /etc/sysctl.conf
         echo "net.ipv4.conf.$iface.arp_ignore=1" >> /etc/sysctl.conf
         echo "net.ipv4.conf.$iface.arp_announce=2" >> /etc/sysctl.conf
-	
         echo 1 > /proc/sys/net/ipv4/conf/$iface/arp_ignore
         echo 2 > /proc/sys/net/ipv4/conf/$iface/arp_announce
     else
         echo "Restoring default ARP on interface $iface"
         sed -i "/net.ipv4.conf.$iface.arp_ignore/d" /etc/sysctl.conf
         sed -i "/net.ipv4.conf.$iface.arp_announce/d" /etc/sysctl.conf
-	
         echo 0 > /proc/sys/net/ipv4/conf/$iface/arp_ignore
         echo 0 > /proc/sys/net/ipv4/conf/$iface/arp_announce
     fi
@@ -63,7 +61,6 @@ done
         uci -q set firewall.@rule[-1].proto='icmp'
         uci -q set firewall.@rule[-1].icmp_type='echo-request'
         uci -q set firewall.@rule[-1].target='REJECT'
-	
 	echo "Blocking ICMP PING from lan"
         uci -q add firewall rule  2>/dev/null
         uci -q set firewall.@rule[-1].name='Block-lan-PING'

@@ -29,6 +29,7 @@ done
 for nic in "$@"; do
     newmac=$(getmac)
     [ "$newmac" == "" ] && newmac=$(getodmac)
+    [ "$newmac" == "" ] && newmac=$(rgmac -ac -u)
     waneth=`uci -q get network.wan.device`
     if [ "$nic" = "$waneth" ] ;then
        ifdown wan 
