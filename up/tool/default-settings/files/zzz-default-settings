@@ -167,6 +167,8 @@ echo "OPENWRT_RELEASE='"${EZVER}"'" >> /etc/os-release
 }
 sed -i 's/immortalwrt/openwrt/g' /etc/config/luci
 
+# docker mirror
+[ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
 #tv
 test $ver -lt 3 && {
 ver=3
@@ -195,12 +197,9 @@ uci -q commit dhcp
 [ x$debug = x1 ] && echo $ver
 }
 
-
 #distfeeds
 test $ver -lt 4 && { 
 ver=4
-
-[ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
 
 [ x$debug = x1 ] && echo $ver
 }
@@ -223,11 +222,9 @@ EOF
 EOF
         fi
     done
-    
 uci -q set dropbear.@dropbear[0].Interface=''
 uci -q commit dropbear
 
-# docker mirror
 
 uci -q batch <<-EOF >/dev/null
     set luci.apply.rollback=30
