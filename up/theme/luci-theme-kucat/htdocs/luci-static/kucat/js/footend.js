@@ -29,7 +29,7 @@
         
         document.querySelectorAll('.footend').forEach(function(element) {
             if (spaceBelowFooter < 0) {
-                element.style.paddingBottom = Math.abs(spaceBelowFooter) + 'px';
+                element.style.paddingBottom = '100px';
             } else {
                 element.style.paddingBottom = '';
             }

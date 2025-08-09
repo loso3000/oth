@@ -2382,6 +2382,10 @@ button:hover,.btn:hover,.cbi-button:hover {
   cursor: pointer;
 }
 
+.table.cbi-section-table tr>.cbi-dropdown[open]>ul.dropdown {
+    max-height: 6rem !important;
+}
+
 .cbi-dropdown>ul>li[display],.cbi-dropdown[open]>ul.preview,.cbi-dropdown[open]>ul.dropdown>li,.cbi-dropdown[multiple]>ul>li>label,.cbi-dropdown[multiple][open]>ul.dropdown>li,.cbi-dropdown[multiple][more]>.more,.cbi-dropdown[multiple][empty]>.more {
   display: flex;
   align-items: center;
@@ -3483,15 +3487,12 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 .node-main-login footer {
-    position: absolute;
     display: none;
-    bottom: 0;
     margin-bottom: 3rem;
     color: #eee;
-    text-align: center;
     text-shadow: 0 0 2px #222;
     font-size: var(--font-x);
-    background-color: rgba(255,255,255,0);
+  background-color: rgba(255,255,255,0)
 }
 
 

@@ -54,10 +54,6 @@ function set_theme()
        kucat = 'kucat'
        config_exists = true
     end
-    print("theme value:", themes)
-    
-
-    
     if (config_exists) then
            local esc_kucat = "'" .. kucat:gsub("'", "'\\''") .. "'"
     local esc_theme = "'" .. themes:gsub("'", "'\\''") .. "'"
