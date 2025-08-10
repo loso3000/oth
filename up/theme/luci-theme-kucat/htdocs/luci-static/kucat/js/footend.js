@@ -1,4 +1,5 @@
 
+	// thanks for sirpdboy Wich <herboy2008@gmail.com>  footer差补代码
     var winHeight = window.innerHeight;
     
     function debounce(func, delay) {

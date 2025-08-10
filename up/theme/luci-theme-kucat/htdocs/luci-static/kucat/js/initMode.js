@@ -19,7 +19,10 @@ async function getUci() {
     
 function getTimeTheme() {
     const hour = new Date().getHours();
+   // console.debug('hour:', hour);
+  
         return (hour < 6 || hour >= 18) ? 'dark' : 'light';
+	
     }
 
 function getSystemTheme() {
@@ -62,26 +65,5 @@ async function updateTheme(theme) {
         console.error('Error updating theme variables:', error);
   }
 }
-(async function(){
-    const config = await getUci();
-    var initMode = config.mode; 
-    var autoTheme; 
-    function applyTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-            meta.content = theme === 'dark' ? '#1a1a1a' : '#ffffff';
-        }
-    }
 
-    (async function() {
-        if (initMode === 'auto') {
-	    autoTheme = getTimeTheme(); 
-        } else {
-            autoTheme = initMode;
-        } 
-            applyTheme(autoTheme);
-            await updateTheme(autoTheme);
-    })();
-})();
 /* ]]> */
