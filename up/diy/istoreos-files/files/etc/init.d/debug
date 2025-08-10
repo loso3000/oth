@@ -7,6 +7,11 @@ shutdown() {
 	logger -s -t "DEBUG" "System Shutting Down"
 	logger -t "DEBUG" "System Shutting Down"
 
+	local consoles="$(cat /sys/class/tty/console/active)"
+	[ -n "$consoles" ] || consoles=console
+	for console in $consoles; do
+		[ -c "/dev/$console" ] && echo "$message" >"/dev/$console"
+	done
 	# blink led
 	. /etc/diag.sh
 	[ -n "$running" ] && {

@@ -19,6 +19,7 @@ boot() {
 	local info kmod action p1 ignore
 	local enable="$( uci -q get kmods.kmods.enable )"
 	ls /etc/modules-pending.d/ 2>/dev/null | while read info; do
+		[ -s "/etc/modules-pending.d/$info" ] || continue
 		if echo "$enable" | grep -qFw "$info" ; then
 			action=enable_kmod
 		else
