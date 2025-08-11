@@ -19,7 +19,7 @@ async function syncgetUci() {
         console.error("Fetch config failed, using default:", error);
         return {
             success: false,
-            bgqs: "0",
+            bgqs: "1",
             primaryrgbm: "45,102,147",
             primaryrgbmts: "0",
             mode: "light"
@@ -40,7 +40,7 @@ async function updateThemeVariables(theme) {
   try {
     const config = await syncgetUci();
         const primaryRgbbody = isDark ? '33,45,60' : '248,248,248';
-        const bgqsValue = config.bgqs || "0"; 
+        const bgqsValue = config.bgqs || "1"; 
         const rgbmValue = config.primaryrgbm || '45,102,147';
         const rgbmtsValue = config.primaryrgbmts || '0';
         const vars = bgqsValue === "0" ? {

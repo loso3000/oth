@@ -13,7 +13,7 @@ end
 function get_theme()
     local kucat = nil
     local config_exists = false
-    local bgqs = "0"
+    local bgqs = "1"
     local primaryrgbm = "45,102,147"
     local primaryrgbmts = "0"
     local mode = "auto"
