@@ -8,7 +8,7 @@ LOG=$TMP/taskplan.log
 TT=/etc/taskplan/taskplanrun
 CR=/etc/crontabs/root
 [ ! -d $TMP ] && mkdir -p $TMP 2>/dev/null
-[ -s $LOG ] && echo '' > $LOG
+[ ! -s $LOG ] && echo '' > $LOG
 
 run_taskplan()
 {
