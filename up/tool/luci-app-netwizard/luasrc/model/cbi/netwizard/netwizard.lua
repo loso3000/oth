@@ -154,10 +154,6 @@ e:value("1.1.1.1", translate("Cloudflare DNS:1.1.1.1"))
 e.anonymous = false
 e:depends("dnsset", true)
 
-masq = s:taboption("wansetup", Flag, "masq", translate("Enable IP dynamic camouflage"),translate("Enable IP dynamic camouflage when the side routing network is not ideal"))
-masq:depends({wan_proto="siderouter"})
-masq.anonymous = false
-
 if has_wifi then
 	e = s:taboption("wifisetup", Value, "wifi_ssid", translate("<abbr title=\"Extended Service Set Identifier\">ESSID</abbr>"))
 	e.datatype = "maxlength(32)"
@@ -170,15 +166,10 @@ synflood = s:taboption("othersetup", Flag, "synflood", translate("Enable SYN-flo
 synflood.default = 1
 synflood.anonymous = false
 
--- dns_redirect = s:taboption("othersetup", Flag, "dns_redirect", translate("DNS Redirect"),translate("Force all TCP/UDP DNS 53ports in IPV4/IPV6 to be forwarded from this route[Suggest opening]"))
--- dns_redirect.default = 1
--- dns_redirect.anonymous = false
-
--- e = s:taboption("othersetup", Flag, "https",translate('Accessing using HTTPS'), translate('Open the address in the background and use HTTPS for secure access'))
 
 m.apply_on_parse = true
 m.on_after_apply = function(self,map)
-	luci.sys.exec("/etc/init.d/netwizard start >/dev/null 2>&1")
+	luci.sys.exec("/etc/init.d/netwizard restart >/dev/null 2>&1")
 end
 
 return m
