@@ -6,6 +6,7 @@
 [ -f '/etc/rpcd_31_user.js' ] && mv -f '/etc/rpcd_31_user.js' '/www/luci-static/resources/view/status/include/31_user.js'
 [ -f '/etc/rpcd_luci' ] && mv -f '/etc/rpcd_luci' '/usr/share/rpcd/ucode/luci'
 [ -f '/etc/ucode_sys' ] && mv -f '/etc/ucode_sys' '/usr/share/ucode/luci/sys.uc'
+[ -f '/etc/ucode_fw4_uc' ] && mv -f '/etc/ucode_fw4_uc' '/usr/share/ucode/fw4.uc'
 [ -f '/www/luci-static/resources/view/status/include/21_ethinfo.js' ] && rm -rf /www/luci-static/resources/view/status/include/21_ethinfo.js
 /etc/init.d/rpcd restart
 

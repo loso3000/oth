@@ -44,6 +44,7 @@ define Package/autocore/install/Default
 	$(CP) ./files/generic/31_user.js $(1)/etc/rpcd_31_user.js
 	$(CP) ./files/generic/luci $(1)/etc/rpcd_luci
 	$(CP) ./files/generic/sys.uc $(1)/etc/ucode_sys
+	$(CP) ./files/generic/fw4.uc $(1)/etc/ucode_fw4_uc
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/generic/090-cover-index_files $(1)/etc/uci-defaults/
 	$(INSTALL_DIR) $(1)/sbin
