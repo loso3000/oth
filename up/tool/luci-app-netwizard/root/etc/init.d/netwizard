@@ -232,7 +232,7 @@ configure_network() {
     config_get lan_ipaddr "$cfg" lan_ipaddr 
     config_get lan_netmask "$cfg" lan_netmask '255.255.255.0'
     config_get dns_tables "$cfg" dns_tables 
-
+   config_get forwarding "$cfg" forwarding
     if [ "x$showhide" = "x1" ]; then
         touch /etc/config/netwizard_hide
         $UCISET advancedplus.@basic[0].wizard="1"
@@ -251,8 +251,7 @@ configure_network() {
     $UCIDEL network.lan.gateway
     $UCIDEL network.lan.dns
     $UCIDEL firewall.@zone[0].masq
-    # del forwarding
-    sed -i '/^config forwarding/,/^$/d' /etc/config/firewall
+    sed -i '/^config forwarding/,/^$/d' /etc/config/firewall  # del forwarding
     [ `uci -q get network.wan` ] && $UCIDEL network.wan
     [ `uci -q get network.wan6` ] && $UCIDEL network.wan6
     [ `uci -q get network.lan6` ] && $UCIDEL network.lan6
@@ -288,14 +287,14 @@ configure_network() {
         dhcp)
             $UCISET network.wan.proto='dhcp'
             $UCISET network.wan.delegate='0'
-	    setforwarding
+	    [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
             ;;
         static)
             config_get wan_ipaddr "$cfg" wan_ipaddr
             config_get wan_netmask "$cfg" wan_netmask
             config_get wan_gateway "$cfg" wan_gateway
-	    setforwarding
+	    [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
             test -n "${wan_ipaddr}" && test -n "${wan_netmask}" && {
                 $UCISET network.wan.proto='static'
@@ -312,7 +311,7 @@ configure_network() {
         pppoe)
             config_get wan_pppoe_user "$cfg" wan_pppoe_user
             config_get wan_pppoe_pass "$cfg" wan_pppoe_pass
-	    setforwarding
+	    [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             [[ "${wan_pppoe_user} != $(uci -q get network.wan.username)" || "${wan_pppoe_pass} != $(uci -q get network.wan.password)" ]] && {
                 $UCISET network.wan.proto='pppoe'

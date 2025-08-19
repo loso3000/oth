@@ -154,6 +154,12 @@ e:value("1.1.1.1", translate("Cloudflare DNS:1.1.1.1"))
 e.anonymous = false
 e:depends("dnsset", true)
 
+e = s:taboption("wansetup", Flag, "forwarding", translate("Forcefully forwarding"),translate("Forcefully add LAN to WAN forwarding"))
+e.default = "1"
+e:depends({wan_proto="pppoe"})
+e:depends({wan_proto="dhcp"})
+e:depends({wan_proto="static"})
+e.anonymous = false
 if has_wifi then
 	e = s:taboption("wifisetup", Value, "wifi_ssid", translate("<abbr title=\"Extended Service Set Identifier\">ESSID</abbr>"))
 	e.datatype = "maxlength(32)"
