@@ -5,7 +5,7 @@ include $(TOPDIR)/rules.mk
 
 NAME:=netwizard
 PKG_NAME:=luci-app-$(NAME)
-PKG_VERSION:=1.9.3
+PKG_VERSION:=1.9.4
 PKG_RELEASE:=20250816
 
 PKG_LICENSE:=GPLv3
