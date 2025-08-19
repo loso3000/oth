@@ -265,7 +265,7 @@ configure_network() {
         lannet=$(echo "$lannet" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
         [ "x$ifname" = "xdevice" ] && $UCISET network.@$ifname[0].ports="${lannet}" || $UCISET network.lan.$ifname="${lannet}"
     }
-
+    uci commit network
     if [ -n "$wan_interface" ] ;then
          $UCISET network.wan=interface
          $UCISET network.wan6=interface
@@ -273,14 +273,17 @@ configure_network() {
          $UCISET network.wan6.delegate='1'
          $UCIDEL dhcp.wan.master
          $UCIDEL dhcp.lan.master
-         $UCIDEL firewall.@zone[1].network
+
+	 $UCISET network.wan.metric='1'
          $UCISET network.wan.$ifname="${wan_interface}"
          $UCISET network.wan6.$ifname="@wan"
+	 # firewall
+         $UCIDEL firewall.@zone[1].network
          $UCISET firewall.@zone[1].masq='1'
          [ "x$ifname" = "xdevice" ] && {
-                 uci -q add_list firewall.@zone[1].network='wan6'
-                  uci -q add_list firewall.@zone[1].network='wan' 
-          } || uci -q set firewall.@zone[1].network='wan wan6'
+                 $UCIADD firewall.@zone[1].network='wan6'
+                 $UCIADD firewall.@zone[1].network='wan' 
+          } || $UCISET firewall.@zone[1].network='wan wan6'
     fi
 
     case "${wan_proto}" in
@@ -374,6 +377,8 @@ configure_network() {
         $UCIDEL dhcp.@dnsmasq[0].boguspriv
         $UCIDEL dhcp.@dnsmasq[0].filterwin2k
         $UCIDEL dhcp.@dnsmasq[0].nonegcache
+	$UCIDEL dhcp.lan.max_preferred_lifetime
+	$UCIDEL dhcp.lan.max_valid_lifetime
     else
         $UCIDEL dhcp.lan.ignore
         $UCIDEL dhcp.lan.dynamicdhcp
