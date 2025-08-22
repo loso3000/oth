@@ -4211,16 +4211,6 @@ border: 0px solid rgba(255,255,255,0.3) !important;
   color: var(--body-color) !important;
 }
 
-.bandix-table tbody tr:nth-child(odd) 
-{
-  background-color: rgba(var(--primary-rgbs), var(--primary-rgbs-ts)) !important;
-}
-
-.bandix-table tbody tr:nth-child(even)
-{
-  background-color: rgba(var(--primary-rgbm), var(--primary-rgbs-ts)) !important;
-}
-
 
 [data-page="admin-services-adguardhome"]>.main .cbi-value .cbi-input-textarea {
   width: 100% !important;
