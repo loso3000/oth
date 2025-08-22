@@ -4145,6 +4145,16 @@ border: 0px solid rgba(255,255,255,0.3) !important;
    color: var(--primary-title-color)!important;
 }
 
+.bandix-container .bandix-badge
+{
+  color: var(--primary-title-color)!important;
+  background-color: var(--inputbg-color)!important;
+  border: 1px solid var(--input-boxcolor);
+}
+
+.bandix-container .action-button {
+  background-color: rgba(var(--primary-rgbm), 0.9);
+}
 .bandix-container .history-tooltip>div,
 .bandix-container .history-tooltip>div>span,
 .bandix-container .form-label ,
@@ -4154,6 +4164,7 @@ border: 0px solid rgba(255,255,255,0.3) !important;
 .bandix-container .bandix-title  {
   color: var(--primary-title-color);
 }
+
 .bandix-container .history-tooltip
 {
   background-color: rgba(var(--primary-rgbbody),1) ;
@@ -4206,10 +4217,12 @@ border: 0px solid rgba(255,255,255,0.3) !important;
 {
   table-layout: auto;
 }
+
 .bandix-container .bandix-table td ,.bandix-table th
 {
 padding: 10px 15px;
 }
+
 .form-input
  {
   background-color: var(--inputbg-color)!important;
