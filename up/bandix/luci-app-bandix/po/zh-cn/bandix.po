@@ -1,6 +1,3 @@
 msgid "Bandix"
-msgstr "流量监控"
-
-
-
+msgstr "Bandix 流量监控"
 

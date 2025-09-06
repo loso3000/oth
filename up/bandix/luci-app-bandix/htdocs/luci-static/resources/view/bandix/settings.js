@@ -7,7 +7,7 @@
 
 const translations = {
 	'zh-cn': {
-		'Bandix流量监控设置': 'Bandix流量监控设置',
+		'Bandix 流量监控设置': 'Bandix 流量监控设置',
 		'启用': '启用',
 		'启用 Bandix 流量监控服务': '启用 Bandix 流量监控服务',
 		'界面语言': '界面语言',
@@ -28,11 +28,13 @@ const translations = {
 		'明亮模式': '明亮模式',
 		'暗黑模式': '暗黑模式',
 		'意见反馈': '意见反馈',
+		'离线超时时间': '离线超时时间',
+		'设置设备离线判断的超时时间（秒）': '设置设备离线判断的超时时间（秒）。超过此时间未活动的设备将被标记为离线',
 		'持久化循环周期': '持久化循环周期',
 		'设置数据持久化循环周期（秒）': '设置数据持久化循环周期(秒)。修改会删除已有数据。600秒循环周期下, 1 个设备, 固定占用约 60KB'
 	},
 	'zh-tw': {
-		'Bandix流量监控设置': 'Bandix 流量監控設置',
+		'Bandix 流量监控设置': 'Bandix 流量監控設置',
 		'启用': '啟用',
 		'启用 Bandix 流量监控服务': '啟用 Bandix 流量監控服務',
 		'界面语言': '界面語言',
@@ -53,11 +55,13 @@ const translations = {
 		'明亮模式': '明亮模式',
 		'暗黑模式': '暗黑模式',
 		'意见反馈': '意見反饋',
+		'离线超时时间': '離線超時時間',
+		'设置设备离线判断的超时时间（秒）': '設定設備離線判斷的超時時間（秒）。超過此時間未活動的設備將被標記為離線',
 		'持久化循环周期': '持久化循環週期',
 		'设置数据持久化循环周期（秒）': '設定資料持久化循環週期(秒)。修改會刪除已有資料。600秒循環週期下, 1 個設備, 固定占用約 60KB'
 	},
 	'en': {
-		'Bandix流量监控设置': 'Bandix Traffic Monitor Settings',
+		'Bandix 流量监控设置': 'Bandix Traffic Monitor Settings',
 		'启用': 'Enable',
 		'启用 Bandix 流量监控服务': 'Enable Bandix Traffic Monitor Service',
 		'界面语言': 'Interface Language',
@@ -78,11 +82,13 @@ const translations = {
 		'明亮模式': 'Light Mode',
 		'暗黑模式': 'Dark Mode',
 		'意见反馈': 'Feedback',
+		'离线超时时间': 'Offline Timeout',
+		'设置设备离线判断的超时时间（秒）': 'Set the timeout for device offline detection (seconds). Devices inactive for longer than this time will be marked as offline',
 		'持久化循环周期': 'Persistence Interval',
 		'设置数据持久化循环周期（秒）': 'Set persistence loop interval (seconds). Changing this will delete existing data. With a 600-second interval, 1 device uses a fixed size of about 60 KB'
 	},
 	'fr': {
-		'Bandix流量监控设置': 'Paramètres de Surveillance du Trafic Bandix',
+		'Bandix 流量监控设置': 'Paramètres de Surveillance du Trafic Bandix',
 		'启用': 'Activer',
 		'启用 Bandix 流量监控服务': 'Activer le Service de Surveillance du Trafic Bandix',
 		'界面语言': 'Langue de l\'Interface',
@@ -103,11 +109,13 @@ const translations = {
 		'明亮模式': 'Mode Clair',
 		'暗黑模式': 'Mode Sombre',
 		'意见反馈': 'Commentaires',
+		'离线超时时间': 'Délai d\'expiration hors ligne',
+		'设置设备离线判断的超时时间（秒）': 'Définir le délai d\'expiration pour la détection hors ligne des appareils (secondes). Les appareils inactifs plus longtemps que cette durée seront marqués comme hors ligne',
 		'持久化循环周期': 'Intervalle de persistance',
 		'设置数据持久化循环周期（秒）': "Définir l’intervalle de persistance (secondes). La modification supprimera les données existantes. Avec un intervalle de 600 secondes, un appareil occupe environ 60 Ko (taille fixe)"
 	},
 	'ja': {
-		'Bandix流量监控设置': 'Bandix トラフィックモニター設定',
+		'Bandix 流量监控设置': 'Bandix トラフィックモニター設定',
 		'启用': '有効',
 		'启用 Bandix 流量监控服务': 'Bandix トラフィックモニターサービスを有効にする',
 		'界面语言': 'インターフェース言語',
@@ -128,11 +136,13 @@ const translations = {
 		'明亮模式': 'ライトモード',
 		'暗黑模式': 'ダークモード',
 		'意见反馈': 'フィードバック',
+		'离线超时时间': 'オフラインタイムアウト',
+		'设置设备离线判断的超时时间（秒）': 'デバイスのオフライン検出のタイムアウト時間（秒）を設定。この時間を超えて非アクティブなデバイスはオフラインとしてマークされます',
 		'持久化循环周期': '永続化ループ間隔',
 		'设置数据持久化循环周期（秒）': 'データ永続化のループ間隔（秒）を設定。この設定を変更すると既存データが削除されます。600 秒のループ間隔では、1 台のデバイスで固定サイズとして約 60 KB を使用します'
 	},
 	'ru': {
-		'Bandix流量监控设置': 'Настройки Монитора Трафика Bandix',
+		'Bandix 流量监控设置': 'Настройки Монитора Трафика Bandix',
 		'启用': 'Включить',
 		'启用 Bandix 流量监控服务': 'Включить Службу Мониторинга Трафика Bandix',
 		'界面语言': 'Язык Интерфейса',
@@ -153,6 +163,8 @@ const translations = {
 		'明亮模式': 'Светлый Режим',
 		'暗黑模式': 'Темный Режим',
 		'意见反馈': 'Обратная связь',
+		'离线超时时间': 'Таймаут отключения',
+		'设置设备离线判断的超时时间（秒）': 'Установить таймаут для обнаружения отключения устройств (секунды). Устройства, неактивные дольше этого времени, будут помечены как отключенные',
 		'持久化循环周期': 'Интервал персистенции',
 		'设置数据持久化循环周期（秒）': 'Установить интервал цикла персистенции (сек). Изменение этого параметра удалит существующие данные. При интервале 600 секунд одно устройство занимает около 60 КБ (фиксированный размер)'
 	}
@@ -363,8 +375,8 @@ return view.extend({
 		// 创建表单
 		m = new form.Map('bandix');
 
-		// Bandix流量监控设置部分
-		s = m.section(form.NamedSection, 'general', 'general', getTranslation('Bandix流量监控设置', language));
+		// Bandix 流量监控设置部分
+		s = m.section(form.NamedSection, 'general', 'general', getTranslation('Bandix 流量监控设置', language));
 		s.addremove = false;
 
 		o = s.option(form.Flag, 'enabled', getTranslation('启用', language),
@@ -434,6 +446,14 @@ return view.extend({
 			getTranslation('设置数据持久化循环周期（秒）', language));
 		o.datatype = 'uinteger';
 		o.placeholder = '600';
+		o.rmempty = true; // 留空则不写入 UCI，由后端决定默认值
+
+		// 添加离线超时时间（秒）
+		o = s.option(form.Value, 'offline_timeout', getTranslation('离线超时时间', language),
+		getTranslation('设置设备离线判断的超时时间（秒）', language));
+		o.datatype = 'uinteger';
+		o.placeholder = '600';
+		o.default = '600';
 		o.rmempty = true; // 留空则不写入 UCI，由后端决定默认值
 
 		// 添加意见反馈信息
