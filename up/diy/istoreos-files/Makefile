@@ -17,7 +17,7 @@ define Package/$(PKG_NAME)
   MAINTAINER:=jjm2473 <jjm2473@gmail.com>
   DEFAULT:=y
   HIDDEN:=y
-  DEPENDS:=+luci-theme-kucat
+  DEPENDS:=
 endef
 
 define Package/$(PKG_NAME)/description
