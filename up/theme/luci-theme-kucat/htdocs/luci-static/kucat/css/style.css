@@ -2269,7 +2269,7 @@ button:hover,.btn:hover,.cbi-button:hover {
 
 .cbi-dropdown>ul {
   display: flex;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: auto;
   width: 100%;
   list-style: none;
@@ -2393,10 +2393,9 @@ button:hover,.btn:hover,.cbi-button:hover {
   color: var(--inputtext-color);
   margin-left: 0 !important;
   margin-top: 0.25rem;
-  left: 0;
+  left: 0 !important;
   cursor: pointer;
 }
-
 
 .cbi-dropdown>ul>li[display],.cbi-dropdown[open]>ul.preview,.cbi-dropdown[open]>ul.dropdown>li,.cbi-dropdown[multiple]>ul>li>label,.cbi-dropdown[multiple][open]>ul.dropdown>li,.cbi-dropdown[multiple][more]>.more,.cbi-dropdown[multiple][empty]>.more {
   display: flex;
@@ -4555,6 +4554,7 @@ div#file-manager-container #status-bar #status-info {
   width: 30rem;
 }
 .cbi-dropdown[open]>ul.dropdown {
+  overflow: auto;
   max-width: 100%;
   width: 30rem;
 }
@@ -4912,9 +4912,10 @@ div#file-manager-container #status-bar #status-info {
   }
   
   .cbi-dropdown[open]>ul.dropdown {
+  overflow: auto;
   max-width: 100%;
   margin: auto;
-  max-height: 8rem !important;
+  /*max-height: 8rem !important;*/
   padding: 0 !important;
   }
   table>tbody>tr>td, table>tfoot>tr>td, table>thead>tr>td {
