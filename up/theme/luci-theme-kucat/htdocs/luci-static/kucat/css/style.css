@@ -1621,7 +1621,6 @@ table>tbody>tr:first-child>td,table>tfoot>tr:first-child>td,table>thead>tr:first
   border: 1px solid var(--inputborder-color)!important;
   transition: box-shadow .25s ease;
   border-radius: var(--radius2);
-  cursor: pointer;
   box-shadow: 0 0.3rem 0.8rem var(--input-boxcolor)
 }
 
