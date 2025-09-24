@@ -705,7 +705,7 @@ footer>a {
 small {
   font-size: 90%;
   line-height: 1.42857143;
-  white-space: nowrap
+  white-space: normal;
 }
 
 .main {
