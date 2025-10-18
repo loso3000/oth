@@ -82,8 +82,6 @@ http.setfilehandler(function(meta, chunk, eof)
         fd:close()
         -- Extract the tar.gz file
         local tar_cmd = "tar -zxvf /tmp/upload/" .. meta.file .. " -C /tmp/upload/ >/dev/null"
-
-        --llog("Starting file upload handler2" .. tar_cmd)
         local success = os.execute(tar_cmd)
         if success ~= 0 then
             um.value = translate("Failed to update feature file, format error")
@@ -113,13 +111,13 @@ http.setfilehandler(function(meta, chunk, eof)
                 os.execute("rm /tmp/upload/* -fr")
                 return
             end
-            local cmd = "cat /tmp/upload/feature.cfg>/etc/appfilter/feature_cnnew.cfg "  
-            os.execute(cmd ) 
-            SYS.exec("rm /www/luci-static/resources/app_icons/* -fr");
+            local cmd = "cp /tmp/upload/feature.cfg " .. feature_file
+            os.execute(cmd)
+            os.execute("rm /www/luci-static/resources/app_icons/* -fr");
             cmd = "cp /tmp/upload/app_icons/* /www/luci-static/resources/app_icons/ -fr >/dev/null"
-            os.execute(cmd )
-	    SYS.exec("chmod 666 /etc/appfilter/feature*.cfg ")
-            SYS.exec("killall -SIGUSR1 oafd")
+            os.execute(cmd)
+            os.execute("chmod 666 " .. feature_file)
+            luci.sys.exec("killall -SIGUSR1 oafd")
 
             um.value = translate("Update the feature file successfully, please refresh the page")
         else

@@ -17,12 +17,12 @@ function index()
 
 	-- entry({"admin", "services", "appfilter", "base_setting"}, cbi("appfilter/base_setting"), _("Basic Settings"), 22).leaf=true
 	-- entry({"admin", "services", "appfilter", "user_setting"}, cbi("appfilter/user_setting"), _("Effective User"), 23).leaf=true
-	entry({"admin", "services", "appfilter", "time"}, cbi("appfilter/time", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("时间配置"), 25).leaf=true
-	entry({"admin", "services", "appfilter", "app_filter"}, cbi("appfilter/app_filter", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("应用过滤"), 21).leaf=true
+	entry({"admin", "services", "appfilter", "time"}, cbi("appfilter/time", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("Time Configuration"), 25).leaf=true
+	entry({"admin", "services", "appfilter", "app_filter"}, cbi("appfilter/app_filter", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("App Filter"), 21).leaf=true
 	entry({"admin", "services", "appfilter", "feature"}, cbi("appfilter/feature"), _("App Feature"), 26).leaf=true
 
-	entry({"admin", "services", "appfilter", "user"}, cbi("appfilter/user", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("用户配置"), 24).leaf=true
-	entry({"admin", "services", "appfilter", "advance"}, cbi("appfilter/advance", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("高级设置"), 27).leaf=true
+	entry({"admin", "services", "appfilter", "user"}, cbi("appfilter/user", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("User Configuration"), 24).leaf=true
+	entry({"admin", "services", "appfilter", "advance"}, cbi("appfilter/advance", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("Advanced Settings"), 27).leaf=true
 	entry({"admin", "network", "user_status"}, call("user_status"), nil).leaf = true
 	entry({"admin", "network", "get_user_list"}, call("get_user_list"), nil).leaf = true
 	entry({"admin", "network", "dev_visit_list"}, call("get_dev_visit_list"), nil).leaf = true
@@ -41,6 +41,9 @@ function index()
 	entry({"admin", "network", "set_app_filter_user"}, call("set_app_filter_user"), nil).leaf = true
 	entry({"admin", "network", "del_app_filter_user"}, call("del_app_filter_user"), nil).leaf = true
 	entry({"admin", "network", "add_app_filter_user"}, call("add_app_filter_user"), nil).leaf = true
+	entry({"admin", "network", "get_whitelist_user"}, call("get_whitelist_user"), nil).leaf = true
+	entry({"admin", "network", "add_whitelist_user"}, call("add_whitelist_user"), nil).leaf = true
+	entry({"admin", "network", "del_whitelist_user"}, call("del_whitelist_user"), nil).leaf = true
 	entry({"admin", "network", "upload_file"}, call("handle_file_upload"), nil).leaf = true
 	entry({"admin", "network", "set_nickname"}, call("set_nickname"), nil).leaf = true
 	entry({"admin", "network", "get_oaf_status"}, call("get_oaf_status"), nil).leaf = true
@@ -201,6 +204,33 @@ function add_app_filter_user()
 	luci.http.write_json(resp_obj);
 end
 
+function get_whitelist_user()
+	local json = require "luci.jsonc"
+	luci.http.prepare_content("application/json")
+	local resp_obj=utl.ubus("appfilter", "get_whitelist_user", {});
+	luci.http.write_json(resp_obj);
+end
+
+function add_whitelist_user()
+	local json = require "luci.jsonc"
+	luci.http.prepare_content("application/json")
+	local req_obj = {}
+	local data_str = luci.http.formvalue("data")
+	req_obj = json.parse(data_str)
+
+	local resp_obj=utl.ubus("appfilter", "add_whitelist_user", req_obj);
+	luci.http.write_json(resp_obj);
+end
+
+function del_whitelist_user()
+	local json = require "luci.jsonc"
+	luci.http.prepare_content("application/json")
+	local req_obj = {}
+	req_obj.mac = luci.http.formvalue("mac")
+	llog("del whitelist user "..req_obj.mac);
+	local resp_obj=utl.ubus("appfilter", "del_whitelist_user", req_obj);
+	luci.http.write_json(resp_obj);
+end
 function get_app_filter()
 	local json = require "luci.jsonc"
 	luci.http.prepare_content("application/json")
