@@ -4324,7 +4324,7 @@ select,input,.cbi-dropdown,.btn,button,.cbi-button,.item::after {
 
 #cbi-appfilter>div>div {
   overflow: auto;
-  background-color: rgba(var(--primary-rgbbody),1) !important
+  /* background-color: rgba(var(--primary-rgbbody),1) !important */
 }
 
 #cbi-appfilter>div>div>button {
@@ -4358,12 +4358,16 @@ select,input,.cbi-dropdown,.btn,button,.cbi-button,.item::after {
 }
 
 #cbi-appfilter>div>div span {
-  color: var(--body-color) !important
+  /* color: var(--body-color) !important*/
 }
 
 #cbi-appfilter>div>div input {
-  background-color: rgba(248,248,248,0.2) !important;
-  color: var(--body-color) !important
+  /* background-color: rgba(248,248,248,0.2) !important;
+  color: var(--body-color) !important*/
+}
+
+#cbi-appfilter #user_status_table th.th:nth-child(1) {
+  width: 150px !important;
 }
 
 .CodeMirror.cm-s-dracula.CodeMirror-wrap {
