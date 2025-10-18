@@ -6,6 +6,7 @@ local m, s, o
 local function is_finded(e)
 	return luci.sys.exec(string.format('type -t -p "%s" 2>/dev/null', e)) ~= ""
 end
+
 m = Map("shadowsocksr")
 
 s = m:section(TypedSection, "access_control")
@@ -161,10 +162,12 @@ if is_finded("dnsproxy") then
 		nixio.fs.writefile(dnsproxyconf, "")
 	end
 end
+
 if luci.sys.call('[ -f "/www/luci-static/resources/uci.js" ]') == 0 then
 	m.apply_on_parse = true
 	function m.on_apply(self)
 		luci.sys.call("/etc/init.d/shadowsocksr reload > /dev/null 2>&1 &")
 	end
 end
+
 return m

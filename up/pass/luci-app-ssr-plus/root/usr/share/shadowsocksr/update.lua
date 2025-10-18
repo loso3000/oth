@@ -13,8 +13,10 @@ local uci = require "luci.model.uci".cursor()
 -- 以下设置更新数据库至 DNSMASQ 配置路径
 -- 获取 DNSMASQ 配置 ID
 local DNSMASQ_UCI_CONFIG = uci:get_first("dhcp", "dnsmasq", ".name")
+
 -- 获取 DNSMASQ 默认配置文件
 local DNSMASQ_CONF_PATH = "/tmp/etc/dnsmasq.conf." .. DNSMASQ_UCI_CONFIG
+
 -- 检查 DNSMASQ 配置文件是否存在，如果存在则提取 conf-dir
 for line in io.lines(DNSMASQ_CONF_PATH) do
     local conf_dir = line:match("^conf%-dir=(.+)")
@@ -23,8 +25,10 @@ for line in io.lines(DNSMASQ_CONF_PATH) do
         break
     end
 end
+
 -- 设置 dnsmasq-ssrplus.d 目录路径，并去除路径末尾的斜杠
 local TMP_DNSMASQ_PATH = DNSMASQ_CONF_DIR:match("^(.-)/?$") .. "/dnsmasq-ssrplus.d"
+
 local TMP_PATH = "/var/etc/ssrplus"
 -- match comments/title/whitelist/ip address/excluded_domain
 local comment_pattern = "^[!\\[@]+"
@@ -115,6 +119,7 @@ local function generate_apple(type)
 	out:close()
 	os.remove("/tmp/ssr-update.tmp")
 end
+
 -- adblock转码至dnsmasq格式
 local function generate_adblock(type)
 	local domains, domains_map = {}, {}
