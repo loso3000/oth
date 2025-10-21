@@ -32,9 +32,9 @@ if nixio.fs.access("/tmp/feature.cfg") then
 end
 
 if nixio.fs.access("/etc/appfilter/feature_cnnew.cfg") then
-   os.execute("mv -f /etc/appfilter/feature_cnnew.cfg /etc/appfilter/feature_cn.cfg")
-   os.execute("chmod 666 /etc/appfilter/feature_cn.cfg")
-   os.execute("/etc/init.d/appfilter restart >/dev/null")
+   SYS.exec("mv -f /etc/appfilter/feature_cnnew.cfg /etc/appfilter/feature_cn.cfg")
+   SYS.call("/etc/init.d/appfilter restart >/dev/null")
+   --luci.http.redirect(luci.dispatcher.build_url("admin", "services", "appfilter" ,"feature"))
 end
 format="v3.0"
 
@@ -42,7 +42,7 @@ local display_str = "<strong>"..translate("Current version")..":  </strong>" .. 
                     "<br><strong>"..translate("Feature format")..":</strong>  " ..format ..
                     "<br><strong>"..translate("App number")..":</strong>  " ..rule_count
 		    
-local display_str2 = "<font color=\'green\'>此处可以自行添加、修改特征库。如更新失败，可至<a href=\'http://www.openappfilter.com\' target=\'_blank\'>官方特征库</a> 复制到此使用。官方特征库会被升级覆盖，如要修改请按示例添加至用户特征库。</font>"
+local display_str2 = "<font color=\'green\'>此处可以自行添加、修改特征库。如更新失败，可至<a href=\'https://www.openappfilter.com/#/feature\' target=\'_blank\'>官方特征库</a> 复制到此使用。官方特征库会被升级覆盖，如要修改请按示例添加至用户特征库。</font>"
 
 s = m:section(TypedSection, "global",  "", display_str)
 s.addremove = false
@@ -209,7 +209,7 @@ function conf.write(self, section, value)
         value = value:gsub("\r\n?", "\n")
         nfs.writefile("/tmp/feature.user.cfg", value)
         if (SYS.call("cmp -s /tmp/feature.user.cfg /etc/appfilter/feature.user.cfg") == 1) then
-	    
+
             nfs.writefile("/etc/appfilter/feature.user.cfg", value)
 	     SYS.exec("chmod 666  /etc/appfilter/feature.user.cfg 2>/dev/null")
 	     SYS.exec("rm -rf /tmp/appfilter 2>/dev/null")
@@ -222,7 +222,7 @@ end
 m.apply_on_parse = true
 m.on_after_apply = function(self,map)
         luci.sys.exec("killall -SIGUSR1 oafd")
-	luci.sys.exec("/etc/init.d/appfilter start 2>/dev/null  && sleep 5")
+	luci.sys.exec("/etc/init.d/appfilter stop 2>/dev/null  && /etc/init.d/appfilter start 2>/dev/null  && sleep 5")
 end
 
 
