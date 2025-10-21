@@ -14,7 +14,7 @@ add_crond() {
 }
 
 stop_service(){
-	killall -9 oafd >/dev/null 2>&1
+	killall -9 oafd
 }
 
 start_service(){
