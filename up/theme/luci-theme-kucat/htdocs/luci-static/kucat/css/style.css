@@ -4981,6 +4981,18 @@ div#file-manager-container #status-bar #status-info {
   .bandix-card .bandix-card-header.history-header {
     padding: 0 !important; 
   }
+  
+  .main-right,
+  .main-left{
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .main-right::-webkit-scrollbar,
+  .main-left::-webkit-scrollbar
+  {
+    display: none;
+  }
   #file-manager-container .file-manager-header {
     flex-wrap: wrap
   }
