@@ -4153,63 +4153,67 @@ border: 0px solid rgba(255,255,255,0.3) !important;
 }
 
 /* bandix */
+.bandix-connection-container,
 .bandix-container {
    padding: 5px!important; 
    background-color: rgba(255,255,255,0) !important;
    color: var(--primary-title-color)!important;
 }
 
-.bandix-container .bandix-badge
+.bandix-badge
 {
   color: var(--primary-title-color)!important;
   background-color: var(--inputbg-color)!important;
-  border: 1px solid var(--input-boxcolor);
+  border: 1px solid var(--input-boxcolor)!important;
 }
 
-.bandix-container .action-button {
-  background-color: rgba(var(--primary-rgbm), 0.9);
+.action-button {
+  background-color: rgba(var(--primary-rgbm), 0.9)!important;
 }
-.bandix-container .history-tooltip>div,
-.bandix-container .history-tooltip>div>span,
+
+.stats-card-title ,
+.stats-card>div ,
+.history-tooltip>div,
+.history-tooltip>div>span,
 .bandix-container .form-label ,
-.bandix-container .bandix-card-title,
-.bandix-container .bandix-card>div,
-.bandix-container .stats-title,
-.bandix-container .bandix-title  {
-  color: var(--primary-title-color);
+.bandix-card-title,
+.bandix-card>div,
+.stats-title,
+.bandix-title  {
+  color: var(--primary-title-color)!important;
+}
+.bandix-card-body {
+   padding: 0!important;
+}
+.history-tooltip
+{
+  background-color: rgba(var(--primary-rgbbody),1)!important;
+  color: var(--body-color) !important;
+  border: 1px solid var(--input-boxcolor)!important;
+  width: 300px!important;
 }
 
-.bandix-container .history-tooltip
+.bandix-card ,
+.stats-card
 {
-  background-color: rgba(var(--primary-rgbbody),1) ;
-  color: var(--body-color) ;
-  border: 1px solid var(--input-boxcolor);
-  width: 300px;
+  background-color: rgba(var(--primary-rgbm), 0.1)!important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
+  margin-bottom: 0 !important;
+  border: 0px solid #333!important;
+  border-bottom: 0px solid var(--input-boxcolor)!important;
+  overflow: auto!important;
 }
 
-.bandix-container .bandix-card ,
-.bandix-container .stats-card
+.bandix-card .bandix-card-header.history-header
 {
-  background-color: rgba(var(--primary-rgbm), 0.1);
-  background-color: rgba(0, 0, 0, 0) ;
-  border-radius: 0 ;
-  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) ;
-  margin-bottom: 0 ;
-  border: 0px solid #3333331c;
-  border-bottom: 1px solid var(--input-boxcolor);
-  overflow: auto;
-}
-
-.bandix-container .bandix-card .bandix-card-header.history-header
-{
-  border-bottom: 1px solid var(--input-boxcolor);
-  background-color: rgba(0, 0, 0, 0) ;
-  padding: 0;
+  border-bottom: 1px solid var(--input-boxcolor)!important;
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 
 .modal-header,
 .device-summary,
-.bandix-container .bandix-card .history-controls
+.bandix-card .history-controls
 {
 
   border: 0px solid var(--input-boxcolor)!important;
@@ -4223,18 +4227,19 @@ border: 0px solid rgba(255,255,255,0.3) !important;
 .device-summary>div,
 .bandix-container .device-name,
 .bandix-container .legend-item,
-.stats-card>div>div>span,
-.bandix-container .bandix-container .stats-card>div>div>span  {
+.stats-card>div>div>span{
   color: var(--primary-title-color)!important;
 }
-.bandix-container .bandix-table
+
+.bandix-table
 {
-  table-layout: auto;
+  table-layout: auto!important;
 }
 
-.bandix-container .bandix-table td ,.bandix-table th
+.bandix-table td ,.bandix-table th
 {
-padding: 10px 15px;
+padding: 10px 15px!important;
+border-bottom: 0px solid #f1f5f9!important;
 }
 
 .form-input
@@ -4258,16 +4263,6 @@ padding: 10px 15px;
   background-color: rgba(255, 255, 255, 0) !important;
   color: var(--body-color) !important;
   border-top: 1px solid var(--inputborder-color)!important;
-}
-
-.oaf-container>div{
-  background: rgba(0, 0, 0, 0.04) !important;
-  color: var(--body-color) !important;
-  border-bottom: 0px solid #ddd!important;
-}
-
-.oaf-container>div span{
-  color: var(--body-color)!important;
 }
 
 [data-page="admin-services-adguardhome"]>.main .cbi-value .cbi-input-textarea {
@@ -4345,6 +4340,18 @@ select,input,.cbi-dropdown,.btn,button,.cbi-button,.item::after {
 
 #cbi-appfilter #user_status_table th.th:nth-child(1) {
   width: 150px !important;
+}
+
+.oaf-container>div{
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: var(--body-color) !important;
+  border-bottom: 0px solid #ddd!important;
+}
+
+.traffic-info>div>span,
+.device-details>div,
+.oaf-container>div span{
+  color: var(--body-color)!important;
 }
 
 .CodeMirror.cm-s-dracula.CodeMirror-wrap {
@@ -4967,7 +4974,13 @@ div#file-manager-container #status-bar #status-info {
   .history-card-body {
     padding: 0 !important
   }
-
+  /* Bandix  */
+  .stats-detail-row>span {
+    display: none!important
+  }
+  .bandix-card .bandix-card-header.history-header {
+    padding: 0 !important; 
+  }
   #file-manager-container .file-manager-header {
     flex-wrap: wrap
   }
