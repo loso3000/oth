@@ -474,12 +474,12 @@
   -moz-border-radius: var(--radius0);
   border-radius: var(--radius0);
   background-clip: content-box;
-  background: rgba(50,50,50,0.9);
-  border: 1px solid rgba(var(--primary-rgbm),1)
+  background: rgba(var(--primary-rgbbody), 0.9);
+  border: 1px solid rgba(var(--primary-rgbm), 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(var(--primary-rgbm),1)
+  background-color: rgba(var(--primary-rgbm),0.9)
 }
 
 ::selection {
@@ -1955,7 +1955,7 @@ button:hover,.btn:hover,.cbi-button:hover {
 .cbi-value {
   display: inline-block;
   width: 100%;
-  padding: 0 0.3rem;
+  padding: 0.1rem 0.3rem;
   line-height: 2.3rem
 }
 
@@ -4957,7 +4957,13 @@ div#file-manager-container #status-bar #status-info {
   [data-page="admin-network-dhcp"] [data-tab-active="true"] {
     padding: 0 !important
   }
-
+  .cbi-value:first-child {
+   padding-top: 0
+  }
+  .cbi-value {
+  padding: 0;
+  line-height: 2rem;
+  }
   .history-card-body {
     padding: 0 !important
   }
