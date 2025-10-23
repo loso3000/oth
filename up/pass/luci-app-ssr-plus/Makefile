@@ -1,4 +1,3 @@
-
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=luci-app-ssr-plus
@@ -69,6 +68,7 @@ LUCI_DEPENDS:= \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server:shadowsocksr-libev-ssr-server \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan
+
 
 define Package/$(PKG_NAME)/config
 select PACKAGE_luci-lib-ipkg if PACKAGE_$(PKG_NAME)
@@ -150,7 +150,7 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Hysteria
 	default n
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Tuic_Client
-	bool "Include tuic-client"
+	bool "Include Tuic-Client"
 	select PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS_NG
 	select PACKAGE_$(PKG_NAME)_INCLUDE_IPT2Socks
 	depends on aarch64||arm||i386||x86_64
@@ -202,7 +202,9 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Trojan
 	bool "Include Trojan"
 	select PACKAGE_$(PKG_NAME)_INCLUDE_IPT2Socks
 	default n
+
 endef
+
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/shadowsocksr

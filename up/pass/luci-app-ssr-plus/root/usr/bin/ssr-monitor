@@ -32,7 +32,7 @@ while [ "1" == "1" ]; do #死循环
 	sleep 000030s
 	#redir tcp
 	if [ "$redir_tcp_process" -gt 0 ]; then
-		icount=$(busybox ps -w | grep ssr-xretcp | grep -v grep | wc -l)
+		icount=$(busybox ps -w | grep ssr-retcp | grep -v grep | wc -l)
 		if [ "$icount" == 0 ]; then
 			logger -t "$NAME" "ssrplus redir tcp error.restart!"
 			echolog "ssrplus redir tcp error.restart!"
@@ -42,7 +42,7 @@ while [ "1" == "1" ]; do #死循环
 	fi
 	#redir udp
 	if [ "$redir_udp_process" -gt 0 ]; then
-		icount=$(busybox ps -w | grep ssr-xreudp | grep -v grep | wc -l)
+		icount=$(busybox ps -w | grep ssr-reudp | grep -v grep | wc -l)
 		if [ "$icount" == 0 ]; then
 			logger -t "$NAME" "ssrplus redir udp error.restart!"
 			echolog "ssrplus redir udp error.restart!"
@@ -184,6 +184,7 @@ while [ "1" == "1" ]; do #死循环
 					fi
 				fi
 				rm -f "$cleaned_file"
+
 				if [ -n "$dnsproxy_dnsserver_file" ] && [ -s "$dnsproxy_dnsserver_file" ]; then
 					local upstreams_logic_mode="$(uci_get_by_type global upstreams_logic_mode)"
 					ln_start_bin $(first_type dnsproxy) dnsproxy -l 127.0.0.1 -p $tmp_dns_port  -p $dns_port -u $dnsproxy_dnsserver_file $disabled_ipv6 --cache --cache-min-ttl=3600 --upstream-mode=$upstreams_logic_mode
@@ -224,7 +225,7 @@ while [ "1" == "1" ]; do #死循环
 			ln_start_bin $(first_type chinadns-ng) chinadns-ng -b 127.0.0.1 -l $tmp_dns_port -l $dns_port -p 3 -d gfw $dnsserver -N --filter-qtype 64,65 -f -r --cache 4096 --cache-stale 86400 --cache-refresh 20
 		fi
 	fi
-	#chinadns-ng
+	#chinadns-ng(china)
 	if [ "$(uci -q get "dhcp.@dnsmasq[0]._unused_ssrp_changed")" = "1" ]; then
 		icount=$(busybox ps -w | grep $TMP_BIN_PATH/chinadns-ng | grep -v grep | wc -l)
 		if [ "$icount" -lt 1 ]; then #如果进程挂掉就重启它

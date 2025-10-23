@@ -4,7 +4,7 @@
 -%>
 <script type="text/javascript">
 	//<![CDATA[
-	window.addEventListener('load',function(){
+	window.addEventListener('load', function () {
 		const doms = document.getElementsByClassName('pingtime');
 		const ports = document.getElementsByClassName("socket-connected");
 		const transports = document.getElementsByClassName("transport");
@@ -85,8 +85,10 @@
 		if (input) input.value = ids.join(" ");
 		return false;
 	}
+
 	// set tr draggable
 	function enableDragForTable(table_selector, store) {
+		// 添加 CSS 样式
 		const style = document.createElement("style");
 		style.textContent = `
 			tr[draggable="true"] {
@@ -95,6 +97,7 @@
 			}
 			`;
 		document.head.appendChild(style);
+		
 		var trs = document.querySelectorAll(table_selector + " tr");
 		if (!trs || trs.length.length < 3) {
 			return;
@@ -145,6 +148,7 @@
 			}
 		}
 	}
+
 	// enable
 	enableDragForTable(
 		"#cbi-shadowsocksr-servers table",

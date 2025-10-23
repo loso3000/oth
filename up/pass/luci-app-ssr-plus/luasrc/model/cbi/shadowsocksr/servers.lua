@@ -9,23 +9,23 @@ local uci = require "luci.model.uci".cursor()
 local m, s, o, node
 local server_count = 0
 
--- È·±£ÕıÈ·ÅĞ¶Ï³ÌĞòÊÇ·ñ´æÔÚ
+-- ç¡®ä¿æ­£ç¡®åˆ¤æ–­ç¨‹åºæ˜¯å¦å­˜åœ¨
 local function is_finded(e)
     return luci.sys.exec(string.format('type -t -p "%s" 2>/dev/null', e)) ~= ""
 end
 
--- ÓÅ»¯ CBI UI£¨ĞÂ°æ LuCI ×¨ÓÃ£©
+-- ä¼˜åŒ– CBI UIï¼ˆæ–°ç‰ˆ LuCI ä¸“ç”¨ï¼‰
 local function optimize_cbi_ui()
 	luci.http.write([[
 		<script type="text/javascript">
-			// ĞŞÕıÉÏÒÆ¡¢ÏÂÒÆ°´Å¥Ãû³Æ
+			// ä¿®æ­£ä¸Šç§»ã€ä¸‹ç§»æŒ‰é’®åç§°
 			document.querySelectorAll("input.btn.cbi-button.cbi-button-up").forEach(function(btn) {
 				btn.value = "]] .. translate("Move up") .. [[";
 			});
 			document.querySelectorAll("input.btn.cbi-button.cbi-button-down").forEach(function(btn) {
 				btn.value = "]] .. translate("Move down") .. [[";
 			});
-			// É¾³ı¿Ø¼şºÍËµÃ÷Ö®¼äµÄ¶àÓà»»ĞĞ
+			// åˆ é™¤æ§ä»¶å’Œè¯´æ˜ä¹‹é—´çš„å¤šä½™æ¢è¡Œ
 			document.querySelectorAll("div.cbi-value-description").forEach(function(descDiv) {
 				var prev = descDiv.previousSibling;
 				while (prev && prev.nodeType === Node.TEXT_NODE && prev.textContent.trim() === "") {
@@ -51,7 +51,7 @@ if has_ss_libev then
     table.insert(ss_type_list, { id = "ss-libev", name = translate("ShadowSocks-libev Version") })
 end
 
--- Èç¹ûÓÃ»§Ã»ÓĞÊÖ¶¯ÉèÖÃ£¬Ôò×Ô¶¯Ñ¡Ôñ
+-- å¦‚æœç”¨æˆ·æ²¡æœ‰æ‰‹åŠ¨è®¾ç½®ï¼Œåˆ™è‡ªåŠ¨é€‰æ‹©
 if ss_type == "" then
     if has_ss_rust then
         ss_type = "ss-rust"
@@ -102,26 +102,27 @@ end
 o.default = 30
 o.rmempty = true
 o:depends("auto_update", "1")
--- È·±£ ss_type_list ²»Îª¿Õ
+
+-- ç¡®ä¿ ss_type_list ä¸ä¸ºç©º
 if #ss_type_list > 0 then
     o = s:option(ListValue, "ss_type", string.format("<b><span style='color:red;'>%s</span></b>", translate("ShadowSocks Node Use Version")))
     o.description = translate("Selection ShadowSocks Node Use Version.")
     for _, v in ipairs(ss_type_list) do
-        o:value(v.id, v.name) -- ´æ´¢ "ss-libev" / "ss-rust"£¬µ« UI ÏÔÊ¾ÍêÕûÃû³Æ
+        o:value(v.id, v.name) -- å­˜å‚¨ "ss-libev" / "ss-rust"ï¼Œä½† UI æ˜¾ç¤ºå®Œæ•´åç§°
     end
-    o.default = ss_type  -- ÉèÖÃÄ¬ÈÏÖµ
+    o.default = ss_type  -- è®¾ç½®é»˜è®¤å€¼
     o.write = function(self, section, value)
-        -- ¸üĞÂ Shadowsocks ½ÚµãµÄ has_ss_type
+        -- æ›´æ–° Shadowsocks èŠ‚ç‚¹çš„ has_ss_type
         uci:foreach("shadowsocksr", "servers", function(s)
-            local node_type = uci:get("shadowsocksr", s[".name"], "type")  -- »ñÈ¡½ÚµãÀàĞÍ
-            if node_type == "ss" then  -- ½öĞŞ¸Ä Shadowsocks ½Úµã
+            local node_type = uci:get("shadowsocksr", s[".name"], "type")  -- è·å–èŠ‚ç‚¹ç±»å‹
+            if node_type == "ss" then  -- ä»…ä¿®æ”¹ Shadowsocks èŠ‚ç‚¹
                 local old_value = uci:get("shadowsocksr", s[".name"], "has_ss_type")
                 if old_value ~= value then
                     uci:set("shadowsocksr", s[".name"], "has_ss_type", value)
                 end
             end
         end)
-        -- ¸üĞÂµ±Ç° section µÄ ss_type
+        -- æ›´æ–°å½“å‰ section çš„ ss_type
         Value.write(self, section, value)
     end
 end

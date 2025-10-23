@@ -58,11 +58,11 @@ end
 
 
 
-if Process_list:find("udp.only.ssr.xreudp") then
+if Process_list:find("udp.only.ssr.reudp") then
 	reudp_run = 1
 end
 
-if Process_list:find("tcp.only.ssr.xretcp") then
+if Process_list:find("tcp.only.ssr.retcp") then
 	redir_run = 1
 end
 
@@ -70,17 +70,17 @@ if Process_list:find("tcp.udp.ssr.local") then
 	sock5_run = 1
 end
 
-if Process_list:find("tcp.udp.ssr.xretcp") then
+if Process_list:find("tcp.udp.ssr.retcp") then
 	redir_run = 1
 	reudp_run = 1
 end
 
-if Process_list:find("local.ssr.xretcp") then
+if Process_list:find("local.ssr.retcp") then
 	redir_run = 1
 	sock5_run = 1
 end
 
-if Process_list:find("local.udp.ssr.xretcp") then
+if Process_list:find("local.udp.ssr.retcp") then
 	reudp_run = 1
 	redir_run = 1
 	sock5_run = 1

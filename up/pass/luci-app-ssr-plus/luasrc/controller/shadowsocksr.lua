@@ -10,7 +10,7 @@ function index()
 		call("act_reset")
 	end
 	local page
-	page = entry({"admin", "services", "shadowsocksr"}, alias("admin", "services", "shadowsocksr", "client"), _("ShadowSocksR Plus++"), 1)
+	page = entry({"admin", "services", "shadowsocksr"}, alias("admin", "services", "shadowsocksr", "client"), _("ShadowSocksR Plus+"), 1)
 	page.dependent = true
 	page.acl_depends = { "luci-app-ssr-plus" }
 	entry({"admin", "services", "shadowsocksr", "client"}, cbi("shadowsocksr/client"), _("SSR Client"), 10).leaf = true
@@ -24,14 +24,14 @@ function index()
 	entry({"admin", "services", "shadowsocksr", "refresh"}, call("refresh_data"))
 	entry({"admin", "services", "shadowsocksr", "subscribe"}, call("subscribe"))
 	entry({"admin", "services", "shadowsocksr", "checkport"}, call("check_port"))
-	entry({"admin", "services", "shadowsocksr", "log"}, cbi("shadowsocksr/log"), _("Log"), 80).leaf = true
+	entry({"admin", "services", "shadowsocksr", "log"}, form("shadowsocksr/log"), _("Log"), 80).leaf = true
+	entry({"admin", "services", "shadowsocksr", "get_log"}, call("get_log")).leaf = true
+	entry({"admin", "services", "shadowsocksr", "clear_log"}, call("clear_log")).leaf = true
 	entry({"admin", "services", "shadowsocksr", "run"}, call("act_status"))
 	entry({"admin", "services", "shadowsocksr", "ping"}, call("act_ping"))
 	entry({"admin", "services", "shadowsocksr", "reset"}, call("act_reset"))
 	entry({"admin", "services", "shadowsocksr", "restart"}, call("act_restart"))
 	entry({"admin", "services", "shadowsocksr", "delete"}, call("act_delete"))
-	 entry({"admin","services","shadowsocksr","getlog"},call("getlog")) 
-         entry({"admin","services","shadowsocksr","dellog"},call("dellog")) 
 	--[[Backup]]
 	entry({"admin", "services", "shadowsocksr", "backup"}, call("create_backup")).leaf = true
 end
@@ -62,11 +62,11 @@ function act_status()
     math.randomseed(os.time())
     local e = {}
 
-    e.global = CALL('busybox ps -w | grep ssr-xretcp | grep -v grep  >/dev/null ') == 0
+    e.global = CALL('busybox ps -w | grep ssr-retcp | grep -v grep  >/dev/null ') == 0
 
     e.pdnsd = CALL("busybox ps -w | grep dns2tcp |  grep -v grep  >/dev/null   || busybox ps -w  |  grep 'mosdns-config' | grep -v grep  >/dev/null   || busybox ps -w  |  grep dns2socks | grep -v grep  >/dev/null "  ) == 0
 
-    e.udp = CALL('busybox ps -w | grep ssr-xreudp | grep -v grep  >/dev/null') == 0
+    e.udp = CALL('busybox ps -w | grep ssr-reudp | grep -v grep  >/dev/null') == 0
 
     e.server= CALL('busybox ps -w | grep ssr-server | grep -v grep  >/dev/null') == 0
     luci.http.prepare_content('application/json')
@@ -174,25 +174,13 @@ function act_delete()
 	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "shadowsocksr", "servers"))
 end
 
-function getlog()
-	logfile="/var/log/ssrplus.log"
-	if not fs.access(logfile) then
-		http.write("")
-		return
-	end
-	local f=io.open(logfile,"r")
-	local a=f:read("*a") or ""
-	f:close()
-	a=string.gsub(a,"\n$","")
-	http.prepare_content("text/plain; charset=utf-8")
-	http.write(a)
+function get_log()
+	luci.http.write(luci.sys.exec("[ -f '/var/log/ssrplus.log' ] && cat /var/log/ssrplus.log"))
 end
-function dellog()
-	fs.writefile("/var/log/ssrplus.log","")
-	http.prepare_content("application/json")
-	http.write('')
+	
+function clear_log()
+	luci.sys.call("echo '' > /var/log/ssrplus.log")
 end
-
 
 function create_backup()
 	local backup_files = {
