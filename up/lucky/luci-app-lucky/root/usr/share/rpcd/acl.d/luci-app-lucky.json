@@ -7,13 +7,11 @@
                 "/bin/pidof": [ "exec" ],
                 "/bin/ps": [ "exec" ],
                 "/bin/ash": [ "exec" ],
-                "/etc/init.d/lucky": [ "exec" ],
+		"/etc/init.d/lucky": [ "exec" ],
                 "/usr/bin/lucky": [ "exec" ],
                 "/usr/share/rpcd/ucode/luci.lucky": [ "exec" ]
       	    },
             "ubus": {
-                "rc": [ "*" ],
-                "service": ["list"],
                 "luci.lucky": [ "*" ]
             }
         },
