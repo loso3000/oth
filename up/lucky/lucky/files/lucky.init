@@ -43,13 +43,15 @@ start_instance() {
     port=$(uci -q get $CONF.$CONF.port ) || port="16601"
     SafeURL=$(uci -q get $CONF.$CONF.safe ) || SafeURL=" "
     delay=$(uci -q get $CONF.$CONF.delay ) || delay="5"
-    SafeURL="$(echo "$SafeURL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    SafeURL="${SafeURL##*( )}"
+    SafeURL="${SafeURL%%*( )}"
+    
     init_confdir
     [  x$enabled = x1 ] || return 1
     [ $(awk -F. '{print $1}' /proc/uptime) -lt "120" ] && sleep $delay 
     $(which lucky) -setconf -key AdminWebListenPort -value $port -cd $CONFDIR  >/dev/null 2>&1
     if [ -z "$SafeURL" ] || [ ! "$SafeURL" ]  ; then
-        $(which lucky) -rCancelSafeURL -cd $CONFDIR 
+        $(which lucky) -rCancelSafeURL
     else
         $(which lucky) -setconf -key SafeURL -value "$SafeURL" -cd $CONFDIR >/dev/null 2>&1
     fi
