@@ -1,4 +1,4 @@
-//   Copyright (C) 2021-2025 sirpdboy herboy2008@gmail.com https://github.com/sirpdboy/luci-app-lucky 
+/*   Copyright (C) 2021-2025 sirpdboy herboy2008@gmail.com https://github.com/sirpdboy/luci-app-ddns-go */
 
 'use strict';
 'require form';
@@ -42,7 +42,6 @@ const getLuckyConfig = rpc.declare({
 function getServiceStatus() {
     return L.resolveDefault(checkProcess(), {}).then(function(res) {
         let isRunning = false;
-        // console.debug('getServiceStatus res:', res);
         try {
             if (res && res.running) {
                 isRunning = true;
@@ -59,8 +58,7 @@ function getServiceStatus() {
 
 function loadLuckyVer() {
     return L.resolveDefault(getLuckyConfig(), {}).then(function(result) {
-        // console.debug('loadLuckyVer result:', result);
-        // 确保返回正确的版本信息结构
+        // console.debug('loadLuckyVer');
         return result.Version || 'Unknown';
     });
 }
@@ -105,8 +103,8 @@ return view.extend({
         let uci_ssl = uci.get('lucky', 'lucky', 'ssl') || '0';
         let protocol = uci_ssl === '1' ? 'https:' : 'http:';
         
-        m = new form.Map('lucky', _('Lucky Configuration'),
-            _('Lucky automatically obtains your public IPv4 or IPv6 address and resolves it to the corresponding domain name service.'));
+        m = new form.Map('lucky', _('Lucky'),
+            _('ipv4/ipv6 portforward,ddns,reverseproxy proxy,wake on lan,IOT and more,Default username and password 666'));
 
         // 状态显示部分
         s = m.section(form.TypedSection);
@@ -120,11 +118,6 @@ return view.extend({
                     L.resolveDefault(loadLuckyVer())
                 ]).then(function(results) {
                     const [isRunning, version] = results;
-                    
-                    // console.debug('Poll results:', results);
-                    // console.debug('isRunning:', isRunning);
-                    // console.debug('version:', version);
-
                     var view = document.getElementById('service_status');
                     if (view) {
                         view.innerHTML = renderStatus(isRunning, webport, safeurl, protocol, version);
@@ -137,7 +130,17 @@ return view.extend({
             return E('div', { class: 'cbi-section', id: 'status_bar' }, [
                 E('div', { id: 'service_status' }, 
                     E('p', {}, _('Collecting data...'))
-                )
+                ),
+		E('div', { 'style': 'text-align: right; font-style: italic;' }, [
+                    E('span', {}, [
+                        _('© github '),
+                        E('a', { 
+                            'href': 'https://github.com/sirpdboy', 
+                            'target': '_blank',
+                            'style': 'text-decoration: none;'
+                        }, 'by sirpdboy')
+                    ])
+                ])
             ]);
         };
 
@@ -166,6 +169,9 @@ return view.extend({
         o.default = '0';
         o.rmempty = false;
         
+        o = s.option(form.Value, 'delay', _('Delayed Start (seconds)'));
+        o.default = '60';
+	
         return m.render();
     }
 });
