@@ -49,11 +49,11 @@ start_instance() {
     init_confdir
     [  x$enabled = x1 ] || return 1
     [ $(awk -F. '{print $1}' /proc/uptime) -lt "120" ] && sleep $delay 
-    $(which lucky) -setconf -key AdminWebListenPort -value $port -cd $CONFDIR  >/dev/null 2>&1
-    if [ -z "$SafeURL" ] || [ ! "$SafeURL" ]  ; then
+    $(which lucky) -setconf -key AdminWebListenPort -value $port -cd $CONFDIR
+    if [ -z "$SafeURL" ] ; then
         $(which lucky) -rCancelSafeURL
     else
-        $(which lucky) -setconf -key SafeURL -value "$SafeURL" -cd $CONFDIR >/dev/null 2>&1
+        $(which lucky) -setconf -key SafeURL -value "$SafeURL" -cd $CONFDIR
     fi
     
     procd_open_instance
