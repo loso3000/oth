@@ -1,0 +1,14 @@
+{
+	"admin/services/lucky-go": {
+		"title": "Lucky",
+		"order": 59,
+		"action": {
+			"type": "view",
+			"path": "lucky/config"
+		},
+		"depends": {
+			"acl": [ "luci-app-lucky" ],
+			"uci": { "lucky": true }
+		}
+	}
+}
