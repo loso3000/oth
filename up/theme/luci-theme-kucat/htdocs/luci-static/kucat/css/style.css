@@ -4012,12 +4012,14 @@ pre.command-output {
   border-bottom-color: #dee2e6
 }
 
+/* openclash */
 [data-page^="admin-services-openclash"] .cbi-tabmenu>li:last-child {
   margin-right: 0 !important
 }
+
 [data-page^="admin-services-openclash"]  .select-popup-header,
 [data-page^="admin-services-openclash"]  .oc,
-[data-page^="admin-services-openclash"]  .oc .main-cards-container   {
+.oc .main-cards-container   {
    background-color: rgba(255,255,255,0) !important;
 }
 
@@ -4029,40 +4031,40 @@ pre.command-output {
    background-color: rgba(255,255,255,0) !important;
    padding: 0 20px 0 10px!important;
 }
+
 [data-page^="admin-services-openclash"] .oc .version-display,
 [data-page^="admin-services-openclash"] .oc .value-indicator,
 [data-page^="admin-services-openclash"] .oc .cbi-button-group{
-border: 0px solid rgba(255,255,255,0.3) !important;
- /* background-color: var(--input-bgcolor) !important; */
-}
-[data-page^="admin-services-openclash"]  .oc .myip-ip-item, .oc .myip-check-item {
-   background-color: rgba(255,255,255,0.1) !important;
-   background-color: rgba(var(--primary-rgbbody),0.2) !important;
-   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-   border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
+border: 0px solid #ddd !important;
 }
 
-[data-page^="admin-services-openclash"]  .oc .developer-container,
-[data-page^="admin-services-openclash"]  .oc .myip-main-card,
-[data-page^="admin-services-openclash"]  .oc .sub-card  {
-  background-color: rgba(255,255,255,0.1) !important;
-  background-color: rgba(var(--primary-rgbm),0.2) !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
-  border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
+[data-page^="admin-services-openclash"] .oc .myip-ip-item, 
+[data-page^="admin-services-openclash"] .oc .myip-check-item,
+[data-page^="admin-services-openclash"] .oc .developer-container,
+[data-page^="admin-services-openclash"] .oc .sub-card  {
+  background-color: rgba(var(--primary-rgbm),0.02) !important;
+  border: 1px solid rgba(var(--primary-rgbm),0.2) ;
 }
 
-[data-page^="admin-services-openclash"]  .oc .main-card {
-  background-color: rgba(255,255,255,0) !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
-  border: 1px solid rgba(var(--primary-rgbm),0.1) !important;
+[data-page^="admin-services-openclash"] .oc>div>div,
+[data-page^="admin-services-openclash"] .oc .myip-main-card,
+[data-page^="admin-services-openclash"] .oc .myip-content-grid,
+[data-page^="admin-services-openclash"] .oc .main-card,
+[data-page^="admin-services-openclash"] .oc .announcement-card
+ {
+  background-color: rgba(255, 255, 255, 0) !important;
+  border: 0px solid #ddd !important;
+  box-shadow: none !important;
 }
 
-[data-page^="admin-services-openclash"]  .oc .ip-result,.oc .ip-geo,
-[data-page^="admin-services-openclash"]  .oc .ip-title, .oc .ip-state_title,
-[data-page^="admin-services-openclash"]  .oc .myip-section-title,
-[data-page^="admin-services-openclash"]  .oc .card-title
+
+[data-page^="admin-services-openclash"] .oc .ip-result,.oc .ip-geo,
+[data-page^="admin-services-openclash"] .oc .ip-title, .oc .ip-state_title,
+[data-page^="admin-services-openclash"] .oc .myip-section-title,
+.oc .card-title
 {
   color: var(--primary-title-color)!important;
+  border: 0px solid #ddd !important;
 }
 
 #tool_label .tool_label_span {
