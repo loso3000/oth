@@ -33,8 +33,6 @@ async function checkProcess() {
     } catch (err) {
         // pidof 失败，继续尝试 ps
     }
-
-    // 回退到 ps
     try {
         const psRes = await fs.exec('/bin/ps', ['-C', 'ddns-go', '-o', 'pid=']);
         const pid = psRes.stdout.trim();
@@ -47,20 +45,20 @@ async function checkProcess() {
     }
 }
 
-// 获取版本信息
 function getVersionInfo() {
     return L.resolveDefault(getDDNSGoInfo(), {}).then(function(result) {
-        return result.ver || {};
+        console.log('getVersionInfo result:', result);
+        return result || {};
     }).catch(function(error) {
         console.error('Failed to get version:', error);
         return {};
     });
 }
 
-// 检查更新状态
 function checkUpdateStatus() {
     return L.resolveDefault(getUpdateInfo(), {}).then(function(result) {
-        return result.update || {};
+        //console.log('checkUpdateStatus result:', result);
+        return result || {};
     }).catch(function(error) {
         console.error('Failed to get update info:', error);
         return {};
@@ -86,10 +84,9 @@ function renderStatus(isRunning, listen_port, noweb, version) {
     return html;
 }
 
-// 渲染更新状态
 function renderUpdateStatus(updateInfo) {
     if (!updateInfo || !updateInfo.status) {
-        return '<span style="color:orange">⚠ ' + _('Update status unknown') + '</span>';
+        return '<span style="color:orange"> ⚠ ' + _('Update status unknown') + '</span>';
     }
     
     var status = updateInfo.status;
@@ -116,47 +113,115 @@ return view.extend({
             uci.load('ddns-go')
         ]);
     },
-    
+
     handleResetPassword: async function () {
-        try {
-            // 检查文件权限
-            const stat = await fs.stat('/usr/bin/ddns-go');
-            const result = await fs.exec('/usr/bin/ddns-go', ['-resetPassword','admin12345' , '-c', '/etc/ddns-go/ddns-go-config.yaml']);
-            if (result.code === 0) {
-                alert(_('SUCCESS:') + '\n' + _('Reset admin password successfully to admin12345'));
-            } 
-        } catch (error) { }
+    try {
+        ui.showModal(_('Resetting Password'), [
+            E('p', { 'class': 'spinning' }, _('Resetting admin password, please wait...'))
+        ]);
+
+        const result = await fs.exec('/usr/bin/ddns-go', ['-resetPassword', 'admin12345', '-c', '/etc/ddns-go/ddns-go-config.yaml']);
+
+        ui.hideModal();
+
+        const output = (result.stdout + result.stderr).trim();
+
+        let success = false;
+        let message = '';
+
+        if (result.code === 0) {
+            
+
+                message = _('Password reset successfully to admin12345');
+
+            ui.showModal(_('Password Reset Successful'), [
+                E('p', _('Admin password has been reset to: admin12345')),
+                E('p', _('You need to restart DDNS-Go service for the changes to take effect.')),
+                E('div', { 'class': 'right' }, [
+                    E('button', {
+                        'class': 'btn cbi-button cbi-button-positive',
+                        'click': ui.createHandlerFn(this, function() {
+                            ui.hideModal();
+                            this.handleRestartService();
+                        })
+                    }, _('Restart Service Now')),
+                    ' ',
+                    E('button', {
+                        'class': 'btn cbi-button cbi-button-neutral',
+                        'click': ui.hideModal
+                    }, _('Restart Later'))
+                ])
+            ]);
+        } else {
+            alert(_('Reset may have failed:') + '\n' + output);
+        }
+        
+    } catch (error) {
+        ui.hideModal();
+        console.error('Reset password failed:', error);
+        alert(_('ERROR:') + '\n' + _('Reset password failed:') + '\n' + error.message);
+    }
     },
+ 
+    handleRestartService: async function() {
+    try {
+        await fs.exec('/etc/init.d/ddns-go', ['stop']);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await fs.exec('/etc/init.d/ddns-go', ['start']);
+        
+        alert(_('SUCCESS:') + '\n' + _('DDNS-Go service restarted successfully'));
+        if (window.statusPoll) {
+            window.statusPoll();
+        }
+    } catch (error) {
+        alert(_('ERROR:') + '\n' + _('Failed to restart service:') + '\n' + error.message);
+    }
+    },
+
     
     handleUpdate: async function () {
         try {
-            // 显示更新中状态
             var updateView = document.getElementById('update_status');
             if (updateView) {
                 updateView.innerHTML = '<span class="spinning"></span> ' + _('Updating, please wait...');
             }
-            
-            // 执行更新检查
             const updateInfo = await checkUpdateStatus();
-            
-            // 显示更新结果
             if (updateView) {
                 updateView.innerHTML = renderUpdateStatus(updateInfo);
             }
-            
-            // 如果更新成功，重新获取版本信息来刷新状态显示
+
             if (updateInfo.update_successful || updateInfo.status === 'updated') {
-                // 触发状态重新检查
                 if (window.statusPoll) {
                     window.statusPoll();
                 }
+                
+                // 3秒后恢复显示版本信息
+                setTimeout(() => {
+                    var updateView = document.getElementById('update_status');
+                    if (updateView) {
+                        getVersionInfo().then(function(versionInfo) {
+                            var version = versionInfo.version || '';
+                            updateView.innerHTML = String.format('<span style="color:green">✓ %s v%s</span>', 
+                                _('Current Version:'), version);
+                        });
+                    }
+                }, 3000);
             }
-            
+
         } catch (error) {
             console.error('Update failed:', error);
             var updateView = document.getElementById('update_status');
             if (updateView) {
                 updateView.innerHTML = '<span style="color:red">✗ ' + _('Update failed') + '</span>';
+
+                // 5秒后恢复显示版本信息
+                setTimeout(() => {
+                    getVersionInfo().then(function(versionInfo) {
+                        var version = versionInfo.version || '';
+                        updateView.innerHTML = String.format('<span>%s v%s</span>', 
+                            _('Current Version:'), version);
+                    });
+                }, 5000);
             }
         }
     },
@@ -172,13 +237,12 @@ return view.extend({
         // 状态显示部分
         s = m.section(form.TypedSection);
         s.anonymous = true;
+   
         s.render = function() {
             var statusView = E('p', { id: 'control_status' }, 
                 '<span class="spinning"></span> ' + _('Checking status...'));
             
-            var updateView = E('p', { id: 'update_status' }, '');
-            
-            // 定义轮询函数供其他函数调用
+
             window.statusPoll = function() {
                 return Promise.all([
                     checkProcess(),
@@ -195,21 +259,8 @@ return view.extend({
             
             var pollInterval = poll.add(window.statusPoll, 5); // 每5秒检查一次
             
-            // 初始检查更新状态
-            checkUpdateStatus().then(function(updateInfo) {
-                updateView.innerHTML = renderUpdateStatus(updateInfo);
-            });
-            
             return E('div', { class: 'cbi-section', id: 'status_bar' }, [
                 statusView,
-                E('div', { style: 'margin: 10px 0;' }, [
-                    E('button', {
-                        'class': 'cbi-button cbi-button-action',
-                        'click': ui.createHandlerFn(this.view, 'handleUpdate'),
-                        'style': 'margin-right: 10px;'
-                    }, _('Check Update')),
-                    updateView
-                ]),
                 E('div', { 'style': 'text-align: right; font-style: italic;' }, [
                     E('span', {}, [
                         _('© github '),
@@ -263,8 +314,26 @@ return view.extend({
         o.inputstyle = 'apply';
         o.onclick = L.bind(this.handleResetPassword, this, data);
         
-        // 添加更新按钮
-        o = s.option(form.Button, '_update', _('Update Program'),
+        o = s.option(form.DummyValue, '_update_status', _('Current Version'));
+        o.rawhtml = true;
+        var currentVersion = '';
+	
+        getVersionInfo().then(function(versionInfo) {
+            currentVersion = versionInfo.version || '';
+            var updateView = document.getElementById('update_status');
+            if (updateView) {
+                updateView.innerHTML = String.format('<span>v%s</span>', currentVersion);
+            }
+        });
+        
+        o.cfgvalue = function() {
+            return E('div', { style: 'margin: 5px 0;' }, [
+                E('span', { id: 'update_status' }, 
+                    currentVersion ? String.format('v%s', currentVersion) : _('Loading...'))
+            ]);
+        };
+
+        o = s.option(form.Button, '_update', _('Update kernel'),
                 _('Check and update DDNS-Go to the latest version'));
         o.inputtitle = _('Check Update');
         o.inputstyle = 'apply';

@@ -73,7 +73,7 @@ msgstr "不启动web服务"
 msgid "Delayed Start (seconds)"
 msgstr "开机延时启动（秒）"
 
-msgid "Update Program"
+msgid "Update kernel"
 msgstr "更新内核"
 
 msgid "Check and update DDNS-Go to the latest version"
@@ -100,5 +100,23 @@ msgstr "重置密码"
 msgid "SUCCESS:"
 msgstr "完成执行："
 
-msgid "Reset admin password successfully to admin12345"
-msgstr "成功重置admin密码admin12345"
+msgid "Password reset successfully to admin12345"
+msgstr "成功重置密码admin12345"
+
+msgid "Password Reset Successful"
+msgstr "重置密码成功"
+
+msgid "User password has been reset to: admin12345"
+msgstr "用户密码重置为admin12345"
+
+msgid "You need to restart DDNS-Go service for the changes to take effect."
+msgstr "需要重启DDNS-GO服务更改才生效"
+
+msgid "Restart Service Now"
+msgstr "立刻重启服务"
+
+msgid "Restart Later"
+msgstr "稍后重启"
+
+msgid ""
+msgstr ""

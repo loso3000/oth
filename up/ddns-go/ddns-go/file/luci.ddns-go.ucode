@@ -13,8 +13,6 @@ import { access, error, lstat, popen, readfile, writefile } from 'fs';
 function shellquote(s) {
 	return `'${replace(s, "'", "'\\''")}'`;
 }
-
-// 获取当前版本号的辅助函数
 function get_current_version() {
 	if (!access('/usr/bin/ddns-go'))
 		return null;
@@ -53,8 +51,6 @@ const methods = {
 		call: function() {
 			if (!access('/usr/bin/ddns-go'))
 				return { update: {}, error: 'ddns-go not found' };
-			
-			// 先获取更新前的版本号
 			let version_before = get_current_version();
 			
 			const fd = popen('/usr/bin/ddns-go -u');
@@ -79,22 +75,17 @@ const methods = {
 						message: output
 					};
 					
-					// 获取更新后的版本号
 					update_info.version_after = get_current_version();
 					
-					// 通过版本号比较判断是否真的更新了
 					if (version_before && update_info.version_after && version_before !== update_info.version_after) {
 						update_info.update_successful = true;
 						update_info.has_update = false; // 已经更新完成，所以没有待更新了
 						update_info.status = 'updated';
 						update_info.message = `更新成功: ${version_before} → ${update_info.version_after}`;
 					}
-					// 检查各种可能的输出模式
 					else if (match(output, /Current version.*is the latest/)) {
 						update_info.status = 'latest';
 						update_info.has_update = false;
-						
-						// 提取版本号
 						let version_match = match(output, /v[\d.]+/);
 						if (version_match) {
 							update_info.current_version = replace(version_match[0], /^v/, '');
@@ -106,7 +97,6 @@ const methods = {
 						update_info.status = 'update_available';
 						update_info.has_update = true;
 						
-						// 尝试提取版本信息
 						let versions = match(output, /v[\d.]+/, 'g');
 						if (versions && length(versions) >= 2) {
 							update_info.current_version = replace(versions[0], /^v/, '');
