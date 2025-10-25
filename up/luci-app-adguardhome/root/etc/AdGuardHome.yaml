@@ -99,31 +99,18 @@ filters:
   - enabled: true
     url: https://anti-ad.net/easylist.txt
     name: anti-AD命中率最高列表
-    id: 139789122
+    id: 139789221
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
+    name: AdGuard DNS filter
+    id: 139789332
+  - enabled: false
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
+    name: AdAway Default Blocklist
+    id: 149789121
 whitelist_filters: []
 user_rules:
-  - '@@||taobao.com^$important'
-  - '@@||tmall.com^$important'
-  - '@@||jd.com^important'
-  - '@@||flyme.cn^$important'
-  - '@@||meizu.com^$important'
-  - '@@||wl.jd.com^$important'
-  - '@@||flydigi.com^'
-  - '@@||pv.sohu.com^$important'
-  - /googleads.$~script,domain=~googleads.github.io
-  - /pagead/lvz?
-  - '||google.com/pagead/'
-  - '||static.doubleclick.net^$domain=youtube.com'
-  - '||youtube.com/get_midroll_'
-  - '||5hz.org^'
-  - '@@||000714.xyz^'
-  - '@@||blueskyxn.com^'
-  - '||topnewsfeeds.net^'
-  - '||nbryb.com^'
-  - '||superbdolly.com^'
-  - '||salutationcheerlessdemote.com^'
-  - '||buildingdoodlesquare.com^'
-  - '||colonistnobilityheroic.com^'
+
 dhcp:
   enabled: false
   interface_name: ""
