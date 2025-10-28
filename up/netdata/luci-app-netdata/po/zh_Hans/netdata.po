@@ -1,6 +1,8 @@
 msgid ""
 msgstr ""
 
+msgid "Netdata"
+msgstr "实时监控"
 
 msgid "Basic Setting"
 msgstr "基本设置"
@@ -14,8 +16,7 @@ msgstr "编辑 Netdata 主配置: <code>/etc/netdata/netdata.conf</code>"
 msgid "Enable"
 msgstr "启用"
 
-msgid "Enable Auth"
-msgstr "启用验证"
+
 
 msgid "Enable SSL"
 msgstr "SSL启用https访问"
@@ -38,14 +39,14 @@ msgstr "未运行"
 msgid "RUNNING"
 msgstr "运行中"
 
-msgid ""
-msgstr ""
+msgid "Netdata Service Not Running"
+msgstr "Netdata服务未启用"
 
-msgid ""
-msgstr ""
+msgid "Cert file"
+msgstr "Cert文件"
 
-msgid ""
-msgstr ""
+msgid "Cert Key file"
+msgstr "Cert密钥文件"
 
 msgid ""
 msgstr ""

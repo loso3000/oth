@@ -18,20 +18,20 @@
       "path": "netdata/netdata"
     }
   },
-  "admin/status/netdata/config": {
+  "admin/status/netdata/basic": {
     "title": "Basic Setting",
     "order": 20,
     "action": {
       "type": "view",
-      "path": "netdata/config"
+      "path": "netdata/basic"
     }
   },
-  "admin/status/netdata/advanced": {
+  "admin/status/netdata/config": {
     "title": "Config Setting",
     "order": 30,
     "action": {
       "type": "view",
-      "path": "netdata/advanced"
+      "path": "netdata/config"
     }
   }
 }
