@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 LUCI_NAME:=luci-app-netdata
 
 
-PKG_NAME:=luci-app-Netdata
+PKG_NAME:=luci-app-netdata
 PKG_VERSION:=2.0.1
 PKG_RELEASE:=20251029
 
