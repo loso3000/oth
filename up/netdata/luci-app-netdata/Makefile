@@ -7,14 +7,20 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_NAME:=luci-app-netdata
-PKG_NAME:=luci-app-netdata
+
+
+PKG_NAME:=luci-app-Netdata
 PKG_VERSION:=2.0.1
 PKG_RELEASE:=20251029
 
-LUCI_TITLE:=LuCI interface for Netdata
-LUCI_DEPENDS:=+@(netdata||netdata-ssl)
+
+LUCI_TITLE:=Grant UCI access for netdata
+
+LUCI_DEPENDS:=+!PACKAGE_netdata-ssl:netdata +PACKAGE_netdata-ssl:netdata-ssl
 LUCI_PKGARCH:=all
+
 PKG_LICENSE:=GPL-3.0
+
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
