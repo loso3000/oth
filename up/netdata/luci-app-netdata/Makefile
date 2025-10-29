@@ -16,7 +16,7 @@ PKG_RELEASE:=20251029
 
 LUCI_TITLE:=Grant UCI access for netdata
 
-LUCI_DEPENDS:=+!netdata-ssl:netdata
+LUCI_DEPENDS:=+netdata
 LUCI_PKGARCH:=all
 
 PKG_LICENSE:=GPL-3.0
