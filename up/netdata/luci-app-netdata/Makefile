@@ -29,23 +29,6 @@ rm -f /tmp/luci*
 exit 0
 endef
 
-define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-	chmod +x /usr/share/netdata/*
-	chmod +x /etc/init.d/netdata
-	/etc/init.d/netdata enable >/dev/null 2>&1
-	enable=$(uci get netdata.netdata.enabled 2>/dev/null)
-	if [ "$enable" == "1" ]; then
-		/etc/init.d/netdata restart >/dev/null 2>&1
-	else
-	
-		/etc/init.d/netdata stop >/dev/null 2>&1
-	fi
-	rm -f /tmp/luci-indexcache
-	rm -f /tmp/luci-modulecache/*
-exit 0
-endef
-
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
 if [ -z "$${IPKG_INSTROOT}" ]; then
