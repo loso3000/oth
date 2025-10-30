@@ -2689,6 +2689,12 @@ select,input {
   background-color: rgba(var(--primary-rgbbody),1);
 }
 
+#cbi-dockerd .shadow
+{
+  background-color: rgba(var(--primary-rgbm), 0.1) !important;
+}
+
+
 body.modal-overlay-active {
   overflow: hidden;
   height: 100vh
@@ -3900,8 +3906,8 @@ body.lang_pl.node-main-login .cbi-value-title {
 
 .pure-g .block h4,
 [data-page="admin-services-vssr"] .block h4 {
-  color: var(--body-color);
-  background-image: none
+  color: var(--body-color)!important;
+  background-image: none!important
 }
 
 [data-page="admin-services-vssr"] .status-bar {
@@ -4143,7 +4149,17 @@ pre.command-output {
   background-color: var(--inputbg-color)!important;
   border: 1px solid var(--input-boxcolor)!important;
 }
+.history-tabs {
+  background-color: rgba(255, 255, 255, 0)!important;
+}
 
+.history-tabs>button {
+  color: var(--primary-title-color)!important;
+  background-color: rgba(var(--primary-rgbm), 0.2);
+}
+.history-tabs>button.active {
+  background-color: rgba(var(--primary-rgbm), 0.5);
+}
 .action-button {
   background-color: rgba(var(--primary-rgbm), 0.9)!important;
 }
