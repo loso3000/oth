@@ -24,8 +24,8 @@ define Package/$(PKG_NAME)/preinst
 		add ucitrack netdata
 		set ucitrack.@netdata[-1].init=netdata
 		commit ucitrack
-	EOF
-	rm -f /tmp/luci*
+EOF
+rm -f /tmp/luci*
 exit 0
 endef
 
@@ -70,6 +70,7 @@ define Package/$(PKG_NAME)/conffiles
 /etc/config/netdata
 /etc/netdata/
 endef
+
 include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
