@@ -10,7 +10,7 @@ LUCI_NAME:=luci-app-netdata
 
 LUCI_TITLE:=Grant UCI access for netdata
 
-LUCI_DEPENDS:=+!PACKAGE_netdata-ssl:netdata +PACKAGE_netdata-ssl:netdata-ssl
+LUCI_DEPENDS:=+!PACKAGE_netdata:netdata-ssl +PACKAGE_netdata:netdata
 LUCI_PKGARCH:=all
 
 
