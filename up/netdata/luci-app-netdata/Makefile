@@ -14,7 +14,7 @@ PKG_LICENSE:=GPL-3.0
 
 LUCI_TITLE:=LuCI app for netdata
 LUCI_PKGARCH:=all
-LUCI_DEPENDS:=+!PACKAGE_netdata:netdata-ssl +PACKAGE_netdata:netdata
+LUCI_DEPENDS:=+netdata
 LUCI_DESCRIPTION:=LuCI support for netdata
 
 define Package/$(PKG_NAME)/preinst
