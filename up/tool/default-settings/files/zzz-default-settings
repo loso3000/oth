@@ -151,11 +151,24 @@ sed -i 's/root.*/root::0:0:99999:7:::/g' /etc/shadow
 
 [ x$debug = x1 ] && echo $ver
 }
+uci -q batch <<-EOF
+	set system.@system[0].timezone='CST-8'
+	set system.@system[0].zonename='Asia/Shanghai'
 
+	delete system.ntp.server
+	add_list system.ntp.server='ntp1.aliyun.com'
+	add_list system.ntp.server='ntp.tencent.com'
+	add_list system.ntp.server='ntp.ntsc.ac.cn'
+	add_list system.ntp.server='time.apple.com'
+EOF
+uci commit system
 # sed -i '/coremark/d' /etc/crontabs/root
 ln -sf /sbin/ip /usr/bin/ip
 # Disable opkg signature check
 sed -i 's/option check_signature/# option check_signature/g' /etc/opkg.conf
+sed -i '/check_signature/d' /etc/opkg.conf
+
+sed -i '/REDIRECT --to-ports 53/d' /etc/firewall.user
 . /etc/ezopenwrt_version
 [ -n $EZVER ] && {
 sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
