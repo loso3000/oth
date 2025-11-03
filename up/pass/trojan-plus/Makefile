@@ -58,7 +58,7 @@ define Package/trojan-plus
 	URL:=https://github.com/Trojan-Plus-Group/trojan-plus
 	DEPENDS:= \
 		+libpthread +libstdcpp +libopenssl \
-		+boost +boost-system +boost-program_options
+		+boost +boost-program_options
 	PROVIDES:=trojan
 endef
 
