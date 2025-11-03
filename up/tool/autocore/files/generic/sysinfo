@@ -65,10 +65,7 @@ case "$DISTRIB_TARGET" in
 "mvebu"/*)
 	cpu_freq="$(mhz | awk -F 'cpu_MHz=' '{printf("%.fMHz",$2)}')" ;;
 "rockchip"/*)
-	cpu_freq="$(awk '{printf("%.fMHz", $0 / 1000)}' "$CPUFREQ_PATH/policy0/cpuinfo_cur_freq")"
-	[ ! -e "$CPUFREQ_PATH/policy4/cpuinfo_cur_freq" ] || \
-		big_cpu_freq="$(awk '{printf("%.fMHz ", $0 / 1000)}' "$CPUFREQ_PATH/policy4/cpuinfo_cur_freq")"
-	;;
+	cpu_freq="$(awk '{printf("%.fMHz ", $0 / 1000)}' "$CPUFREQ_PATH"/policy*/cpuinfo_cur_freq | awk '$1=$1')" ;;
 "x86"/*)
 	cpu_freq="$(awk -F ': ' '/MHz/ {print $2}' "$CPUINFO_PATH" | head -n1 | awk -F '.' '{print $1}' )MHz" ;;
 *)
@@ -135,12 +132,14 @@ if grep -Eq "x86" "/etc/openwrt_release" || grep -Eq "bcm27xx" "/etc/openwrt_rel
 case "$DISTRIB_TARGET" in
 "bcm27xx"/*)
 	cpu_temp="$(vcgencmd measure_temp | awk -F '=' '{print $2}' | awk -F "'" '{print $1}')°C" ;;
-
+"ipq40xx"/*|"ipq806x"/*|"mediatek"/*|"qualcommax"/*) ;;
 "x86"/*)
-	if grep -q "GenuineIntel" "/proc/cpuinfo"; then
+	if [ -n "$(uci -q get "wechatpush.config.server_host")" ]; then
+		cpu_temp="$(/usr/share/wechatpush/wechatpush soc)°C"
+	elif grep -q "GenuineIntel" "/proc/cpuinfo"; then
 		cpu_temp="$(sensors "coretemp-*" 2>"/dev/null" | grep -E "(Package id |Core )" | grep -Eo "\+[0-9.]*°C" | head -n1 | tr -d "+")"
 	elif grep -q "AuthenticAMD" "/proc/cpuinfo"; then
-		cpu_temp=`sensors 'k*temp-*' 2>/dev/null | awk '/Tdie/ {print $2}' | head -n1 | tr -d "+"`
+		cpu_temp=`sensors 'k*temp-*' 2>/dev/null | awk '/Tctl|Tdie/ {print $2}' | head -n1 | tr -d "+"`
 		[ -n "${cpu_temp}" ] || cpu_temp=`sensors 2>/dev/null | grep -E 'temp1'  | grep -Eo "\+[0-9]*.[0-9]" | head -n1 | tr -d "+"`
 		[ -n "${cpu_temp}" ] || cpu_temp=`sensors  2>/dev/null | grep -E 'Tctl'  | grep -Eo "\+[0-9]*.[0-9]" | head -n1 | tr -d "+"`
 	fi
