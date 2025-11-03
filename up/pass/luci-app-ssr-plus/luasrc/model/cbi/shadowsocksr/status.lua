@@ -56,8 +56,6 @@ if nixio.fs.access("/etc/ssrplus/netflixip.list") then
 	nfip_count = tonumber(luci.sys.exec("cat /etc/ssrplus/netflixip.list | wc -l"))
 end
 
-
-
 if Process_list:find("udp.only.ssr.reudp") then
 	reudp_run = 1
 end
@@ -168,6 +166,7 @@ s.write = function()
 	luci.sys.call("/etc/init.d/shadowsocksr restart >/dev/null 2>&1 &")
 	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "shadowsocksr", "client"))
 end
+
 s = m:field(DummyValue, "google", translate("Google Connectivity"))
 s.value = translate("No Check")
 s.template = "shadowsocksr/check"
@@ -194,10 +193,10 @@ if uci:get_first("shadowsocksr", 'global', 'apple_optimization', '0') ~= '0' the
 end
 
 if uci:get_first("shadowsocksr", 'global', 'netflix_enable', '0') ~= '0' then
-s = m:field(DummyValue, "nfip_data", translate("Netflix IP Data"))
-s.rawhtml = true
-s.template = "shadowsocksr/refresh"
-s.value = nfip_count .. " " .. translate("Records")
+	s = m:field(DummyValue, "nfip_data", translate("Netflix IP Data"))
+	s.rawhtml = true
+	s.template = "shadowsocksr/refresh"
+	s.value = nfip_count .. " " .. translate("Records")
 end
 
 if uci:get_first("shadowsocksr", 'global', 'adblock', '0') == '1' then
@@ -206,7 +205,6 @@ if uci:get_first("shadowsocksr", 'global', 'adblock', '0') == '1' then
 	s.template = "shadowsocksr/refresh"
 	s.value = ad_count .. " " .. translate("Records")
 end
-
 
 s = m:field(DummyValue, "check_port", translate("Check Server Port"))
 s.template = "shadowsocksr/checkport"
