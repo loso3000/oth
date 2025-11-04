@@ -117,9 +117,11 @@ wifi up
 
 frmware=`cat /etc/ezopenwrt_version | awk -F '-' '{printf $2}'`
 
-if [ $frmware = Super ] ;then
+if [ $frmware = Super || $frmware = Mini  ]  ;then
 sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
 sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-samba4.json
+sed -i 's/vpn/services/g' /usr/share/luci/menu.d/luci-app-zerotier.json
+
 fi
 sed -i 's/network/status/g' /www/luci-static/resources/view/bandix/connection.js
 sed -i 's/network/status/g' /usr/share/luci/menu.d/luci-app-bandix.json
@@ -189,9 +191,9 @@ echo "OPENWRT_RELEASE='"${EZVER}"'" >> /etc/os-release
 }
 sed -i 's/immortalwrt/openwrt/g' /etc/config/luci
 
-uci set firewall.@defaults[0].synflood_protect='1'
-uci set firewall.@defaults[0].input='DROP'
-uci set firewall.@defaults[0].flow_offloading='1'
+# uci set firewall.@defaults[0].synflood_protect='1'
+# uci set firewall.@defaults[0].input='DROP'
+# uci set firewall.@defaults[0].flow_offloading='1'
 
 # docker mirror
 [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
