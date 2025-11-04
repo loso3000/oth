@@ -1,14 +1,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-bypass
-PKG_VERSION:=1.8.2
-PKG_RELEASE:=23
+PKG_VERSION:=1.8.3
+PKG_RELEASE:=24
 
 PKG_CONFIG_DEPENDS:= \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server \
+
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Simple_obfs \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Simple_obfs_server \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Xray_plugin \
@@ -23,16 +20,11 @@ LUCI_TITLE:=LuCI support for bypass
 LUCI_PKGARCH:=all
 LUCI_DEPENDS:=+ipset +kmod-ipt-nat +ip-full +iptables-mod-tproxy +lua-neturl +dnsmasq-full +smartdns +coreutils \
 	+coreutils-base64 +curl +tcping +resolveip +chinadns-ng +lua +luci-compat +luci-base +unzip \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server:shadowsocks-libev-ss-server \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client:shadowsocks-libev-ss-local \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client:shadowsocks-libev-ss-redir \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-local \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server:shadowsocksr-libev-ssr-server \
+
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Simple_obfs:simple-obfs \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Xray_plugin:xray-plugin \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Xray:xray-core \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan-plus \
+	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_NaiveProxy:naiveproxy \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Hysteria:hysteria \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Socks5_Proxy:redsocks2 \
@@ -40,21 +32,6 @@ LUCI_DEPENDS:=+ipset +kmod-ipt-nat +ip-full +iptables-mod-tproxy +lua-neturl +dn
 
 define Package/$(PKG_NAME)/config
 
-config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client
-	bool "Include Shadowsocks Libev Client"
-	default y if i386||x86_64||arm||aarch64
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server
-	bool "Include Shadowsocks Libev Server"
-	default y if i386||x86_64||arm||aarch64
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client
-	bool "Include ShadowsocksR Libev Client"
-	default y
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server
-	bool "Include ShadowsocksR Libev Server"
-	default y if i386||x86_64||aarch64
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Simple_Obfs
 	bool "Include Shadowsocks Simple Obfs Plugin"
