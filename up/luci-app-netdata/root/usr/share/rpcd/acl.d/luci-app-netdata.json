@@ -5,7 +5,6 @@
       "file": {
         "/etc/netdata/netdata.conf": [ "read" ],
         "/etc/init.d/netdata": [ "exec" ],
-        "/usr/bin/openssl passwd -apr1 *": [ "exec" ],
         "/bin/pidof": [ "exec" ],
         "/bin/ps": [ "exec" ],
         "/bin/ash": [ "exec" ]
