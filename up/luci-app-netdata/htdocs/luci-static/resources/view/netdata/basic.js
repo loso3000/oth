@@ -163,17 +163,25 @@ return view.extend({
         o.rmempty = true;
 
         o = s.option(form.Value, 'cert_file', _('Cert file'));
-        o.placeholder = '/etc/netdata/cert.crt';
-        o.rmempty = false;
-        o.retain = true;
+        o.default = '/etc/ssl/ezopwrt.crt';
         o.depends('enable_ssl', '1');
+	o.cfgvalue = function(section_id) {
+		return uci.get('netdata', netdata, 'cert_file') || '/etc/ssl/ezopwrt.crt';
+	};
 
         o = s.option(form.Value, 'key_file', _('Cert Key file'));
-        o.placeholder = '/etc/netdata/cert.key';
-        o.rmempty = false;
-        o.retain = true;
+        o.default = '/etc/ssl/ezopwrt.key';
         o.depends('enable_ssl', '1');
-
+	o.cfgvalue = function(section_id) {
+		return uci.get('netdata', netdata, 'key_file') || '/etc/ssl/ezopwrt.key';
+	};
+	
+	o = s.option(form.DummyValue, 'feedback_info',  _('feedback info'));
+	o.href = 'https://github.com/sirpdboy';
+	o.cfgvalue = function() {
+		return 'https://github.com/sirpdboy';
+	};
+	
         return m.render();
     }
 });
