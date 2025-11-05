@@ -125,3 +125,9 @@ msgstr "显示或隐藏设置向导菜单，隐藏后在[进阶设置][高级]�
 
 msgid "Hide Wizard"
 msgstr "隐藏设置向导"
+
+msgid "Redirect to HTTPS"
+msgstr "重定向到HTTPS"
+
+msgid "Enable automatic redirection of HTTP requests to HTTPS port."
+msgstr "允许自动将HTTP请求重定向至 HTTPS 端口。"

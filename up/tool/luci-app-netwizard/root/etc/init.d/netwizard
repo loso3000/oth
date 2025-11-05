@@ -171,16 +171,23 @@ sethttps() {
 	   uci commit nginx
     	   /etc/init.d/nginx reload
     else
-    
 	 /etc/init.d/uhttpd stop
          sed -i "/listen_https/d" /etc/config/uhttpd
-        [ "x${https}" = "x1" ] &&{
+	 $UCISET uhttpd.main.redirect_https='0'
+         if [ "x${https}" == "x1" ] ;then
+	         certscrt='/etc/ssl/ezopwrt.crt'
+		 certskey='/etc/ssl/ezopwrt.key'
+	         rm -f $certskey $certscrt
 	         $UCIADD uhttpd.main.listen_https='0.0.0.0:443'
 	         $UCIADD uhttpd.main.listen_https='[::]:443'
-	         # $UCISET uhttpd.main.redirect_https='1' 
-       }
-	 uci commit uhttpd
-	 
+	         $UCISET uhttpd.main.redirect_https='1' 
+		 hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
+		 $UCISET network.lan.hostname=${hostname}
+		 $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
+	         openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"
+	         $UCISET uhttpd.main.cert="$certscrt"
+	         $UCISET uhttpd.main.key="$certskey"
+       fi
     fi
 }
 dnsredirect(){
@@ -363,8 +370,7 @@ configure_network() {
     test -n "${lan_ipaddr}"  &&  $UCISET network.lan.ipaddr="${lan_ipaddr}"  
     test -n "${lan_netmask}" &&  $UCISET network.lan.netmask="${lan_netmask}"
     setsynflood
-    # dnsredirect
-    # sethttps
+    sethttps
     sed -i "/dhcp_option '6/d" /etc/config/dhcp
     sed -i "/list dns/d" /etc/config/dhcp
 
@@ -437,12 +443,16 @@ EOF
 
     uci -q batch <<-EOF >/dev/null
     commit advancedplus
+    commit uhttpd
+    commit system
     commit netwizard
     commit dhcp
     commit firewall
     commit network
 EOF
     (sleep 2
+     /etc/init.d/system reload
+     /etc/init.d/uhttpd reload
      /etc/init.d/network restart
      /etc/init.d/dnsmasq reload)&
 }
