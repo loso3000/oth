@@ -179,25 +179,37 @@ sethttps() {
 	    /etc/init.d/lighttpd reload
     else
          sed -i "/listen_https/d" /etc/config/uhttpd
-	 uci -q set uhttpd.main.redirect_https='0'
-	 
+	 $UCISET uhttpd.main.redirect_https='0'
+	 $UCISET ttyd.@ttyd[0].ssl='0'
+	 $UCISET netdata.netdata.enable_ssl='0'
 	 certscrt=''
 	 certskey=''
         if [ "x${https}" = "x1" ] ; then
-	         uci -q add_list uhttpd.main.listen_https='0.0.0.0:443'
+	         $UCIADD uhttpd.main.listen_https='0.0.0.0:443'
 	         uci -q add_list uhttpd.main.listen_https='[::]:443'
-	         uci -q set uhttpd.main.redirect_https='1'
+	         $UCISET uhttpd.main.redirect_https='1'
+		 
+		 if [ -f "/etc/ssl/ezopwrt.crt" ] && [ -f "/etc/ssl/ezopwrt.key" ]; then
 	         certscrt='/etc/ssl/ezopwrt.crt'
 		 certskey='/etc/ssl/ezopwrt.key'
-	         rm -f $certskey $certscrt
+		 else
 		 hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
 		 $UCISET network.lan.hostname=${hostname}
 		 $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
-	         openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"
+	         openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"   > /dev/null  2>&1
+		 fi
+		 $UCISET ttyd.@ttyd[0].ssl='1'
+		 $UCISET netdata.netdata.enable_ssl='1'
 		 uci commit system
         fi
-	    uci -q set uhttpd.main.cert=$certscrt 
-	    uci -q set uhttpd.main.key=$certskey 
+	    $UCISET ttyd.@ttyd[0].ssl_cert=$certscrt 
+	    $UCISET ttyd.@ttyd[0].ssl_key=$certskey 
+	    $UCISET netdata.netdata.cert_file=$certscrt 
+	    $UCISET netdata.netdata.key_file=$certskey 
+	    $UCISET uhttpd.main.cert=$certscrt 
+	    $UCISET uhttpd.main.key=$certskey 
+	    uci commit ttyd
+	    uci commit netdata
 	    uci commit uhttpd
 	    /etc/init.d/uhttpd reload
     fi
