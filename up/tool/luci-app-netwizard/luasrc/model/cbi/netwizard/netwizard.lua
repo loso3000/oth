@@ -10,7 +10,10 @@ local lan_gateway = uci:get("netwizard", "default", "lan_gateway")
 if lan_gateway ~= "" then
    lan_gateway = sys.exec("ipaddr=`uci -q get network.lan.ipaddr`;echo ${ipaddr%.*}")
 end
-local lan_ip = uci:get("network", "lan", "ipaddr")
+local lan_ip = uci:get("netwizard", "default", "ipaddr")
+if lan_ip ~= "" then
+   lan_ip = sys.exec("ipaddr=`uci -q get network.lan.ipaddr`;echo ${ipaddr%/*}")
+end 
 local landhcp =  uci:get("network", "lan", "lan_dhcp")
 if landhcp ~= "" then
    landhcp = uci:get("dhcp", "lan", "ignore")
@@ -81,7 +84,7 @@ for _, iface in ipairs(ifaces) do
 	end
   end
 end
--- wan_interface.default = wan_face
+wan_interface.default = wan_face
 
 wan_pppoe_user = s:taboption("wansetup", Value, "wan_pppoe_user", translate("PAP/CHAP username"))
 wan_pppoe_user:depends({wan_proto="pppoe"})

@@ -148,48 +148,61 @@ sethttps() {
 	config_get https "$cfg" https
 	if [ -n "$(command -v nginx)" ]; then
 		if [ -z "`uci -q get nginx._redirect2ssl`" ]; then
-			$UCISET nginx._redirect2ssl=server
-			$UCISET nginx._redirect2ssl.server_name='_redirect2ssl'
-			$UCISET nginx._redirect2ssl.return='302 https://$host$request_uri'
-			$UCISET nginx._redirect2ssl.access_log='off; # logd openwrt'
+			uci -q set nginx._redirect2ssl=server
+			uci -q set nginx._redirect2ssl.server_name='_redirect2ssl'
+			uci -q set nginx._redirect2ssl.return='302 https://$host$request_uri'
+			uci -q set nginx._redirect2ssl.access_log='off; # logd openwrt'
 		fi
-           if [ "x${https}" = "x1" ] ; then
-    		$UCIDEL nginx.default_server.listen
-    		$UCIADD nginx.default_server.listen='80'
-    		$UCIADD nginx.default_server.listen='[::]:80'
-    		$UCIDEL nginx._redirect2ssl.listen
-    		$UCIADD nginx._redirect2ssl.listen='80 default_server'
-    		$UCIADD nginx._redirect2ssl.listen='[::]:80 default_server'
-    	   else
-	         $UCIDEL nginx._redirect2ssl.listen
-	         $UCIADD nginx._redirect2ssl.listen='80'
-	         $UCIADD nginx._redirect2ssl.listen='[::]:80'
-	         $UCIDEL nginx.default_server.listen
-	         $UCIADD nginx.default_server.listen='80 default_server'
-	         $UCIADD nginx.default_server.listen='[::]:80 default_server'
-    	   fi
-	   uci commit nginx
-    	   /etc/init.d/nginx reload
+    	if [ "x${https}" = "x1" ] ; then
+    		uci -q del nginx.default_server.listen
+    		uci -q add_list nginx.default_server.listen='80'
+    		uci -q add_list nginx.default_server.listen='[::]:80'
+    		uci -q del nginx._redirect2ssl.listen
+    		uci -q add_list nginx._redirect2ssl.listen='80 default_server'
+    		uci -q add_list nginx._redirect2ssl.listen='[::]:80 default_server'
+    	else
+	         uci -q del nginx._redirect2ssl.listen
+	         uci -q add_list nginx._redirect2ssl.listen='80'
+	         uci -q add_list nginx._redirect2ssl.listen='[::]:80'
+	         uci -q del nginx.default_server.listen
+	         uci -q add_list nginx.default_server.listen='80 default_server'
+	         uci -q add_list nginx.default_server.listen='[::]:80 default_server'
+    	fi
+    	uci commit nginx
+    	/etc/init.d/nginx reload
+	elif [ -n "$(command -v lighttpd)" ]; then
+        if [ "x${https}" = "x1" ] ; then
+	         sed -i "s/	# url.redirect =/	url.redirect =/" /etc/lighttpd/conf.d/82-https.conf
+		else
+	         sed -i "s/	url.redirect =/	# url.redirect =/" /etc/lighttpd/conf.d/82-https.conf
+        fi
+	    /etc/init.d/lighttpd reload
     else
-	 /etc/init.d/uhttpd stop
          sed -i "/listen_https/d" /etc/config/uhttpd
-	 $UCISET uhttpd.main.redirect_https='0'
-         if [ "x${https}" == "x1" ] ;then
+	 uci -q set uhttpd.main.redirect_https='0'
+	 
+	 certscrt=''
+	 certskey=''
+        if [ "x${https}" = "x1" ] ; then
+	         uci -q add_list uhttpd.main.listen_https='0.0.0.0:443'
+	         uci -q add_list uhttpd.main.listen_https='[::]:443'
+	         uci -q set uhttpd.main.redirect_https='1'
 	         certscrt='/etc/ssl/ezopwrt.crt'
 		 certskey='/etc/ssl/ezopwrt.key'
 	         rm -f $certskey $certscrt
-	         $UCIADD uhttpd.main.listen_https='0.0.0.0:443'
-	         $UCIADD uhttpd.main.listen_https='[::]:443'
-	         $UCISET uhttpd.main.redirect_https='1' 
 		 hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
 		 $UCISET network.lan.hostname=${hostname}
 		 $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
 	         openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"
-	         $UCISET uhttpd.main.cert="$certscrt"
-	         $UCISET uhttpd.main.key="$certskey"
-       fi
+		 uci commit system
+        fi
+	    uci -q set uhttpd.main.cert=$certscrt 
+	    uci -q set uhttpd.main.key=$certskey 
+	    uci commit uhttpd
+	    /etc/init.d/uhttpd reload
     fi
 }
+
 dnsredirect(){
 [ -n "$(command -v nft)" ] && nftables_clear || iptables_clear
 config_get_bool dns_redirect "$cfg" dns_redirect 1
@@ -289,7 +302,7 @@ configure_network() {
          $UCISET firewall.@zone[1].masq='1'
          [ "x$ifname" = "xdevice" ] && {
                  $UCIADD firewall.@zone[1].network='wan6'
-                 $UCIADD firewall.@zone[1].network='wan' 
+                 $UCIADD firewall.@zone[1].network='wan'
           } || $UCISET firewall.@zone[1].network='wan wan6'
     fi
 
@@ -443,22 +456,24 @@ EOF
 
     uci -q batch <<-EOF >/dev/null
     commit advancedplus
-    commit uhttpd
-    commit system
     commit netwizard
     commit dhcp
     commit firewall
     commit network
 EOF
-    (sleep 2
-     /etc/init.d/system reload
-     /etc/init.d/uhttpd reload
-     /etc/init.d/network restart
-     /etc/init.d/dnsmasq reload)&
+
 }
 
 boot() {
 	XBOOT=1 start
+	SSID=$(uci -q get wireless.@wifi-iface[0].ssid)
+	KEY=$(uci -q get wireless.@wifi-iface[0].key)
+	IPADDR=`a=$(uci -q get network.lan.ipaddr);echo ${a%/*}`
+	NETMASK=$(uci -q get network.lan.netmask)
+	uci -q set netwizard.default=netwizard
+	uci -q set netwizard.default.lan_ipaddr="$IPADDR"
+	uci -q set netwizard.default.lan_netmask="$NETMASK"
+	uci commit netwizard
 }
 
 start() { 
@@ -466,6 +481,10 @@ start() {
     [ "x$XBOOT" = "x1" ] && exit 0
     config_load netwizard
     config_foreach configure_network netwizard
+    	(
+	 /etc/init.d/network restart
+	 /etc/init.d/dnsmasq reload
+	 )&
     rm -f $LOCK 2>/dev/null
 }
 
