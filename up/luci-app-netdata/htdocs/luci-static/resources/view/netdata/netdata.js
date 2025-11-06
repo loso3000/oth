@@ -1,4 +1,4 @@
-// Copyright (C) 2021-2025 sirpdboy herboy2008@gmail.com https://github.com/sirpdboy/luci-app-netdata
+// Copyright (C) 2021-2025 sirpdboy herboy2008@gmail.com https://github.com/sirpdboy/luci-app-netdata ，
 'use strict';
 'require view';
 'require fs';
@@ -45,13 +45,41 @@ return view.extend({
                     E('h2', {}, message)
                 ]));
             } else {
-                var iframe = E('iframe', {
-                    src: buttonUrl,
-                    style: 'width: 100%; min-height: 100vh; border: none;'
-                });
-                container.appendChild(iframe);
+                var isHttps = window.location.protocol === 'https:';
+                var netdataIsHttps = (uci_ssl === '1' || protocol === 'https:');
+                if (isHttps && !netdataIsHttps) {
+                    var buttonContainer = E('div', {
+                        style: 'text-align: center; padding: 2em;'
+                    }, [
+                        E('h2', {}, _('Netdata Control panel')),
+                    E('p', {}, _('Due to browser security policies, the Netdata interface https cannot be embedded directly.')),
+                        E('a', {
+                            href: 'http://' + window.location.hostname + ':' + webport,
+                            target: '_blank',
+                            class: 'cbi-button cbi-button-apply',
+                            style: 'display: inline-block; margin-top: 1em; padding: 10px 20px; font-size: 16px; text-decoration: none; color: white;'
+                        }, _('Open Web UI')),
+                        E('div', { 'style': 'text-align: right; font-style: italic; margin-top: 2em;' }, [
+                            E('span', {}, [
+                                _('© github '),
+                                E('a', { 
+                                    'href': 'https://github.com/sirpdboy', 
+                                    'target': '_blank',
+                                    'style': 'text-decoration: none;'
+                                }, 'by sirpdboy')
+                            ])
+                        ])
+                    ]);
+                    container.appendChild(buttonContainer);
+                } else {
+                    var iframe = E('iframe', {
+                        src: protocol + '//' + window.location.hostname + ':' + webport, 
+                        style: 'width: 100%; min-height: 100vh; border: none;'
+                    });
+                    container.appendChild(iframe);
+                }
             }
-
+            
             poll.add(function() {
                 return self.checkRunning().then(function(checkResult) {
                     var newStatus = checkResult.isRunning;

@@ -16,8 +16,6 @@ msgstr "编辑 Netdata 主配置: <code>/etc/netdata/netdata.conf</code>"
 msgid "Enable"
 msgstr "启用"
 
-
-
 msgid "Enable SSL"
 msgstr "SSL启用https访问"
 
@@ -48,8 +46,8 @@ msgstr "Cert文件"
 msgid "Cert Key file"
 msgstr "Cert密钥文件"
 
-msgid ""
-msgstr ""
+msgid "Netdata Control panel"
+msgstr "Netdata控制台"
 
-msgid ""
-msgstr ""
+msgid "Due to browser security policies, the Netdata interface https cannot be embedded directly."
+msgstr "由于浏览器安全策略，Netdata接口https不能直接嵌入。"
