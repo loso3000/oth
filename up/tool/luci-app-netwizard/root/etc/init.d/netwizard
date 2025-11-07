@@ -6,7 +6,6 @@ UCISET='uci -q set'
 UCIDEL='uci -q delete'
 UCIADD='uci -q add_list'
 
-
 setipv6() {
     local mode=$1
     case $mode in
@@ -219,17 +218,18 @@ generate_main_certificate() {
     local main_key="/etc/ssl/${hostname}.key"
     # 检查现有证书
     if check_valid_cert "$main_cert" "$main_key"; then
-    	         certscrt="/etc/ssl/${hostname}.crt"
-	         certskey="/etc/ssl/${hostname}.key"
+    	         main_cert="/etc/ssl/${hostname}.crt"
+	         main_key="/etc/ssl/${hostname}.key"
     else
         # echo "生成主SSL证书..."
         $UCISET network.lan.hostname="${hostname}"
         $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
-        openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
-            -keyout "$main_key" -out "$main_cert" \
-            -subj "/C=CN/CN=${hostname}.lan" > /dev/null 2>&1
+        # openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout "$main_key" -out "$main_cert" -subj "/C=CN/CN=${hostname}.lan" > /dev/null 2>&1
+	openssl ecparam -genkey -name prime256v1 -out "$main_key" > /dev/null 2>&1
+	openssl req -new -x509 -key "$main_key" -out "$main_cert" -days 3650 -subj "/C=CN/CN=${hostname}.lan" > /dev/null 2>&1
+	chmod 600 "$main_key" && chmod 644 "$main_cert"
         if [ $? -ne 0 ]; then
-            # echo "错误: 证书生成失败"
+            echo "错误: 证书生成失败"
             return 1
         fi
     fi
@@ -320,7 +320,7 @@ disable_https() {
     $UCISET uhttpd.main.listen_http='0.0.0.0:80'
     uci -q add_list uhttpd.main.listen_http='[::]:80'
     uci commit uhttpd 
-    /etc/init.d/uhttpd reload 
+    /etc/init.d/uhttpd restart
     if check_service "openlist2"; then
          $UCISET openlist2.@openlist2[0].ssl='0'
          uci commit openlist2 > /dev/null 2>&1
