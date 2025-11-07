@@ -13,7 +13,7 @@ PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=sirpdboy <herboy2008@gmail.com>
 
 LUCI_TITLE:=LuCI Support for Wizard
-LUCI_DEPENDS:=+libustream-openssl +ca-bundle
+LUCI_DEPENDS:=
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles
