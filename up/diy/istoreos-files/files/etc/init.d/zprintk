@@ -3,10 +3,21 @@
 
 START=99
 
+check_service() {
+    local service_name="$1"
+    if [ -f "/usr/lib/lua/luci/controller/$service_name" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
 boot() {
 	# tune printk level after success boot, avoid noise in console
 	echo '4 5 1 7' > /proc/sys/kernel/printk
-
+	check_service "dockerman.lua" || {
+		/etc/init.d/dockerd disable
+		/etc/init.d/dockerd stop
+	}
 	# notify console system is ready
 	sleep 1
 	local pids=`pgrep -P 1 askfirst 2>/dev/null`
