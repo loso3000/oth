@@ -20,7 +20,8 @@ uci -q batch <<-EOF >/dev/null
     commit luci
 EOF
 
-/etc/samba/
+# samba4 share
+sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
 
 uci set luci.main.sessiontime='86400'
 uci set luci.main.sessionkeep='1'
