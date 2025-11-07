@@ -70,24 +70,65 @@ wan_interface = s:taboption("wansetup",Value, "wan_interface",translate("interfa
 wan_interface:depends({wan_proto="pppoe"})
 wan_interface:depends({wan_proto="dhcp"})
 wan_interface:depends({wan_proto="static"})
+
 local br_lan_members = {}
-local br_lan_interfaces = uci:get("network", "@device[0]", "ports")
-if br_lan_interfaces then
-    for member in br_lan_interfaces:gmatch("[^%s]+") do
-        br_lan_members[member] = true
+
+local function get_lan_bridge_members()
+    local members = {}
+    
+    local br_lan_ports = uci:get("network", "lan", "ifname")
+    if br_lan_ports and type(br_lan_ports) == "string" then
+        for member in br_lan_ports:gmatch("[^%s]+") do
+            members[member] = true
+        end
     end
+    
+    uci:foreach("network", "device",
+        function(section)
+            if section.name == "br-lan" and section.ports then
+                local ports = section.ports
+                if type(ports) == "string" then
+                    for member in ports:gmatch("[^%s]+") do
+                        members[member] = true
+                    end
+                elseif type(ports) == "table" then
+                    for _, member in ipairs(ports) do
+                        if type(member) == "string" then
+                            members[member] = true
+                        end
+                    end
+                end
+            end
+        end
+    )
+    
+    return members
 end
+
+br_lan_members = get_lan_bridge_members()
+
+local interface_info = {}
+local wan_candidates = {}
+
 for _, iface in ipairs(ifaces) do
     if (iface:match("^eth%d+") or iface:match("^wlan%d+") or iface:match("^usb%d+")) 
        and not iface:match("^br%-") 
        and not iface:match("_ifb$") 
        and not iface:match("^ifb%d+") then
+        
         local is_lan_member = br_lan_members[iface] or false
         local interface_obj = net:get_interface(iface)
         local networks = interface_obj and interface_obj:get_networks() or {}
         local network_names = {}
+        local is_wan = false
+        
         for _, net_obj in pairs(networks) do
-            table.insert(network_names, net_obj.sid)
+            local net_name = net_obj.sid
+            table.insert(network_names, net_name)
+            if net_name == "wan" then
+                is_wan = true
+                table.insert(wan_candidates, iface)
+            end
         end
         
         local display_text = iface
@@ -98,7 +139,23 @@ for _, iface in ipairs(ifaces) do
         else
             display_text = string.format("%s (...)", iface)
         end
+        
         wan_interface:value(iface, display_text)
+    end
+end
+
+-- 设置默认的WAN接口
+if #wan_candidates > 0 then
+    wan_interface.default = wan_candidates[1]
+else
+    for _, iface in ipairs(ifaces) do
+        if (iface:match("^eth%d+") or iface:match("^wlan%d+") or iface:match("^usb%d+")) 
+           and not iface:match("^br%-") 
+           and not iface:match("_ifb$") 
+           and not iface:match("^ifb%d+") then
+            wan_interface.default = iface
+            break
+        end
     end
 end
 
@@ -188,9 +245,18 @@ if has_wifi then
 	e.password = true
 end
 
-e = s:taboption("wansetup", Flag, "https", translate("Redirect to HTTPS"),translate("Enable automatic redirection of HTTP requests to HTTPS port."))
+e = s:taboption("wansetup", Flag, 'https', translate('Enables SSL secure access'))
 e.default = 1
 e.anonymous = false
+
+-- e = s:taboption("wansetup", DummyValue, 'ssl_cert', translate('SSL cert'))
+-- e.default = '/etc/ssl/ezopwrt.crt'
+-- e:depends("https", true)
+-- e:depends("dnsset", true)
+
+-- e = s:taboption("wansetup", DummyValue, 'ssl_key', translate('SSL key'))
+-- e.default = '/etc/ssl/ezopwrt.key'
+-- e:depends("https", true)
 
 synflood = s:taboption("othersetup", Flag, "synflood", translate("Enable SYN-flood defense"),translate("Enable Firewall SYN-flood defense [Suggest opening]"))
 synflood.default = 1
