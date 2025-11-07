@@ -14,10 +14,13 @@ check_service() {
 boot() {
 	# tune printk level after success boot, avoid noise in console
 	echo '4 5 1 7' > /proc/sys/kernel/printk
-	check_service "dockerman.lua" || {
+    if check_service "dockerman.lua"  ; then
+		/etc/init.d/dockerd enable
+		/etc/init.d/dockerd restart
+	else
 		/etc/init.d/dockerd disable
 		/etc/init.d/dockerd stop
-	}
+	fi
 	# notify console system is ready
 	sleep 1
 	local pids=`pgrep -P 1 askfirst 2>/dev/null`
