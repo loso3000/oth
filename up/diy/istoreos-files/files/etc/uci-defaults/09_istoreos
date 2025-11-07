@@ -23,11 +23,11 @@ EOF
 # samba4 share
 sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
 
-uci set uhttpd.main.max_requests=50
-uci set uhttpd.main.max_connections=20
-uci set uhttpd.main.script_timeout=30
-uci set uhttpd.main.network_timeout=15
-uci set uhttpd.main.http_keepalive=10
+# uci set uhttpd.main.max_requests=50
+# uci set uhttpd.main.max_connections=20
+# uci set uhttpd.main.script_timeout=30
+# uci set uhttpd.main.network_timeout=15
+# uci set uhttpd.main.http_keepalive=10
 uci set uhttpd.main.rfc1918_filter=0
 
 uci commit luci
