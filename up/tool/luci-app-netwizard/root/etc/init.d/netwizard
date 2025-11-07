@@ -205,10 +205,11 @@ optimized_sethttps() {
         generate_main_certificate
         setup_service_certificates
         configure_service_ports
-        restart_services_safely
     else
         disable_https
     fi
+   restart_services_safely
+    
 fi
 }
 
@@ -292,24 +293,33 @@ configure_service_ports() {
      if check_service "netdata"; then
        $UCISET netdata.netdata.enable_ssl='1'
     fi
-
 }
 
 restart_services_safely() {
-
+    uci -q set luci.main.sessiontime='86400'
+    uci set luci.main.sessionkeep='1'
+    uci set luci.main.reqtimeout='60'
+    uci set uhttpd.main.rfc1918_filter=0
+    uci -q set uhttpd.main.session_timeout='86400'
+    uci set uhttpd.main.session_keepalive='1'
+    uci -q set uhttpd.main.cookie_lifetime='86400'
+    uci -q set uhttpd.main.instances=4
+    uci -q set uhttpd.main.max_connections=100
+    uci -q set uhttpd.main.max_requests=500
+    uci -q set uhttpd.main.network_timeout=30
+    uci -q set uhttpd.main.script_timeout='60'
+    uci -q set uhttpd.main.network_timeout='30'
+    uci -q set uhttpd.main.http_keepalive='20'
+    uci commit luci 
     uci commit uhttpd 
-    /etc/init.d/uhttpd reload
+    /etc/init.d/uhttpd restart
     sleep 3
     for service in ttyd netdata openlist2; do
-    if ! check_service "$service"; then
+        if ! check_service "$service"; then
                 continue
-    fi
-    # /etc/init.d/$service stop > /dev/null 2>&1
-    # sleep 1
-    uci commit $service
-
-    /etc/init.d/$service restart > /dev/null 2>&1
-
+        fi
+        uci commit $service
+        /etc/init.d/$service restart > /dev/null 2>&1
     done
 }
 
@@ -319,22 +329,14 @@ disable_https() {
     uci -q delete uhttpd.main.listen_https
     $UCISET uhttpd.main.listen_http='0.0.0.0:80'
     uci -q add_list uhttpd.main.listen_http='[::]:80'
-    uci commit uhttpd 
-    /etc/init.d/uhttpd restart
     if check_service "openlist2"; then
          $UCISET openlist2.@openlist2[0].ssl='0'
-         uci commit openlist2 > /dev/null 2>&1
-         /etc/init.d/openlist2 restart  > /dev/null 2>&1
     fi
     if check_service "ttyd"; then
          $UCISET ttyd.@ttyd[0].ssl='0'
-         uci commit ttyd > /dev/null 2>&1
-         /etc/init.d/ttyd restart > /dev/null 2>&1
     fi
     if check_service "netdata"; then
          $UCISET netdata.netdata.enable_ssl='0'
-         uci commit netdata > /dev/null 2>&1
-         /etc/init.d/netdata restart > /dev/null 2>&1
     fi
 }
 
