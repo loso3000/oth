@@ -116,12 +116,10 @@ sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh   >/dev/n
 wifi up
 
 frmware=`cat /etc/ezopenwrt_version | awk -F '-' '{printf $2}'`
-
 if [ "$frmware" = "Super" ] || [ "$frmware" = "Mini"  ] ; then
 sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
 sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-samba4.json
 sed -i 's/vpn/services/g' /usr/share/luci/menu.d/luci-app-zerotier.json
-
 fi
 sed -i 's/network/status/g' /www/luci-static/resources/view/bandix/connection.js
 sed -i 's/network/status/g' /usr/share/luci/menu.d/luci-app-bandix.json
@@ -294,16 +292,48 @@ fi
 
 [ x$debug = x1 ] && echo $ver
 }
-#no login 
-sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
-uci -q set base_config.@base[0].ver=$ver
-uci -q commit base_config
+
 [ -f '/etc/init.d/miniupnpd' ] &&/etc/init.d/miniupnpd restart
 [ -f '/etc/init.d/turboacc' ] &&/etc/init.d/turboacc restart
 [ -f '/etc/init.d/ttyd' ] &&/etc/init.d/ttyd restart
 [ -f '/etc/init.d/mwan3' ] &&/etc/init.d/mwan3 restart
 [ -f '/etc/init.d/watchdog' ] &&/etc/init.d/watchdog restart
+#no login 
+sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
 
+uci -q get system.@imm_init[0] > "/dev/null" || uci -q add system imm_init > "/dev/null"
+
+if ! uci -q get system.@imm_init[0].lang > "/dev/null"; then
+	uci -q batch <<-EOF
+		set luci.main.lang="auto"
+		commit luci
+
+		set system.@imm_init[0].lang="1"
+		commit system
+	EOF
+fi
+
+ln -sf "/sbin/ip" "/usr/bin/ip"
+
+case "$DISTRIB_TARGET" in
+"bcm4908"/*|\
+"bcm53xx"/*|\
+"ramips/mt7621"|\
+"x86"/*)
+	if ! uci -q get system.@imm_init[0].packet_steering > "/dev/null"; then
+	uci -q batch <<-EOF
+		set network.globals="globals"
+		set network.@globals[0].packet_steering="1"
+		commit network
+
+		set system.@imm_init[0].packet_steering="1"
+		commit system
+	EOF
+	fi
+	;;
+esac
+uci -q set base_config.@base[0].ver=$ver
+uci -q commit base_config
 uci set luci.main.sessiontime='86400'
 uci set luci.main.sessionkeep='1'
 uci set luci.main.reqtimeout='60'
@@ -323,9 +353,24 @@ uci commit uhttpd
 /etc/init.d/network restart
 /etc/init.d/dnsmasq restart
 
+check_service() {
+    local service_name="$1"
+    if [ -f "/usr/lib/lua/luci/controller/$service_name" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+    if check_service "dockerman.lua"  ; then
+		/etc/init.d/dockerd enable
+		/etc/init.d/dockerd restart
+	else
+		/etc/init.d/dockerd disable
+		/etc/init.d/dockerd stop
+	fi
 ntpd -n -q -p 0.pool.ntp.org -p 1.pool.ntp.org -p 2.pool.ntp.org
-sed -i '/log-facility/d' /etc/dnsmasq.conf
-echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+sed -i "/log-facility/d" "/etc/dnsmasq.conf"
+echo "log-facility=/dev/null" >> "/etc/dnsmasq.conf"
 echo 'hsts=0' > /root/.wgetrc
 rm -rf /tmp/luci-*
 
