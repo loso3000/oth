@@ -70,21 +70,39 @@ wan_interface = s:taboption("wansetup",Value, "wan_interface",translate("interfa
 wan_interface:depends({wan_proto="pppoe"})
 wan_interface:depends({wan_proto="dhcp"})
 wan_interface:depends({wan_proto="static"})
-
-for _, iface in ipairs(ifaces) do
-   if not (iface:match("_ifb$") or iface:match("^ifb*")) then
-	if ( iface:match("^eth*") or iface:match("^wlan*") or iface:match("^usb*")) then
-		local nets = net:get_interface(iface)
-		nets = nets and nets:get_networks() or {}
-		for k, v in pairs(nets) do
-			nets[k] = nets[k].sid
-		end
-		nets = table.concat(nets, ",")
-		wan_interface:value(iface, ((#nets > 0) and "%s (%s)" % {iface, nets} or iface))
-	end
-  end
+local br_lan_members = {}
+local br_lan_interfaces = uci:get("network", "@device[0]", "ports")
+if br_lan_interfaces then
+    for member in br_lan_interfaces:gmatch("[^%s]+") do
+        br_lan_members[member] = true
+    end
 end
--- wan_interface.default = wan_face
+for _, iface in ipairs(ifaces) do
+    if (iface:match("^eth%d+") or iface:match("^wlan%d+") or iface:match("^usb%d+")) 
+       and not iface:match("^br%-") 
+       and not iface:match("_ifb$") 
+       and not iface:match("^ifb%d+") then
+        local is_lan_member = br_lan_members[iface] or false
+        local interface_obj = net:get_interface(iface)
+        local networks = interface_obj and interface_obj:get_networks() or {}
+        local network_names = {}
+        for _, net_obj in pairs(networks) do
+            table.insert(network_names, net_obj.sid)
+        end
+        
+        local display_text = iface
+        if #network_names > 0 then
+            display_text = string.format("%s (%s)", iface, table.concat(network_names, ","))
+        elseif is_lan_member then
+            display_text = string.format("%s (lan)", iface)
+        else
+            display_text = string.format("%s (...)", iface)
+        end
+        wan_interface:value(iface, display_text)
+    end
+end
+
+
 
 wan_pppoe_user = s:taboption("wansetup", Value, "wan_pppoe_user", translate("PAP/CHAP username"))
 wan_pppoe_user:depends({wan_proto="pppoe"})

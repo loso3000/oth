@@ -143,7 +143,18 @@ setforwarding(){
     $UCISET firewall.@forwarding[-1].src='lan'
     $UCISET firewall.@forwarding[-1].dest='wan'
 }
-
+check_valid_cert() {
+    local cert_file="$1"
+    local key_file="$2"
+    if [ ! -r "$cert_file" ] || [ ! -r "$key_file" ]; then
+        return 1
+    fi
+    if openssl x509 -in "$cert_file" -noout > /dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
 sethttps() {
 	config_get https "$cfg" https
 	if [ -n "$(command -v nginx)" ]; then
@@ -182,22 +193,29 @@ sethttps() {
 	 $UCISET uhttpd.main.redirect_https='0'
 	 $UCISET ttyd.@ttyd[0].ssl='0'
 	 $UCISET netdata.netdata.enable_ssl='0'
-	 certscrt=''
-	 certskey=''
+	 local certscrt=''
+	 local certskey=''
         if [ "x${https}" = "x1" ] ; then
 	         $UCIADD uhttpd.main.listen_https='0.0.0.0:443'
 	         uci -q add_list uhttpd.main.listen_https='[::]:443'
 	         $UCISET uhttpd.main.redirect_https='1'
 		 
-		 if [ -f "/etc/ssl/ezopwrt.crt" ] && [ -f "/etc/ssl/ezopwrt.key" ]; then
-	         certscrt='/etc/ssl/ezopwrt.crt'
-		 certskey='/etc/ssl/ezopwrt.key'
-		 else
-		 hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
-		 $UCISET network.lan.hostname=${hostname}
-		 $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
-	         openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"   > /dev/null  2>&1
-		 fi
+	         hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
+	         certscrt="/etc/ssl/${hostname}.crt"
+	         certskey="/etc/ssl/${hostname}.key"
+	         local ezopwrt_crt="/etc/ssl/ezopwrt.crt"
+	         local ezopwrt_key="/etc/ssl/ezopwrt.key"
+	         if check_valid_cert "$ezopwrt_crt" "$ezopwrt_key"; then
+	             certscrt="$ezopwrt_crt"
+	             certskey="$ezopwrt_key"
+	         elif check_valid_cert "$certscrt" "$certskey"; then
+	             certscrt="/etc/ssl/${hostname}.crt"
+	             certskey="/etc/ssl/${hostname}.key"
+	         else
+	             $UCISET network.lan.hostname="${hostname}"
+	             $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
+	             openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"  > /dev/null 2>&1
+	         fi
 		 $UCISET ttyd.@ttyd[0].ssl='1'
 		 $UCISET netdata.netdata.enable_ssl='1'
 		 uci commit system
@@ -215,37 +233,6 @@ sethttps() {
     fi
 }
 
-dnsredirect(){
-[ -n "$(command -v nft)" ] && nftables_clear || iptables_clear
-config_get_bool dns_redirect "$cfg" dns_redirect 1
-if [ "$dns_redirect" = 1 ]; then
- 	if [ -n "$(command -v nft)" ]; then
- 		nft add table inet dnsmasq
- 		nft add chain inet dnsmasq prerouting "{ type nat hook prerouting priority -105; policy accept; }"
- 		nft add rule inet dnsmasq prerouting "meta nfproto { ipv4, ipv6 } udp dport 53 counter redirect to :53 comment \"DNSMASQ HIJACK\""
- 	else
- 		iptables -t nat -A PREROUTING -m comment --comment "DNSMASQ" -p udp --dport 53 -j REDIRECT --to-ports 53
- 		iptables -t nat -A PREROUTING -m comment --comment "DNSMASQ" -p tcp --dport 53 -j REDIRECT --to-ports 53
- 		[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -m comment --comment "DNSMASQ" -p udp --dport 53 -j REDIRECT --to-ports 53
- 		[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -m comment --comment "DNSMASQ" -p tcp --dport 53 -j REDIRECT --to-ports 53
- 	fi
-fi
-}
-
-iptables_clear()
- {
- 	config_get dns_port "$cfg" port 53
- 	iptables -t nat -D PREROUTING -m comment --comment "DNSMASQ" -p udp --dport 53 -j REDIRECT --to-ports $dns_port 2>"/dev/null"
- 	iptables -t nat -D PREROUTING -m comment --comment "DNSMASQ" -p tcp --dport 53 -j REDIRECT --to-ports $dns_port 2>"/dev/null"
- 	[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -D PREROUTING -m comment --comment "DNSMASQ" -p udp --dport 53 -j REDIRECT --to-ports $dns_port 2>"/dev/null"
- 	[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -D PREROUTING -m comment --comment "DNSMASQ" -p tcp --dport 53 -j REDIRECT --to-ports $dns_port 2>"/dev/null"
- }
-
- nftables_clear()
- {
- 	! nft --check list table inet dnsmasq > "/dev/null" 2>&1 || \
- 		nft delete table inet dnsmasq
- }
 # Function to configure network settings
 configure_network() {
     local cfg=$1
@@ -477,7 +464,6 @@ EOF
 }
 
 boot() {
-	XBOOT=1 start
 	SSID=$(uci -q get wireless.@wifi-iface[0].ssid)
 	KEY=$(uci -q get wireless.@wifi-iface[0].key)
 	IPADDR=`a=$(uci -q get network.lan.ipaddr);echo ${a%/*}`
@@ -486,6 +472,7 @@ boot() {
 	uci -q set netwizard.default.lan_ipaddr="$IPADDR"
 	uci -q set netwizard.default.lan_netmask="$NETMASK"
 	uci commit netwizard
+	XBOOT=1 start
 }
 
 start() { 
