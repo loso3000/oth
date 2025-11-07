@@ -162,17 +162,33 @@ sed -i 's/root.*/root::0:0:99999:7:::/g' /etc/shadow
 
 [ x$debug = x1 ] && echo $ver
 }
-uci -q batch <<-EOF
-	set system.@system[0].timezone='CST-8'
-	set system.@system[0].zonename='Asia/Shanghai'
+uci -q get system.@imm_init[0] > "/dev/null" || uci -q add system imm_init > "/dev/null"
 
-	delete system.ntp.server
-	add_list system.ntp.server='ntp1.aliyun.com'
-	add_list system.ntp.server='ntp.tencent.com'
-	add_list system.ntp.server='ntp.ntsc.ac.cn'
-	add_list system.ntp.server='time.apple.com'
-EOF
-uci commit system
+if ! uci -q get system.@imm_init[0].system_chn > "/dev/null"; then
+	uci -q batch <<-EOF
+		set system.@system[0].timezone="CST-8"
+		set system.@system[0].zonename="Asia/Shanghai"
+
+		delete system.ntp.server
+		add_list system.ntp.server="ntp.tencent.com"
+		add_list system.ntp.server="ntp1.aliyun.com"
+		add_list system.ntp.server="ntp.ntsc.ac.cn"
+		add_list system.ntp.server="cn.ntp.org.cn"
+
+		set system.@imm_init[0].system_chn="1"
+		commit system
+	EOF
+fi
+
+opkg_mirror="$(uci -q get system.@imm_init[0].opkg_mirror)"
+if [ -z "$opkg_mirror" ]; then
+	opkg_mirror="https://mirrors.vsean.net/openwrt"
+	uci -q batch <<-EOF
+		set system.@imm_init[0].opkg_mirror="$opkg_mirror"
+		commit system
+	EOF
+fi
+
 # sed -i '/coremark/d' /etc/crontabs/root
 ln -sf /sbin/ip /usr/bin/ip
 # Disable opkg signature check
@@ -197,6 +213,8 @@ sed -i 's/immortalwrt/openwrt/g' /etc/config/luci
 
 # docker mirror
 [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
+
+sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf"
 #tv
 test $ver -lt 3 && {
 ver=3
@@ -368,7 +386,7 @@ check_service() {
 		/etc/init.d/dockerd disable
 		/etc/init.d/dockerd stop
 	fi
-ntpd -n -q -p 0.pool.ntp.org -p 1.pool.ntp.org -p 2.pool.ntp.org
+
 sed -i "/log-facility/d" "/etc/dnsmasq.conf"
 echo "log-facility=/dev/null" >> "/etc/dnsmasq.conf"
 echo 'hsts=0' > /root/.wgetrc
