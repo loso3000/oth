@@ -20,17 +20,17 @@ uci -q batch <<-EOF >/dev/null
     commit luci
 EOF
 
-uci set luci.main.sessiontime='2592000'
-uci set luci.main.sessionkeep='1'
-uci set luci.main.reqtimeout='300'
+# uci set luci.main.sessiontime='2592000'
+# uci set luci.main.sessionkeep='1'
+# uci set luci.main.reqtimeout='300'
 
-uci set uhttpd.main.session_timeout='2592000'
-uci set uhttpd.main.session_keepalive='1'
-uci set uhttpd.main.cookie_lifetime='2592000'
-uci set uhttpd.main.max_requests='100'
+# uci set uhttpd.main.session_timeout='2592000'
+# uci set uhttpd.main.session_keepalive='1'
+# uci set uhttpd.main.cookie_lifetime='2592000'
+# uci set uhttpd.main.max_requests='100'
 
-uci commit luci
-uci commit uhttpd
+# uci commit luci
+# uci commit uhttpd
 
 /etc/init.d/uhttpd restart
 exit 0
