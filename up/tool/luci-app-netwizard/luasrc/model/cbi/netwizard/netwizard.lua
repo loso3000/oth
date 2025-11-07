@@ -171,7 +171,7 @@ if has_wifi then
 end
 
 e = s:taboption("wansetup", Flag, "https", translate("Redirect to HTTPS"),translate("Enable automatic redirection of HTTP requests to HTTPS port."))
-e.default = 0
+e.default = 1
 e.anonymous = false
 
 synflood = s:taboption("othersetup", Flag, "synflood", translate("Enable SYN-flood defense"),translate("Enable Firewall SYN-flood defense [Suggest opening]"))
