@@ -155,83 +155,143 @@ check_valid_cert() {
         return 1
     fi
 }
-sethttps() {
-	config_get https "$cfg" https
-	if [ -n "$(command -v nginx)" ]; then
-		if [ -z "`uci -q get nginx._redirect2ssl`" ]; then
-			uci -q set nginx._redirect2ssl=server
-			uci -q set nginx._redirect2ssl.server_name='_redirect2ssl'
-			uci -q set nginx._redirect2ssl.return='302 https://$host$request_uri'
-			uci -q set nginx._redirect2ssl.access_log='off; # logd openwrt'
-		fi
-    	if [ "x${https}" = "x1" ] ; then
-    		uci -q del nginx.default_server.listen
-    		uci -q add_list nginx.default_server.listen='80'
-    		uci -q add_list nginx.default_server.listen='[::]:80'
-    		uci -q del nginx._redirect2ssl.listen
-    		uci -q add_list nginx._redirect2ssl.listen='80 default_server'
-    		uci -q add_list nginx._redirect2ssl.listen='[::]:80 default_server'
-    	else
-	         uci -q del nginx._redirect2ssl.listen
-	         uci -q add_list nginx._redirect2ssl.listen='80'
-	         uci -q add_list nginx._redirect2ssl.listen='[::]:80'
-	         uci -q del nginx.default_server.listen
-	         uci -q add_list nginx.default_server.listen='80 default_server'
-	         uci -q add_list nginx.default_server.listen='[::]:80 default_server'
-    	fi
-    	uci commit nginx
-    	/etc/init.d/nginx reload
-	elif [ -n "$(command -v lighttpd)" ]; then
-        if [ "x${https}" = "x1" ] ; then
-	         sed -i "s/	# url.redirect =/	url.redirect =/" /etc/lighttpd/conf.d/82-https.conf
-		else
-	         sed -i "s/	url.redirect =/	# url.redirect =/" /etc/lighttpd/conf.d/82-https.conf
-        fi
-	    /etc/init.d/lighttpd reload
+
+# 优化https服务
+optimized_sethttps() {
+    config_get https "$cfg" https
+    
+    if [ "x${https}" = "x1" ]; then
+        generate_main_certificate
+        setup_service_certificates
+        configure_service_ports
+        restart_services_safely
     else
-         sed -i "/listen_https/d" /etc/config/uhttpd
-	 $UCISET uhttpd.main.redirect_https='0'
-	 $UCISET ttyd.@ttyd[0].ssl='0'
-	 $UCISET netdata.netdata.enable_ssl='0'
-	 local certscrt=''
-	 local certskey=''
-        if [ "x${https}" = "x1" ] ; then
-	         $UCIADD uhttpd.main.listen_https='0.0.0.0:443'
-	         uci -q add_list uhttpd.main.listen_https='[::]:443'
-	         $UCISET uhttpd.main.redirect_https='1'
-		 
-	         hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
-	         certscrt="/etc/ssl/${hostname}.crt"
-	         certskey="/etc/ssl/${hostname}.key"
-	         local ezopwrt_crt="/etc/ssl/ezopwrt.crt"
-	         local ezopwrt_key="/etc/ssl/ezopwrt.key"
-	         if check_valid_cert "$ezopwrt_crt" "$ezopwrt_key"; then
-	             certscrt="$ezopwrt_crt"
-	             certskey="$ezopwrt_key"
-	         elif check_valid_cert "$certscrt" "$certskey"; then
-	             certscrt="/etc/ssl/${hostname}.crt"
-	             certskey="/etc/ssl/${hostname}.key"
-	         else
-	             $UCISET network.lan.hostname="${hostname}"
-	             $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
-	             openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"  > /dev/null 2>&1
-	         fi
-		 $UCISET ttyd.@ttyd[0].ssl='1'
-		 $UCISET netdata.netdata.enable_ssl='1'
-		 uci commit system
-        fi
-	    $UCISET ttyd.@ttyd[0].ssl_cert=$certscrt 
-	    $UCISET ttyd.@ttyd[0].ssl_key=$certskey 
-	    $UCISET netdata.netdata.cert_file=$certscrt 
-	    $UCISET netdata.netdata.key_file=$certskey 
-	    $UCISET uhttpd.main.cert=$certscrt 
-	    $UCISET uhttpd.main.key=$certskey 
-	    uci commit ttyd
-	    uci commit netdata
-	    uci commit uhttpd
-	    /etc/init.d/uhttpd reload
+        disable_https
     fi
 }
+
+generate_main_certificate() {
+    local hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
+    local main_cert="/etc/ssl/${hostname}.crt"
+    local main_key="/etc/ssl/${hostname}.key"
+    # 检查现有证书
+    if check_valid_cert "$main_cert" "$main_key"; then
+    	         certscrt="/etc/ssl/${hostname}.crt"
+	         certskey="/etc/ssl/${hostname}.key"
+    else
+        # echo "生成主SSL证书..."
+        $UCISET network.lan.hostname="${hostname}"
+        $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
+        openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
+            -keyout "$main_key" -out "$main_cert" \
+            -subj "/C=CN/CN=${hostname}.lan" > /dev/null 2>&1
+        
+        if [ $? -ne 0 ]; then
+            # echo "错误: 证书生成失败"
+            return 1
+        fi
+    fi
+    # 设置uhttpd使用主证书
+    $UCISET uhttpd.main.cert="$main_cert"
+    $UCISET uhttpd.main.key="$main_key"
+}
+
+setup_service_certificates() {
+    local hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}')
+    local main_cert="/etc/ssl/${hostname}.crt"
+    local main_key="/etc/ssl/${hostname}.key"
+    # 为每个服务创建硬链接（节省空间，避免文件锁）
+    for service in ttyd netdata openlist2; do
+        local service_cert="/etc/ssl/${service}.crt"
+        local service_key="/etc/ssl/${service}.key"
+        
+        # 创建硬链接（如果支持）
+        if ln "$main_cert" "$service_cert" 2>/dev/null; then
+            ln "$main_key" "$service_key" 2>/dev/null
+        else
+            # 如果不支持硬链接，复制文件
+            cp "$main_cert" "$service_cert"
+            cp "$main_key" "$service_key"
+        fi
+        # 设置服务证书路径
+        case $service in
+            ttyd)
+                $UCISET ttyd.@ttyd[0].ssl_cert="$service_cert"
+                $UCISET ttyd.@ttyd[0].ssl_key="$service_key"
+                ;;
+            netdata)
+                $UCISET netdata.netdata.cert_file="$service_cert"
+                $UCISET netdata.netdata.key_file="$service_key"
+                ;;
+            openlist2)
+                $UCISET openlist2.@openlist2[0].ssl_cert="$service_cert"
+                $UCISET openlist2.@openlist2[0].ssl_key="$service_key"
+                ;;
+        esac
+    done
+}
+configure_service_ports() {
+    # uhttpd - 主Web界面 (443)
+    $UCISET uhttpd.main.listen_http='0.0.0.0:80'
+    uci -q add_list uhttpd.main.listen_http='[::]:80'
+    $UCISET uhttpd.main.listen_https='0.0.0.0:443'
+    uci -q add_list uhttpd.main.listen_https='[::]:443'
+    $UCISET uhttpd.main.redirect_https='1'
+
+    $UCISET openlist2.@openlist2[0].ssl='1'
+    # ttyd - 终端服务 (8443)
+    $UCISET ttyd.@ttyd[0].ssl='1'
+    # $UCISET ttyd.@ttyd[0].ssl_port='8443'
+    # netdata - 监控服务 (8444)  
+    $UCISET netdata.netdata.enable_ssl='1'
+    # $UCISET netdata.netdata.bind_address='0.0.0.0'
+    # $UCISET netdata.netdata.bind_to='0.0.0.0:8444'
+}
+
+restart_services_safely() {
+    /etc/init.d/uhttpd stop
+    /etc/init.d/ttyd stop
+    /etc/init.d/netdata stop
+    /etc/init.d/openlist2 stop
+    sleep 2
+    
+    uci commit uhttpd
+    uci commit ttyd
+    uci commit netdata
+    uci commit openlist2
+    uci commit system
+    uci commit dhcp
+    
+    /etc/init.d/uhttpd start
+    sleep 3
+    /etc/init.d/ttyd start
+    sleep 1
+    /etc/init.d/netdata start
+    sleep 1
+    /etc/init.d/openlist2 start
+}
+
+
+
+disable_https() {
+    $UCISET uhttpd.main.redirect_https='0'
+    $UCISET ttyd.@ttyd[0].ssl='0'
+    $UCISET netdata.netdata.enable_ssl='0'
+    $UCISET openlist2.@openlist2[0].ssl='0'
+    $UCISET uhttpd.main.listen_https=''
+    uci -q delete uhttpd.main.listen_https
+    $UCISET uhttpd.main.listen_http='0.0.0.0:80'
+    uci -q add_list uhttpd.main.listen_http='[::]:80'
+    uci commit uhttpd
+    uci commit ttyd
+    uci commit netdata
+    uci commit openlist2
+    /etc/init.d/openlist2 restart
+    /etc/init.d/uhttpd restart
+    /etc/init.d/ttyd restart
+    /etc/init.d/netdata restart
+}
+
 
 # Function to configure network settings
 configure_network() {
@@ -382,7 +442,7 @@ configure_network() {
     test -n "${lan_ipaddr}"  &&  $UCISET network.lan.ipaddr="${lan_ipaddr}"  
     test -n "${lan_netmask}" &&  $UCISET network.lan.netmask="${lan_netmask}"
     setsynflood
-    sethttps
+    optimized_sethttps
     sed -i "/dhcp_option '6/d" /etc/config/dhcp
     sed -i "/list dns/d" /etc/config/dhcp
 
