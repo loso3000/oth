@@ -21,7 +21,7 @@ uci -q batch <<-EOF >/dev/null
 EOF
 
 # samba4 share
-sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
+# sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
 
 # uci set uhttpd.main.max_requests=50
 # uci set uhttpd.main.max_connections=20
