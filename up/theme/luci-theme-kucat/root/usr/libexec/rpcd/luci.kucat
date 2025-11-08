@@ -1,0 +1,193 @@
+#!/bin/sh
+
+# author github@sirpdboy
+
+#   luci-theme-kucat
+#   Copyright (C) 2019-2025 The Sirpdboy Team <herboy2008@gmail.com> 
+# 
+#   Have a bug? Please create an issue here on GitHub!
+#       https://github.com/sirpdboy/luci-theme-kucat/issues
+# 
+# Licensed to the public under the Apache License 2.0
+
+
+. /lib/functions.sh
+. /usr/share/libubox/jshn.sh
+
+kucat='kucat'
+[ -s "/etc/config/advancedplus" ] && kucat='advancedplus'
+background="$(uci -q get $kucat.@basic[0].background || echo '0')"
+KUCATTMP="/var/kucat_date_${background}.tmp"
+BGURL="/www/luci-static/kucat/img/down${background}.jpg"
+REBGURL="/luci-static/kucat/img/down${background}.jpg"
+DFBGURL="/luci-static/kucat/img/bg1.jpg"
+WRLOCK="/var/lock/kucat_lock_${background}.lock"
+
+LANG=$(uci get luci.main.lang 2>/dev/null || echo "zh_cn")
+WORDDATETMP="/var/dayword_kucatword_date.tmp"
+LOCK="/var/lock/dayword_kucatword.lock"
+WORDTMP="/var/dayword_kucatword_$LANG.tmp"
+
+get_word() {
+    kucat='kucat'
+    [ -s "/etc/config/advancedplus" ] && kucat='advancedplus'
+    dayword="$(uci -q get $kucat.@basic[0].dayword || echo '0')"
+    case "$dayword" in
+        1)
+            [ "X$LANG" == "Xen" ] && gwordjson=$(curl -s 'https://open.iciba.com/dsapi/' | jsonfilter -qe '@.content') || gwordjson=$(curl -s 'https://open.iciba.com/dsapi/' | jsonfilter -qe '@.note')
+            [ -n "${gwordjson}" ] && echo "$gwordjson"
+            ;;
+        2)
+            # form iciba : https://api.vvhan.com/api/en
+            [ "X$LANG" == "Xen" ] && gwordjson=$(curl -s 'https://api.vvhan.com/api/en?type=sj' | jsonfilter -qe '@.data.zh') || gwordjson=$(curl -s 'https://api.vvhan.com/api/en?type=sj' | jsonfilter -qe '@.data.en')
+            [ -n "${gwordjson}" ] && echo "$gwordjson"
+            ;;
+        3)
+            local gwordjson=$(curl -s 'https://api.yixiangzhilv.com/yiyan/sentence/get/')
+            local gword=$(echo $gwordjson | jsonfilter -qe '@.content')
+            local gfrom=$(echo $gwordjson | jsonfilter -qe '@.author')
+            [ -n "${gfrom}" ] && gfrom=$(echo "         ---- $gfrom") || gfrom=''
+            [ -n "${gword}" ] && echo "$gword       $gfrom"
+            ;;
+        4)
+            local gwordjson=$(curl -s 'https://yijuzhan.com/api/word.php?m=json')
+            local gword=$(echo $gwordjson | jsonfilter -qe '@.content')
+            local gfrom=$(echo $gwordjson | jsonfilter -qe '@.source')
+            [ -n "${gfrom}" ] && gfrom=$(echo "    ---- $gfrom") || gfrom=''
+            [ -n "${gword}" ] && echo "$gword     $gfrom"
+            ;;
+        5)
+            local gword=$(curl -s https://v.api.aa1.cn/api/api-wenan-dujitang/index.php?aa1=json | sed 's/\[//g' | sed 's/\]//g' | jsonfilter -qe '@.dujitang')
+            [ -n "${gword}" ] && echo "$gword"
+            ;;
+        *)
+            local gwordjson=$(curl -s 'https://v1.hitokoto.cn')
+            local gword=$(echo $gwordjson | jsonfilter -qe '@.hitokoto')
+            local gfrom=$(echo $gwordjson | jsonfilter -qe '@.from_who')
+            [ -n "${gfrom}" ] && gfrom=$(echo "    ---- $gfrom") || gfrom=''
+            [ -n "${gword}" ] && echo "$gword     $gfrom"
+            ;;
+    esac
+}
+
+kucatword() {
+    lock="$LOCK"
+    exec 200>"$lock"
+    if flock -n 200 >"/dev/null" 2>&1; then
+        local localword="$(get_word)"
+        if [ -n "$localword" ]; then
+            echo "$localword" >$WORDTMP
+            date +%Y%m%d > $WORDDATETMP
+        fi
+        flock -u 200 >"/dev/null" 2>&1
+    fi
+    [ -s "$WORDTMP" ] && cat $WORDTMP || echo -ne "Acquisition failed ,Please Issues:github@sirpdboy"
+}
+
+curl_bgurl() {
+    case "$background" in
+        1) #iciba
+            local ppath=$(curl -s 'https://open.iciba.com/dsapi/' | jsonfilter -qe '@.picture4')
+            [ -n "${ppath}" ] && echo "$ppath"
+            ;;
+        2) #unsplash
+            curl -fks --max-time 3 \
+                --header "Authorization: Client-ID kmFIroj2ELqXJPtC0XUoyww-Tr_lDU8Ho8uxjptIrCo" \
+                "https://api.unsplash.com/photos/random?count=1&orientation=landscape" |
+                jsonfilter -e "@[0]['urls']['regular']"
+            ;;
+        3) #bing
+            local ppath=$(curl -s "https://www.bing.com/HPImageArchive.aspx?format=js&n=1" | jsonfilter -qe '@.images[0].url')
+            [ -n "${ppath}" ] && echo "https://www.bing.com${ppath}"
+            ;;
+        4) #birdpaper
+            local i=$(awk 'BEGIN{srand();print int(rand()*8)}')
+            local j=$(awk 'BEGIN{srand();print int(rand()*200)}')
+            local ppath=$(curl -s "http://wp.birdpaper.com.cn/intf/search?content=4k&pageno=$j&count=9" | awk -F '\"count\":9' '{print $2}' | awk -F ',\"processTime\"' '{print $1}' | sed 's#,#{#' | jsonfilter -e "@.list[$i].url")
+            [ -n "${ppath}" ] && echo "$ppath"
+            ;;
+        5) #wallhaven
+            curl -fks --max-time 3 \
+                "https://wallhaven.cc/api/v1/search?resolutions=1920x1080&sorting=random" |
+                jsonfilter -qe '@.data[0].path'
+            ;;
+    esac
+}
+
+bgurl_down() {
+    local lock="$WRLOCK"
+    exec 200>$lock
+    if flock -n 200 >/dev/null 2>&1; then
+        local bgurl="$(curl_bgurl)"
+        if [ -n "$bgurl" ]; then
+            rm -rf $BGURL
+            curl -kLfsm 3 $bgurl -o $BGURL
+            date +%Y%m%d > $KUCATTMP
+        fi
+        flock -u 200 >/dev/null 2>&1
+    fi
+    [ -s "$BGURL" ] && echo -ne $REBGURL || echo -ne $DFBGURL
+}
+
+
+case "$1" in
+    "list")
+        json_init
+        json_add_object "get_url"
+        json_add_object "get_word"
+        json_close_object
+        json_dump
+        json_cleanup
+        ;;
+    "call")
+        case "$2" in
+            "get_url")
+                read -r input
+                if [ -s $KUCATTMP ]; then
+                    localtime=$(cat $KUCATTMP | grep $(date +%Y%m%d))
+                    if [ -n "$localtime" ] && [ -s $BGURL ]; then
+                        json_init
+                        json_add_string "url" "$REBGURL"
+                        json_dump
+                        json_cleanup
+                        return 0
+                    fi
+                fi
+                local checknet=$(ping -c 1 -W 1 223.5.5.5 > /dev/null 2>&1 && echo 1 || echo 2)
+                local final_url="$DFBGURL"
+                if [ "x$checknet" == "x1" ]; then
+                    final_url=$(bgurl_down)
+                else
+                    [ -s "$BGURL" ] && final_url=$REBGURL || final_url=$DFBGURL
+                fi
+                json_init
+                json_add_string "url" "$final_url"
+                json_dump
+                json_cleanup
+                return 0
+                ;;
+            "get_word")
+                read -r input
+                local word_content="No internet connection, no information."
+                
+                if [ -f "$WORDDATETMP" ]; then
+                    localtime=$(cat $WORDDATETMP | grep $(date +%Y%m%d))
+                    if [ -n "$localtime" ] && [ -s "$WORDTMP" ]; then
+                        word_content=$(cat "$WORDTMP")
+                    fi
+                fi
+                
+                local checknet=$(ping -c 1 -W 1 223.5.5.5 > /dev/null 2>&1 && echo 1 || echo 2)
+                if [ "x$checknet" == "x1" ]; then
+                    word_content=$(kucatword)
+                fi
+                
+                json_init
+                json_add_string "word" "$word_content"
+                json_dump
+                json_cleanup
+                return 0
+                ;;
+        esac
+        ;;
+esac
