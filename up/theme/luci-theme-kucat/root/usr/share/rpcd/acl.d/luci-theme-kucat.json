@@ -2,7 +2,17 @@
     "luci-theme-kucat": {
         "description": "Grant UCI access for luci-theme-kucat",
         "read": {
-            "uci": [ "kucat" ]
+            "uci": [ "kucat" ],
+            "ubus": {
+                "rc": [ "*" ],
+                "luci.kucat": [ "*" ]
+            }
+        },
+        "write": {
+            "ubus": {
+                "luci.kucat": [ "*" ]
+            },
+            "uci": ["kucat"]
         }
     }
 }

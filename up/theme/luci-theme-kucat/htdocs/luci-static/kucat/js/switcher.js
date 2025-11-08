@@ -1,120 +1,108 @@
 /* <![CDATA[ */
 
-function syncToUci(theme) {
-    fetch('/cgi-bin/luci/api/set', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'theme=' + encodeURIComponent(theme)
-    }).catch(console.error);
+function getKucatConfig() {
+    try {
+        const configResult = ubus.call("luci.kucat", "get_config") || {};
+        if (configResult && configResult.success) {
+            return {
+                mode: configResult.mode || "light"
+            };
+        }
+    } catch (error) {
+        console.error("Get kucat config failed:", error);
+    }
+    return {
+        mode: "light"
+    };
 }
 
-async function syncgetUci() {
+function saveKucatConfigAndReload(config) {
     try {
-        const response = await fetch("/cgi-bin/luci/api/get");
-        if (!response.ok) throw new Error("Network error");
-        return await response.json();
+        ubus.call("luci.kucat", "set_config", config);
+        // 保存配置后直接刷新页面，让服务端重新渲染
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
     } catch (error) {
-        console.error("Fetch config failed, using default:", error);
-        return {
-            success: false,
-            bgqs: "1",
-            primaryrgbm: "45,102,147",
-            primaryrgbmts: "0",
-            mode: "light"
-        };
+        console.error("Save kucat config failed:", error);
     }
 }
+
 // Theme Detection
 function getTimeBasedTheme() {
     const hour = new Date().getHours();
-    // console.debug('hour:', hour);
     return (hour < 6 || hour >= 18) ? 'dark' : 'light';
 }
 
-// Theme Application
-async function updateThemeVariables(theme) {
-  const root = document.documentElement;
-  const isDark = theme === 'dark';
-  try {
-    const config = await syncgetUci();
-        const primaryRgbbody = isDark ? '33,45,60' : '248,248,248';
-        const bgqsValue = config.bgqs || "1"; 
-        const rgbmValue = config.primaryrgbm || '45,102,147';
-        const rgbmtsValue = config.primaryrgbmts || '0';
-        const vars = bgqsValue === "0" ? {
-            '--menu-fontcolor': isDark ? '#ddd' : '#f5f5f5',
-            '--primary-rgbbody': primaryRgbbody,
-            '--bgqs-image': '-webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent)',
-            '--menu-bgcolor': `rgba(${rgbmValue}, ${rgbmtsValue})`,
-            '--menu-item-hover-bgcolor': 'rgba(248,248,248, 0.22)',
-            '--menu-item-active-bgcolor': 'rgba(248,248,248, 0.3)',
-        } : {
-            '--menu-fontcolor': isDark ? '#ddd' : '#4d4d5d',
-            '--primary-rgbbody': primaryRgbbody,
-            '--menu-bgcolor': `rgba(${primaryRgbbody},${rgbmtsValue})`,
-        };
+// 应用主题到界面（仅用于自动模式的时间检测）
+function applyThemeToUI(theme) {
+    document.body.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const switcher = document.getElementById('themeToggle');
     
-
-        Object.entries(vars).forEach(([key, value]) => {
-        root.style.setProperty(key, value);
-      });
-
-        if (window.LuciForm) {
-            LuciForm.refreshVisibility();
-        }
-  } catch (error) {
-        console.error('Error updating theme variables:', error);
-  }
-}
-
-document.getElementById('themeToggle').addEventListener('click', function() {
-    const switcher = this;
-    const isDark = switcher.dataset.theme === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
-    
-    switcher.dataset.theme = newTheme;
-    
-    document.querySelectorAll('.theme-switcher span').forEach(span => {
-        span.classList.toggle('active');
-    });
-
-    document.body.setAttribute('data-theme', newTheme);
-    
-     // console.debug('switcher:', switcher.dataset.theme,newTheme);
-    syncToUci(newTheme);
-    updateThemeVariables(newTheme);
-});
-
-window.addEventListener('DOMContentLoaded', async function() {
-
-    const config = await syncgetUci();
-    
-    function applyTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        const meta = document.querySelector('meta[name="theme-color"]');
-        const switcher = document.getElementById('themeToggle');
+    if (switcher) {
         switcher.dataset.theme = theme;
         if (theme === 'dark') {
-        switcher.querySelector('.pdboy-dark').classList.add('active');
-        switcher.querySelector('.pdboy-light').classList.remove('active');
-    } else {
-        switcher.querySelector('.pdboy-light').classList.add('active');
-        switcher.querySelector('.pdboy-dark').classList.remove('active');
-    }
-        if (meta) {
-            meta.content = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+            switcher.querySelector('.pdboy-dark').classList.add('active');
+            switcher.querySelector('.pdboy-light').classList.remove('active');
+        } else {
+            switcher.querySelector('.pdboy-light').classList.add('active');
+            switcher.querySelector('.pdboy-dark').classList.remove('active');
         }
     }
-        const themeToApply = config.mode === 'auto' 
-            ? getTimeBasedTheme() 
-            : (config.mode || 'light');
+    
+    if (meta) {
+        meta.content = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+    }
+}
 
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    if (!themeToggle) return;
 
-    // console.debug('switcher:', config.mode,themeToApply);
-    applyTheme(themeToApply);
-    await updateThemeVariables(themeToApply);
+    themeToggle.addEventListener('click', function() {
+        const switcher = this;
+        const isDark = switcher.dataset.theme === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        
+        // 显示加载状态
+        const originalHTML = switcher.innerHTML;
+        switcher.innerHTML = '<span class="loading-spinner"></span>';
+        switcher.style.opacity = '0.7';
+        
+        // 保存配置并刷新页面
+        const config = { mode: newTheme };
+        saveKucatConfigAndReload(config);
+        
+        setTimeout(() => {
+            switcher.innerHTML = originalHTML;
+            switcher.style.opacity = '1';
+        }, 2000);
+    });
 });
+
+window.addEventListener('DOMContentLoaded', function() {
+    const config = getKucatConfig();
+    
+    const themeToApply = config.mode === 'auto' 
+        ? getTimeBasedTheme() 
+        : (config.mode || 'light');
+
+    applyThemeToUI(themeToApply);
+});
+
+// 自动主题模式的时间检测（每5分钟检查一次）
+setInterval(function() {
+    const config = getKucatConfig();
+    if (config.mode === 'auto') {
+        const currentTheme = getTimeBasedTheme();
+        const bodyTheme = document.body.getAttribute('data-theme');
+        
+        if (bodyTheme !== currentTheme) {
+            // 对于自动模式，只更新UI不刷新页面
+            applyThemeToUI(currentTheme);
+        }
+    }
+}, 5 * 60 * 1000);
 
 /* ]]> */
