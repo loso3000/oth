@@ -169,12 +169,12 @@ check_service() {
 optimized_sethttps() {
     config_get https "$cfg" https
 	if [ -n "$(command -v nginx)" ]; then
-		if [ -z "`uci -q get nginx._redirect2ssl`" ]; then
+		  if [ -z "`uci -q get nginx._redirect2ssl`" ]; then
 			uci -q set nginx._redirect2ssl=server
 			uci -q set nginx._redirect2ssl.server_name='_redirect2ssl'
 			uci -q set nginx._redirect2ssl.return='302 https://$host$request_uri'
 			uci -q set nginx._redirect2ssl.access_log='off; # logd openwrt'
-		fi
+		  fi
     	if [ "x${https}" = "x1" ] ; then
     		uci -q del nginx.default_server.listen
     		uci -q add_list nginx.default_server.listen='80'
@@ -195,11 +195,11 @@ optimized_sethttps() {
 	elif [ -n "$(command -v lighttpd)" ]; then
         if [ "x${https}" = "x1" ] ; then
 	         sed -i "s/	# url.redirect =/	url.redirect =/" /etc/lighttpd/conf.d/82-https.conf
-		else
+		    else
 	         sed -i "s/	url.redirect =/	# url.redirect =/" /etc/lighttpd/conf.d/82-https.conf
         fi
-	    /etc/init.d/lighttpd reload
-    else
+	      /etc/init.d/lighttpd reload
+  else
     
     if [ "x${https}" = "x1" ]; then
         generate_main_certificate
@@ -210,7 +210,7 @@ optimized_sethttps() {
     fi
    restart_services_safely
     
-fi
+  fi
 }
 
 generate_main_certificate() {
@@ -225,7 +225,6 @@ generate_main_certificate() {
         # echo "生成主SSL证书..."
         $UCISET network.lan.hostname="${hostname}"
         $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
-        # openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout "$main_key" -out "$main_cert" -subj "/C=CN/CN=${hostname}.lan" > /dev/null 2>&1
 	openssl ecparam -genkey -name prime256v1 -out "$main_key" > /dev/null 2>&1
 	openssl req -new -x509 -key "$main_key" -out "$main_cert" -days 3650 -subj "/C=CN/CN=${hostname}.lan" > /dev/null 2>&1
 	chmod 600 "$main_key" && chmod 644 "$main_cert"
@@ -312,7 +311,7 @@ restart_services_safely() {
     uci -q set uhttpd.main.http_keepalive='20'
     uci commit luci 
     uci commit uhttpd 
-    /etc/init.d/uhttpd restart
+    /etc/init.d/uhttpd reload
     sleep 3
     for service in ttyd netdata openlist2; do
         if ! check_service "$service"; then
