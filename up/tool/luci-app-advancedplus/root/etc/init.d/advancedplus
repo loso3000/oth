@@ -321,15 +321,23 @@ if [ "x$useset" == "x0" ] ; then
 	uci set advancedplus.@basic[0].primary_opacity='5'
  	[ $mode == dark ] && uci set advancedplus.@basic[0].primary_rgbbody='33,45,60' || uci set advancedplus.@basic[0].primary_rgbbody='248,248,248'
 fi
-if [ "x$(uci -q get advancedplus.@basic[0].fontmode)" = "x1" ] ; then
-	uci set advancedplus.@basic[0].font_d='1.3rem'
-	uci set advancedplus.@basic[0].font_z='1.1rem'
-	uci set advancedplus.@basic[0].font_x='0.92rem'
-else
+case "x$(uci -q get advancedplus.@basic[0].fontmode)" in
+	x1)
 	uci set advancedplus.@basic[0].font_d='1.1rem'
 	uci set advancedplus.@basic[0].font_z='0.92rem'
 	uci set advancedplus.@basic[0].font_x='0.875rem'
-fi
+	;;
+	x2)
+	uci set advancedplus.@basic[0].font_d='1.3rem'
+	uci set advancedplus.@basic[0].font_z='1.1rem'
+	uci set advancedplus.@basic[0].font_x='0.92rem'
+	;;
+	*)
+	uci set advancedplus.@basic[0].font_d='0.92rem'
+	uci set advancedplus.@basic[0].font_z='0.875rem'
+	uci set advancedplus.@basic[0].font_x='0.82rem'
+	;;
+esac
 uci commit advancedplus
 }
 
