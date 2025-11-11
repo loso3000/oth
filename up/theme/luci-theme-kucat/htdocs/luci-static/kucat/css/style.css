@@ -678,7 +678,7 @@ footer>a {
     border-radius: 0.25rem;
     background-color: rgba(var(--primary-rgbbody), 1);
     color: var(--body-color);
-    box-shadow: 0 .1rem .1rem .3rem var(--input-boxcolor);
+    box-shadow: 0 .1rem .5rem .2rem var(--input-boxcolor);
 }
 #view > div:first-child {
   display: flex;
