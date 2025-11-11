@@ -1,0 +1,357 @@
+#!/bin/sh
+
+# author github@sirpdboy
+
+#   luci-app-kucat-config
+#   Copyright (C) 2019-2025 The Sirpdboy Team <herboy2008@gmail.com> 
+# 
+#   Have a bug? Please create an issue here on GitHub!
+#       https://github.com/sirpdboy/luci-app-kucat-config/issues
+# 
+# Licensed to the public under the Apache License 2.0
+
+. /lib/functions.sh
+. /usr/share/libubox/jshn.sh
+
+readonly bg_path="/www/luci-static/kucat/background"
+readonly tmp_path="/tmp/kucat_background.tmp"
+readonly allowed_extensions="jpg jpeg png gif webp mp4 webm"
+readonly max_file_size=$((50 * 1024 * 1024))  # 50MB
+
+# 创建背景目录
+mkdir -p "$bg_path"
+
+# 安全检查函数
+check_filename() {
+    local filename="$1"
+    
+    # 检查空值
+    [ -z "$filename" ] && return 1
+    
+    # 防止路径遍历攻击
+    if echo "$filename" | grep -q '\.\.' || echo "$filename" | grep -q '/'; then
+        return 1
+    fi
+    
+    # 检查文件扩展名
+    local extension=$(echo "$filename" | awk -F. '{print tolower($NF)}')
+    if ! echo "$allowed_extensions" | grep -q "\b$extension\b"; then
+        return 1
+    fi
+    
+    return 0
+}
+
+# 获取可用空间
+get_avail_space() {
+    local avail_kb
+    if [ -d "$bg_path" ]; then
+        # 获取背景目录所在分区的可用空间
+        avail_kb=$(df -k "$bg_path" 2>/dev/null | awk 'NR==2 {print $4}')
+    else
+        # 回退到根分区
+        avail_kb=$(df -k / 2>/dev/null | awk 'NR==2 {print $4}')
+    fi
+    
+    # 转换为MB
+    local avail_mb=$((avail_kb / 1024))
+    echo "$avail_mb"
+}
+
+# 获取文件列表
+get_file_list() {
+    json_init
+    json_add_array "files"
+    
+    if [ -d "$bg_path" ]; then
+        find "$bg_path" -maxdepth 1 -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.gif' -o -name '*.webp' -o -name '*.mp4' -o -name '*.webm' \) | while read -r file; do
+            local filename=$(basename "$file")
+            local size=$(stat -c "%s" "$file" 2>/dev/null || echo "0")
+            local mtime=$(stat -c "%Y" "$file" 2>/dev/null || echo "0")
+            
+            json_add_object
+            json_add_string "name" "$filename"
+            json_add_int "size" "$size"
+            json_add_int "mtime" "$mtime"
+            json_close_object
+        done
+    fi
+    
+    json_close_array
+    json_dump
+}
+
+# 删除文件
+remove_file() {
+    local filename="$1"
+    
+    if ! check_filename "$filename"; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Invalid filename"
+        json_dump
+        return 1
+    fi
+    
+    local file_path="$bg_path/$filename"
+    
+    if [ ! -f "$file_path" ]; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "File not found"
+        json_dump
+        return 1
+    fi
+    
+    if rm -f "$file_path"; then
+        json_init
+        json_add_int "result" 0
+        json_add_string "message" "File deleted successfully"
+        json_dump
+    else
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Failed to delete file"
+        json_dump
+        return 1
+    fi
+}
+
+# 重命名/移动文件（处理上传）
+rename_file() {
+    local newname="$1"
+    
+    if ! check_filename "$newname"; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Invalid filename or file type not allowed"
+        json_dump
+        return 1
+    fi
+    
+    # 查找匹配的临时文件
+    local temp_file=$(find /tmp -name "kucat_upload_*_$newname" -type f 2>/dev/null | head -1)
+    
+    if [ -z "$temp_file" ] || [ ! -f "$temp_file" ]; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Temporary file not found"
+        json_dump
+        return 1
+    fi
+    
+    # 检查文件大小
+    local file_size=$(stat -c "%s" "$temp_file" 2>/dev/null || echo "0")
+    if [ "$file_size" -gt "$max_file_size" ]; then
+        rm -f "$temp_file"
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "File too large. Maximum size: 50MB"
+        json_dump
+        return 1
+    fi
+    
+    local final_path="$bg_path/$newname"
+    
+    # 移动文件
+    if mv "$temp_file" "$final_path" 2>/dev/null; then
+        # 设置权限
+        chmod 0644 "$final_path"
+        json_init
+        json_add_int "result" 0
+        json_add_string "message" "File uploaded successfully"
+        json_dump
+    else
+        # 清理临时文件
+        rm -f "$temp_file"
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Failed to move file to destination"
+        json_dump
+        return 1
+    fi
+}
+
+# 直接上传文件
+upload_file() {
+    local filename="$1"
+    local filedata="$2"
+    
+    if ! check_filename "$filename"; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Invalid filename or file type not allowed"
+        json_dump
+        return 1
+    fi
+    
+    local final_path="$bg_path/$filename"
+    
+    # 检查文件大小
+    local data_size=$(echo "$filedata" | wc -c)
+    if [ "$data_size" -gt "$max_file_size" ]; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "File too large. Maximum size: 50MB"
+        json_dump
+        return 1
+    fi
+    
+    # 写入文件
+    if echo "$filedata" > "$final_path" 2>/dev/null; then
+        chmod 0644 "$final_path"
+        json_init
+        json_add_int "result" 0
+        json_add_string "message" "File uploaded successfully"
+        json_dump
+    else
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Failed to write file"
+        json_dump
+        return 1
+    fi
+}
+
+# 设置文件权限
+set_permissions() {
+    local filename="$1"
+    
+    if ! check_filename "$filename"; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Invalid filename"
+        json_dump
+        return 1
+    fi
+    
+    local file_path="$bg_path/$filename"
+    
+    if [ ! -f "$file_path" ]; then
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "File not found"
+        json_dump
+        return 1
+    fi
+    
+    if chmod 0644 "$file_path"; then
+        json_init
+        json_add_int "result" 0
+        json_add_string "message" "Permissions set successfully"
+        json_dump
+    else
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Failed to set permissions"
+        json_dump
+        return 1
+    fi
+}
+
+# 主处理函数
+case "$1" in
+    "list")
+        json_init
+        json_add_array "methods"
+        
+        json_add_object
+        json_add_string "method" "avail"
+        json_add_array "params"
+        json_close_array
+        json_add_string "description" "Get available disk space"
+        json_close_object
+        
+        json_add_object
+        json_add_string "method" "remove"
+        json_add_array "params"
+        json_add_string "filename" "string"
+        json_close_array
+        json_add_string "description" "Remove background file"
+        json_close_object
+        
+        json_add_object
+        json_add_string "method" "rename"
+        json_add_array "params"
+        json_add_string "newname" "string"
+        json_close_array
+        json_add_string "description" "Rename/Move uploaded file"
+        json_close_object
+        
+        json_add_object
+        json_add_string "method" "upload"
+        json_add_array "params"
+        json_add_string "filename" "string"
+        json_add_string "filedata" "string"
+        json_close_array
+        json_add_string "description" "Upload file directly"
+        json_close_object
+        
+        json_add_object
+        json_add_string "method" "set_permissions"
+        json_add_array "params"
+        json_add_string "filename" "string"
+        json_close_array
+        json_add_string "description" "Set file permissions"
+        json_close_object
+        
+        json_add_object
+        json_add_string "method" "file_list"
+        json_add_array "params"
+        json_close_array
+        json_add_string "description" "Get file list"
+        json_close_object
+        
+        json_close_array
+        json_dump
+        ;;
+    "call")
+        case "$2" in
+            "avail")
+                json_init
+                json_add_int "avail" "$(get_avail_space)"
+                json_dump
+                ;;
+            "remove")
+                read -r input
+                json_load "$input"
+                json_get_var filename "filename"
+                remove_file "$filename"
+                ;;
+            "rename")
+                read -r input
+                json_load "$input"
+                json_get_var newname "newname"
+                rename_file "$newname"
+                ;;
+            "upload")
+                read -r input
+                json_load "$input"
+                json_get_var filename "filename"
+                json_get_var filedata "filedata"
+                upload_file "$filename" "$filedata"
+                ;;
+            "set_permissions")
+                read -r input
+                json_load "$input"
+                json_get_var filename "filename"
+                set_permissions "$filename"
+                ;;
+            "file_list")
+                get_file_list
+                ;;
+            *)
+                json_init
+                json_add_int "result" 1
+                json_add_string "error" "Unknown method: $2"
+                json_dump
+                ;;
+        esac
+        ;;
+    *)
+        json_init
+        json_add_int "result" 1
+        json_add_string "error" "Invalid command"
+        json_dump
+        ;;
+esac

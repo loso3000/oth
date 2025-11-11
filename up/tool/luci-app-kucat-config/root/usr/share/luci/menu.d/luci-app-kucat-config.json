@@ -1,0 +1,49 @@
+{
+    "admin/system/kucat-config": {
+         "title": "kucat-config",
+         "order": 90,
+         "action": {
+               "type": "firstchild"
+         },
+         "depends": {
+               "acl": [ "luci-app-kucat-config" ],
+               "uci": { "kucat-config": true }
+         }
+    },
+    "admin/system/kucat-config/config": {
+         "title": "Base Setting",
+         "order": 10,
+         "action": {
+               "type": "view",
+               "path": "kucat-config/config"
+         }
+    },
+
+    "admin/system/kucat-config/schemes": {
+         "title": "Color Schemes",
+         "order": 20,
+         "action": {
+               "type": "view",
+               "path": "kucat-config/schemes"
+         }
+    },
+    
+    "admin/system/kucat-config/updesktop": {
+         "title": "Desktop Wallpaper Upload",
+         "order": 30,
+         "action": {
+		"type": "view",
+		"path": "kucat-config/updesktop"
+         }
+    },
+    
+    "admin/system/kucat-config/uplogin": {
+         "title": "Login Wallpaper Upload",
+         "order": 40,
+         "action": {
+		"type": "view",
+		"path": "kucat-config/uplogin"
+             }
+    }
+
+}
