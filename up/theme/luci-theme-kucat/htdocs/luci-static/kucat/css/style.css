@@ -2369,7 +2369,7 @@ body.lang_pl.node-main-login .cbi-value-title { width: 12rem; }
 
 .node-main-login>.main>.main-right #maincontent .container {
   backdrop-filter: none !important;
-  width: 20rem;
+  flex-grow: unset;
   -webkit-transition: all 0.2s;
   transition: all 0.2s;
   -webkit-user-select: none;
