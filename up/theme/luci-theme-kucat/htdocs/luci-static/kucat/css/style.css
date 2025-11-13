@@ -3172,7 +3172,7 @@ background-color: #9E9E9E!important;
   .cbi-input-textarea, textarea, .cbi-value-description, .cbi-value-field,
   .cbi-value-field .cbi-dropdown, .cbi-value-field .cbi-input-select,
   .cbi-value input[type="text"], .cbi-value input[type="password"] {
-    width: 100%;
+    width: 18rem; 
     text-align: left;
     min-width: 8rem;
     margin: 0;
@@ -3190,7 +3190,7 @@ background-color: #9E9E9E!important;
   }
   
   table>tbody>tr>td, table>tfoot>tr>td, table>thead>tr>td { padding: 0; }
-  .cbi-input-textarea, textarea { min-width: 19rem; }
+  .cbi-input-textarea, textarea { width: 18rem;min-width: 8rem; }
   
   .cbi-dynlist>.add-item, .cbi-dynlist, .cbi-dropdown { width: 100%; }
   
