@@ -30,9 +30,9 @@ config basic
 	option primary_rgbm_ts '0.9'
 	option primary_rgbm '20,109,179'
 	option fontmode '0'
-	option font_d '1.1rem'
-	option font_z '0.92rem'
-	option font_x '0.875rem'
+	option font_d '1rem'
+	option font_z '0.875rem'
+	option font_x '0.78rem'
 	option tsoset '1'
 	option dhcp_domain '1'
 
@@ -316,19 +316,19 @@ fi
 [ $mode == dark ] && uci set advancedplus.@basic[0].primary_rgbbody='33,45,60' || uci set advancedplus.@basic[0].primary_rgbbody='244,245,247'
 case "x$(uci -q get advancedplus.@basic[0].fontmode)" in
 	x1)
-	uci set advancedplus.@basic[0].font_d='1.1rem'
+	uci set advancedplus.@basic[0].font_d='1.2rem'
 	uci set advancedplus.@basic[0].font_z='0.92rem'
 	uci set advancedplus.@basic[0].font_x='0.875rem'
 	;;
 	x2)
-	uci set advancedplus.@basic[0].font_d='1.3rem'
+	uci set advancedplus.@basic[0].font_d='1.32rem'
 	uci set advancedplus.@basic[0].font_z='1.1rem'
 	uci set advancedplus.@basic[0].font_x='0.92rem'
 	;;
 	*)
-	uci set advancedplus.@basic[0].font_d='0.92rem'
+	uci set advancedplus.@basic[0].font_d='1rem'
 	uci set advancedplus.@basic[0].font_z='0.875rem'
-	uci set advancedplus.@basic[0].font_x='0.82rem'
+	uci set advancedplus.@basic[0].font_x='0.78rem'
 	;;
 esac
 uci commit advancedplus
