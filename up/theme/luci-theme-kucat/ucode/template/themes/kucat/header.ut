@@ -40,7 +40,6 @@ let primary_rgbm = '45,102,147', primary_rgbbody = '244,245,247',primary_rgbm_ts
 let gohome = bar + "status/", gouser = bar + "system/", gossr = bar + "services/", bgqs = '1', setbar = '1', dayword = '0';
 let background = '0', bkuse = '0', bklock = '1', fontd = '0.92rem', fontz = '0.875rem', fontx = '0.825rem';
 let bg_url = media + "/img/bg1.jpg";
-const dark_css = readfile('/www/luci-static/kucat/css/dark.css');
 
 if (access('/etc/config/advancedplus')) {
         kucat = "advancedplus";
