@@ -123,8 +123,6 @@ EOF
 
 kucatset(){
 sum=$(grep -c 'theme' /etc/config/kucat)
-
-    echo 'start'
 useset=0
 for i in $(seq 0 $((sum-1)))
 do
@@ -230,7 +228,7 @@ case "x$(uci -q get kucat.@basic[0].fontmode)" in
 	*)
 	uci set kucat.@basic[0].font_d='0.92rem'
 	uci set kucat.@basic[0].font_z='0.875rem'
-	uci set kucat.@basic[0].font_x='0.82rem'
+	uci set kucat.@basic[0].font_x='0.78rem'
 	;;
 esac
 uci commit kucat
@@ -239,7 +237,6 @@ uci commit kucat
 start() {
     [ "x$(uci -q get kucat.@basic[0].mode)" = "x" ]  && /etc/config/kucat reset 
     kucatset
-    echo 'end ok'
     rm -rf /tmp/luci-*
 }
 

@@ -17,12 +17,11 @@ msgstr "Content-Type: text/plain; charset=UTF-8\n"
 msgid "KuCat Theme Config"
 msgstr "KuCat主题设置"
 
-msgid "Theme Config"
-msgstr "主题设置"
+msgid "KuCat Config"
+msgstr "KuCat主题设置"
 
-
-msgid "Here you can set the blur and transparency of the login page of argon theme, and manage the background pictures and videos.[Chrome is recommended]"
-msgstr "在这里你可以设置argon 主题的登录页面的模糊和透明度。[建议使用 Chrome]"
+msgid "You can set KuCat theme font size, color scheme, shortcut tools, and manage login and desktop background images here."
+msgstr "您可以在这里设置KuCat主题字体大小,颜色方案,快捷工具,并管理登录背景和桌面背景图片."
 
 msgid "Here you can set the mode of the theme and change the proxy tool icon in the navigation bar. [Recommend Chrome]"
 msgstr "这里可以设置主题的模式和更换导航栏的代理工具图标。[建议使用 Chrome]"
@@ -43,10 +42,16 @@ msgid "Auto download Iciba wallpaper"
 msgstr "自动下载词霸每日壁纸"
 
 msgid "Auto download Bird 4K wallpaper"
-msgstr "自动下载360小鸟4K高清壁纸(每日4千张随机选)"
+msgstr "自动下载小鸟4K高清壁纸(每日4千张随机选)"
+
+msgid "Set font size"
+msgstr "字体大小"
 
 msgid "Wallpaper synchronization"
 msgstr "壁纸同步"
+
+msgid "Is the login wallpaper consistent with the desktop wallpaper? If selected, it means that the desktop wallpaper and login wallpaper are the same image."
+msgstr "登录壁纸与桌面壁纸是否一致？选择则表示桌面壁纸和登录壁纸是同一张图片。"
 
 msgid "Refreshing mode"
 msgstr "清爽模式"
@@ -57,82 +62,11 @@ msgstr "启用每日一言"
 msgid "Care mode (large font)"
 msgstr "关怀模式(大字体)"
 
-msgid "Expand Toolbar"
+msgid "Expand navigation bar"
 msgstr "展开导航栏"
 
-
-msgid "You can upload jpg, png, and gif files to create your favorite kucat desktop interface"
-msgstr "你可以上传jpg、png、gif文件，以创建自己喜欢的kucat桌面界面"
-
-msgid "You can upload files such as jpg,png,gif files, To change the login page background.Uploading Kucat, Agron, and Opentopd all three themes can be used once"
-msgstr "你可以上传jpg、png、gif文件，以创建自己喜欢的登录界面,上传一次Kucat,Agron,Opentopd三种主题都可使用"
-
-msgid "Save Changes"
-msgstr "保存更改"
-
-msgid "Choose local file:"
-msgstr "选择本地文件："
-
-msgid "Couldn't open file:"
-msgstr "无法打开文件："
-
-msgid "Create upload file error."
-msgstr "创建上传文件失败。"
-
-msgid "File name"
-msgstr "文件名"
-
-msgid "File saved to"
-msgstr "文件保存到"
-
-msgid "FileTransfer"
-msgstr "文件传输"
-
-msgid "Install"
-msgstr "安装"
-
-msgid "Attributes"
-msgstr "属性"
-
-msgid "Modify time"
-msgstr "修改时间"
-
-msgid "No specify upload file."
-msgstr "未指定上传文件"
-
-msgid "Path on Route:"
-msgstr "路由根目录："
-
-msgid "Remove"
-msgstr "移除"
-
-msgid "Size"
-msgstr "大小"
-
-msgid "Upload (Free:"
-msgstr "上传 (剩余空间："
-
-msgid "Background file list"
-msgstr "壁纸文件列表"
-
-msgid "Upload file to '/www/luci-static/resources/background/'"
-msgstr "文件将上传到'/www/luci-static/resources/background/'"
-
-msgid "Color scheme list"
-msgstr "颜色配置方案列表"
-
-msgid "List menu background color transparency"
-msgstr "列表菜单背景色透明度"
-
-
-msgid "There are 6 preset color schemes, and only the desktop background image can be set to display or not. The custom color values are RGB values such as 255,0,0 (representing red), and a blur radius of 0 indicates no lag in the image."
-msgstr "预置6种颜色方案，只可设置桌面壁纸图显示与否。自定义的颜色值是RGB值如：255,0,0(表示红色)，模糊半径为0则画面无卡顿。"
-
-msgid "Set and manage features such as KuCat themed background wallpaper, main background color, partition background, transparency, blur, toolbar retraction and shortcut pointing.</br>"
-msgstr "设置和管理酷猫主题登陆壁纸、桌面壁纸、主背景色、隔栏背景、透明度、模糊度、工具栏收放和快捷指向等功能。</br>"
-
-msgid "</br>For specific usage, see:"
-msgstr "</br>使用说明："
+msgid "Expand or shrink the five quick navigation bars"
+msgstr "展开或收缩五个快捷导航栏"
 
 msgid "Services Ssrkey settings"
 msgstr "服务相关快捷键设置"
@@ -143,14 +77,29 @@ msgstr "系统相关快捷键设置"
 msgid "Status Homekey settings"
 msgstr "状态相关快捷键设置"
 
-msgid "Color scheme list"
+msgid "Save settings"
+msgstr "保存更改"
+
+msgid "Save current settings"
+msgstr "保存当前设置"
+
+msgid "Color Schemes list"
 msgstr "颜色配置方案列表"
 
-msgid "Enable color matching"
-msgstr "启用配色方案"
+msgid "Remarks"
+msgstr "备注"
 
-msgid "Theme mode"
-msgstr "主题模式"
+msgid "Enable this color scheme"
+msgstr "启用此配色"
+
+msgid "Light dark mode"
+msgstr "亮暗模式"
+
+msgid "Main Background color(RGB)"
+msgstr "主背景色(RGB)"
+
+msgid "RGB values, such as red being '255,0,0', or using a preset scheme (which includes fence color values)"
+msgstr "RGB值，如红色为'255,0,0'，或使用预设方案（预设方案包含栅栏色值）"
 
 msgid "Light"
 msgstr "亮色"
@@ -185,20 +134,61 @@ msgstr "炫酷海洋之心(透明亮)"
 msgid "Enable wallpaper"
 msgstr "启用壁纸"
 
-msgid "Wallpaper blur radius"
-msgstr "壁纸模糊半径"
+msgid "Use desktop wallpaper"
+msgstr "使用桌面壁纸"
 
 msgid "Wallpaper transparency"
 msgstr "壁纸透明度"
 
-msgid "Main Background color(RGB)"
-msgstr "主背景色(RGB)"
+msgid "0: Transparent, 1: Opaque (Suggestion: Mild Transparent 0.9)"
+msgstr "0：透明，1：不透明（建议：轻度透明0.9）"
 
-msgid "Fence background transparency"
-msgstr "隔栏背景透明度"
+msgid "Wallpaper blur radius"
+msgstr "壁纸模糊半径"
 
-msgid "Fence background(RGB)"
-msgstr "隔栏背景色(RGB)"
+msgid "The larger the value, the more blurry it becomes (0: not blurry, suggestion: 0, blurry values may cause slower reflection)"
+msgstr "值越大越模糊（0：不模糊，建议：0，模糊值可能导致反映变慢）"
+
+msgid "Fence Color Value (RGB)"
+msgstr "栅栏颜色色值(RGB)"
+
+msgid "Fence color transparency"
+msgstr "栅栏颜色透明度"
+
+msgid "0: Transparent, 1: Opaque (Recommendation: Heavy Transparency 0.1)"
+msgstr "0：透明，1：不透明（建议：重度透明0.1）"
+
+msgid "RGB values, such as '255,0,0' for red, suggest dark values"
+msgstr "RGB值，例如红色为'255,0,0'，建议深色值"
+
+msgid "Upload desktop background"
+msgstr "上传桌面背景"
+
+msgid "Upload background (available space: %1024.2mB)"
+msgstr "上传背景（可用空间：%1024.2mB）"
+
+msgid "Upload..."
+msgstr "上传..."
+
+msgid ""
+"You can upload files such as gif/jpg/png/webm files, to change the desktop page background."
+msgstr ""
+"你可以上传 gif/jpg/png/webm 等格式的文件，以创建自己喜欢的桌面壁纸。"
+
+msgid "Failed to upload file: %s."
+msgstr "上传文件失败：%s。"
+
+msgid "Background file list"
+msgstr "背景文件列表"
+
+msgid "Filename"
+msgstr "文件名"
+
+msgid "Modified date"
+msgstr "修改时间"
+
+msgid "Size"
+msgstr "大小"
 
 msgid "Action"
 msgstr "操作"
@@ -209,44 +199,11 @@ msgstr "删除"
 msgid "Expecting: %s"
 msgstr "请输入：%s"
 
-msgid "Failed to upload file: %s."
-msgstr "上传文件失败：%s。"
-
-msgid "Filename"
-msgstr "文件名"
-
 msgid "Files will be uploaded to <code>%s</code>."
 msgstr "文件将被上传至<code>%s</code>。"
 
-msgid "Modified date"
-msgstr "修改时间"
-
 msgid "No files found."
 msgstr "没有找到文件。"
-
-msgid "Save current settings"
-msgstr "保存当前设置"
-
-msgid "Save settings"
-msgstr "保存设置"
-
-msgid "Size"
-msgstr "大小"
-
-msgid "Upload background"
-msgstr "上传背景"
-
-msgid "Upload background (available space: %1024.2mB)"
-msgstr "上传背景（可用空间：%1024.2mB）"
-
-msgid "Upload..."
-msgstr "上传..."
-
-msgid ""
-"You can upload files such as gif/jpg/mp4/png/webm/webp files, to change the "
-"login page background."
-msgstr ""
-"你可以上传 gif/jpg/mp4/png/webm/webp 等格式的文件，以创建自己喜欢的登录界面。"
 
 msgid "Login Background Upload"
 msgstr "登录壁纸上传"
@@ -254,198 +211,12 @@ msgstr "登录壁纸上传"
 msgid "Desktop background upload"
 msgstr "桌面壁纸上传"
 
+msgid "Upload Login background"
+msgstr "上传登录背景"
+
 msgid "Kucat Theme Desktop Background Wallpaper Upload and Management."
 msgstr "kucat主题桌面背景壁纸文件上传和管理。"
 
 msgid "Kucat theme login background wallpaper upload and management."
-msgstr "kucat 主题登录背景壁纸上传和管理"
+msgstr "kucat主题登录背景壁纸上传和管理"
 
-msgid "Background file list"
-msgstr "背景文件列表"
-
-msgid "Progress bar Font Color"
-msgstr "进度条字体颜色"
-
-msgid ""
-msgstr ""
-
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:102
-msgid "0 transparent - 1 opaque (suggest: black translucent preset: 0.5)."
-msgstr "0 最透明 - 1 不透明（建议：黑色半透明 0.5）"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:78
-msgid ""
-"0 transparent - 1 opaque (suggest: transparent: 0 or translucent preset: "
-"0.5)."
-msgstr "0 最透明 - 1 不透明（建议: 透明 0 或 半透明预设 0.5）。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:91
-msgid "A HEX Color (default: #483d8b)."
-msgstr "十六进制颜色值（预设为：#483d8b）。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:67
-msgid "A HEX color (default: #5e72e4)."
-msgstr "十六进制颜色值（预设为：#5e72e4）。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:155
-msgid "Action"
-msgstr "操作"
-
-#: applications/luci-app-argon-config/root/usr/share/luci/menu.d/luci-app-argon-config.json:3
-msgid "Argon Config"
-msgstr "Argon 主题设置"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:45
-msgid "Argon theme configuration"
-msgstr "Argon 主题设置"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:175
-msgid "Background file list"
-msgstr "背景文件列表"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:54
-msgid "Bing"
-msgstr "Bing"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:53
-msgid "Built-in"
-msgstr "内建"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:63
-msgid "Dark mode"
-msgstr "暗黑模式"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:170
-msgid "Delete"
-msgstr "删除"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:73
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:97
-msgid "Expecting: %s"
-msgstr "请输入：%s"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:139
-msgid "Failed to upload file: %s."
-msgstr "上传文件失败：%s。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:152
-msgid "Filename"
-msgstr "文件名"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:129
-msgid "Files will be uploaded to <code>%s</code>."
-msgstr "文件将被上传至<code>%s</code>。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:61
-msgid "Follow system"
-msgstr "跟随系统"
-
-#: applications/luci-app-argon-config/root/usr/share/rpcd/acl.d/luci-app-argon-config.json:3
-msgid "Grant UCI access for luci-app-argon-config"
-msgstr "授予 luci-app-argon-config 访问 UCI 配置的权限"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:46
-msgid ""
-"Here you can set the blur and transparency of the login page of argon theme, "
-"and manage the background pictures and videos. Chrome is recommended."
-msgstr ""
-"在这里你可以设置argon 主题的登录页面的模糊和透明度，并管理背景图片与视频。推"
-"荐使用 Chrome。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:85
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:109
-msgid "Larger value will more blurred (suggest: clear: 1 or blur preset: 10)."
-msgstr "值越大越模糊（建议：清透 1 或 模糊预设 10）"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:62
-msgid "Light mode"
-msgstr "亮色模式"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:153
-msgid "Modified date"
-msgstr "修改时间"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:172
-msgid "No files found."
-msgstr "没有找到文件。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:116
-msgid "Save current settings"
-msgstr "保存当前设置"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:114
-msgid "Save settings"
-msgstr "保存设置"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:154
-msgid "Size"
-msgstr "大小"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:48
-msgid "Theme configuration"
-msgstr "主题配置"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:60
-msgid "Theme mode"
-msgstr "主题模式"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:55
-msgid "Unsplash"
-msgstr "Unsplash"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:128
-msgid "Upload background"
-msgstr "上传背景"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:122
-msgid "Upload background (available space: %1024.2mB)"
-msgstr "上传背景（可用空间：%1024.2mB）"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:131
-msgid "Upload..."
-msgstr "上传..."
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:56
-msgid "Wallhaven"
-msgstr "Wallhaven"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:52
-msgid "Wallpaper source"
-msgstr "壁纸来源"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:124
-msgid ""
-"You can upload files such as gif/jpg/mp4/png/webm/webp files, to change the "
-"login page background."
-msgstr ""
-"你可以上传 gif/jpg/mp4/png/webm/webp 等格式的文件，以创建自己喜欢的登录界面。"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:108
-msgid "[Dark mode] Frosted Glass Radius"
-msgstr "[暗色模式] 毛玻璃模糊半径"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:90
-msgid "[Dark mode] Primary Color"
-msgstr "[暗色模式] 主色调"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:101
-msgid "[Dark mode] Transparency"
-msgstr "[暗色模式] 透明度"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:84
-msgid "[Light mode] Frosted Glass Radius"
-msgstr "[亮色模式] 毛玻璃模糊半径"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:67
-msgid "[Light mode] Primary Color"
-msgstr "[亮色模式] 主色调"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:77
-msgid "[Light mode] Transparency"
-msgstr "[亮色模式] 透明度"
-
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:73
-#: applications/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js:97
-msgid "valid HEX color value"
-msgstr "有效十六进制颜色值"

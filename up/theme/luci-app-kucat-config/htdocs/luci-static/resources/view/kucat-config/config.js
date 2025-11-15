@@ -68,13 +68,13 @@ return view.extend({
 
 		// Wallpaper synchronization
 		o = s.option(form.Flag, 'bklock', _('Wallpaper synchronization'),
-			_('Is the login wallpaper consistent with the desktop wallpaper? If not selected, it indicates that the desktop wallpaper and login wallpaper are set independently.'));
+			_('Is the login wallpaper consistent with the desktop wallpaper? If selected, it means that the desktop wallpaper and login wallpaper are the same image.'));
 		o.rmempty = false;
 		o.default = '0';
 
 		// Expand Toolbar
-		o = s.option(form.Flag, 'setbar', _('Expand Toolbar'),
-			_('Expand or shrink the toolbar'));
+		o = s.option(form.Flag, 'setbar', _('Expand navigation bar'),
+			_('Expand or shrink the five quick navigation bars'));
 		o.rmempty = false;
 		o.default = '0';
 
@@ -91,21 +91,21 @@ return view.extend({
 		// Status Homekey settings
 		o = s.option(form.ListValue, 'gohome', _('Status Homekey settings'));
 		o.value('overview', _('Overview'));
-		o.value('online', _('Online User'));
-		o.value('realtime', _('Realtime Graphs'));
-		o.value('netdata', _('NetData'));
+		o.value('processes', _('Processes'));
+		o.value('realtime', _('Realtime_Graphs'));
+		o.value('netdata', _('Netdata'));
 		o.default = 'overview';
 		o.rmempty = false;
 
 		// System Userkey settings
 		o = s.option(form.ListValue, 'gouser', _('System Userkey settings'));
-		o.value('kucat-config', _('Advanced plus'));
-		o.value('netwizard', _('Inital Setup'));
+		o.value('kucat-config', _('KuCat Config'));
+		o.value('netwizard', _('Netwizard'));
 		o.value('system', _('System'));
 		o.value('admin', _('Administration'));
-		o.value('terminal', _('TTYD Terminal'));
-		o.value('packages', _('Software'));
-		o.value('filetransfer', _('FileTransfer'));
+		o.value('filemanager', _('File_Manager'));
+		o.value('ttyd', _('Terminal'));
+		o.value('poweroffdevice', _('PowerOff'));
 		o.default = 'kucat';
 		o.rmempty = false;
 
@@ -113,13 +113,15 @@ return view.extend({
 		o = s.option(form.ListValue, 'gossr', _('Services Ssrkey settings'));
 		o.value('shadowsocksr', _('SSR'));
 		o.value('bypass', _('bypass'));
-		o.value('nikki', _('nikki[Mihomo]'));
+		o.value('nikki', _('Nikki'));
 		o.value('passwall', _('passwall'));
 		o.value('passwall2', _('passwall2'));
 		o.value('openclash', _('OpenClash'));
 		o.value('homeproxy', _('HomeProxy'));
-		o.value('vssr', _('Hello World'));
-		o.default = 'bypass';
+		o.value('mosdns', _('MosDNS'));
+		o.value('smartdns', _('SmartDNS'));
+		o.value('AdGuardHome', _('AdGuard_Home'));
+		o.default = 'OpenClash';
 		o.rmempty = false;
 
 		o = s.option(form.Button, '_save', _('Save settings'));
@@ -131,27 +133,29 @@ return view.extend({
 		}
 
 		// Add theme scheme section reference
-		s = m.section(form.GridSection, 'theme', _('Color Schemes'));
+		s = m.section(form.GridSection, 'theme', _('Color Schemes list'));
 		s.addremove = true;
 		s.anonymous = true;
 
-		o = s.option(form.Value, 'remarks', _('Remarks'),
-			_('Give a descriptive name for this color scheme'));
+		o = s.option(form.Value, 'remarks', _('Remarks'));
 
-		o = s.option(form.Flag, 'use', _('Enable color matching'),
-			_('Enable this color scheme'));
+		o = s.option(form.Flag, 'use', _('Enable this color scheme'));
 		o.rmempty = false;
 		o.default = '1';
 
-		o = s.option(form.ListValue, 'mode', _('Theme mode'),
-			_('Select the theme appearance mode'));
+		o = s.option(form.Flag, 'bkuse', _('Enable wallpaper'),
+			_('Use desktop wallpaper'));
+		o.rmempty = false;
+		o.default = '1';
+		
+		o = s.option(form.ListValue, 'mode', _('Light dark mode'));
 		o.value('auto', _('Auto'));
 		o.value('light', _('Light'));
 		o.value('dark', _('Dark'));
 		o.default = 'light';
 
 		o = s.option(form.Value, 'primary_rgbm', _('Main Background color(RGB)'),
-			_('RGB values like "255,0,0" for red, or use preset names'));
+			_("RGB values, such as red being '255,0,0', or using a preset scheme (which includes fence color values)"));
 		o.value('blue', _('RoyalBlue'));
 		o.value('green', _('MediumSeaGreen'));
 		o.value('orange', _('SandyBrown'));
@@ -162,21 +166,16 @@ return view.extend({
 		o.rmempty = false;
 		o.default = '74,161,133';
 
-		o = s.option(form.Flag, 'bkuse', _('Enable wallpaper'),
-			_('Show background wallpaper'));
-		o.rmempty = false;
-		o.default = '1';
-
 		o = s.option(form.ListValue, 'primary_rgbm_ts', _('Wallpaper transparency'),
-			_('Set the transparency level of the wallpaper'));
+			_('0: Transparent, 1: Opaque (Suggestion: Mild Transparent 0.9)'));
 		ts_sets.forEach(function(value) {
 			o.value(value.toString(), value.toString());
 		});
 		o.rmempty = false;
-		o.default = '0.5';
+		o.default = '0.9';
 
 		o = s.option(form.ListValue, 'primary_opacity', _('Wallpaper blur radius'),
-			_('Blur effect on wallpaper (0 = no blur)'));
+			_('The larger the value, the more blurry it becomes (0: not blurry, suggestion: 0, blurry values may cause slower reflection)'));
 		opacity_sets.forEach(function(value) {
 			o.value(value.toString(), value.toString());
 		});
@@ -184,13 +183,13 @@ return view.extend({
 		o.rmempty = false;
 		o.default = '0';
 
-		o = s.option(form.Value, 'primary_rgbs', _('Fence background(RGB)'),
-			_('Background color for sections and partitions'));
+		o = s.option(form.Value, 'primary_rgbs', _('Fence Color Value (RGB)'),
+			_("RGB values, such as '255,0,0' for red, suggest dark values"));
 		o.default = '225,112,88';
 		o.rmempty = false;
 		
-		o = s.option(form.ListValue, 'primary_rgbs_ts', _('Fence background transparency'),
-			_('Transparency level for partition backgrounds'));
+		o = s.option(form.ListValue, 'primary_rgbs_ts', _('Fence color transparency'),
+			_("0: Transparent, 1: Opaque (Recommendation: Heavy Transparency 0.1)"));
 		ts_sets.forEach(function(value) {
 			o.value(value.toString(), value.toString());
 		});
@@ -200,11 +199,11 @@ return view.extend({
 
 		s = m.section(form.TypedSection, null, _('Upload background (available space: %1024.2mB)')
 			.format(data[1].avail * 1024),
-			_('You can upload files such as gif/jpg/mp4/png/webm/webp files, to change the login page background.'));
+			_('You can upload files such as gif/jpg/png/webm files, to change the desktop page background.'));
 		s.addremove = false;
 		s.anonymous = true;
 
-		o = s.option(form.Button, '_upload_bg', _('Upload background'),
+		o = s.option(form.Button, '_upload_bg', _('Upload desktop background'),
 			_('Files will be uploaded to <code>%s</code>.').format(bg_path));
 		o.inputstyle = 'action';
 		o.inputtitle = _('Upload...');
