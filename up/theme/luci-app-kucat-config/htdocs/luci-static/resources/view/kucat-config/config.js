@@ -44,11 +44,15 @@ return view.extend({
 		var m, s, o;
 		m = new form.Map('kucat', _('KuCat Theme Config'),
 			_('Here you can set the blur and transparency of the login page of kucat theme, and manage the background pictures.'));
-		s = m.section(form.TypedSection, 'basic', _('Settings'));
+		
+		s = m.section(form.TypedSection, 'basic', '');
 		s.anonymous = true;
+		
+		s.tab('basic',  _('Basic Settings'));
+		s.tab('theme', _('Color Schemes'));
 
 		// Wallpaper Source
-		o = s.option(form.ListValue, 'background', _('Wallpaper Source'), 
+		o = s.taboption('basic', form.ListValue, 'background', _('Wallpaper Source'), 
 			_('Local wallpapers need to be uploaded on their own, and only the first update downloaded on the same day will be automatically downloaded.'));
 		o.value('0', _('Local wallpaper'));
 		o.value('1', _('Auto download Iciba wallpaper'));
@@ -59,7 +63,7 @@ return view.extend({
 		o.rmempty = false;
 		
 		// Set font size
-		o = s.option(form.ListValue, 'fontmode', _('Set font size'));
+		o = s.taboption('basic', form.ListValue, 'fontmode', _('Set font size'));
 		o.rmempty = false;
 		o.value('0', _('Small font'));
 		o.value('1', _('Normal font'));
@@ -67,29 +71,29 @@ return view.extend({
 		o.default = '0';
 
 		// Wallpaper synchronization
-		o = s.option(form.Flag, 'bklock', _('Wallpaper synchronization'),
+		o = s.taboption('basic', form.Flag, 'bklock', _('Wallpaper synchronization'),
 			_('Is the login wallpaper consistent with the desktop wallpaper? If selected, it means that the desktop wallpaper and login wallpaper are the same image.'));
 		o.rmempty = false;
 		o.default = '0';
 
 		// Expand Toolbar
-		o = s.option(form.Flag, 'setbar', _('Expand navigation bar'),
+		o = s.taboption('basic', form.Flag, 'setbar', _('Expand navigation bar'),
 			_('Expand or shrink the five quick navigation bars'));
 		o.rmempty = false;
 		o.default = '0';
 
 		// Refreshing mode
-		o = s.option(form.Flag, 'bgqs', _('Refreshing mode'));
+		o = s.taboption('basic', form.Flag, 'bgqs', _('Refreshing mode'));
 		o.rmempty = false;
 		o.default = '0';
 
 		// Enable Daily Word
-		o = s.option(form.Flag, 'dayword', _('Enable Daily Word'));
+		o = s.taboption('basic', form.Flag, 'dayword', _('Enable Daily Word'));
 		o.rmempty = false;
 		o.default = '0';
 
 		// Status Homekey settings
-		o = s.option(form.ListValue, 'gohome', _('Status Homekey settings'));
+		o = s.taboption('basic', form.ListValue, 'gohome', _('Status Homekey settings'));
 		o.value('overview', _('Overview'));
 		o.value('processes', _('Processes'));
 		o.value('realtime', _('Realtime_Graphs'));
@@ -98,7 +102,7 @@ return view.extend({
 		o.rmempty = false;
 
 		// System Userkey settings
-		o = s.option(form.ListValue, 'gouser', _('System Userkey settings'));
+		o = s.taboption('basic', form.ListValue, 'gouser', _('System Userkey settings'));
 		o.value('kucat-config', _('KuCat Config'));
 		o.value('netwizard', _('Netwizard'));
 		o.value('system', _('System'));
@@ -110,7 +114,7 @@ return view.extend({
 		o.rmempty = false;
 
 		// Services Ssrkey settings
-		o = s.option(form.ListValue, 'gossr', _('Services Ssrkey settings'));
+		o = s.taboption('basic', form.ListValue, 'gossr', _('Services Ssrkey settings'));
 		o.value('shadowsocksr', _('SSR'));
 		o.value('bypass', _('bypass'));
 		o.value('nikki', _('Nikki'));
@@ -124,38 +128,36 @@ return view.extend({
 		o.default = 'OpenClash';
 		o.rmempty = false;
 
-		o = s.option(form.Button, '_save', _('Save settings'));
-		o.inputstyle = 'apply';
-		o.inputtitle = _('Save current settings');
-		o.onclick = function() {
-			ui.changes.apply(true);
-			return this.map.save(null, true);
-		}
 
-		// Add theme scheme section reference
-		s = m.section(form.GridSection, 'theme', _('Color Schemes list'));
-		s.addremove = true;
-		s.anonymous = true;
+		var themeSection = m.section(form.TableSection, 'theme', _('Color Schemes'), 
+			_('Manage multiple color schemes for the theme.'));
+		themeSection.addremove = true;
+		themeSection.anonymous = false;
+		themeSection.sortable = true;
 
-		o = s.option(form.Value, 'remarks', _('Remarks'));
+		o = themeSection.option(form.Value, 'remarks', _('Remarks'),
+			_('Give a descriptive name for this color scheme'));
+		o.rmempty = false;
 
-		o = s.option(form.Flag, 'use', _('Enable this color scheme'));
+		o = themeSection.option(form.Flag, 'use', _('Enable'),
+			_('Enable this color scheme'));
 		o.rmempty = false;
 		o.default = '1';
-
-		o = s.option(form.Flag, 'bkuse', _('Enable wallpaper'),
+		o = themeSection.option(form.Flag, 'bkuse', _('Wallpaper'),
 			_('Use desktop wallpaper'));
 		o.rmempty = false;
 		o.default = '1';
-		
-		o = s.option(form.ListValue, 'mode', _('Light dark mode'));
+
+		o = themeSection.option(form.ListValue, 'mode', _('Mode'),
+			_('Select the theme appearance mode'));
 		o.value('auto', _('Auto'));
 		o.value('light', _('Light'));
 		o.value('dark', _('Dark'));
 		o.default = 'light';
+		o.rmempty = false;
 
-		o = s.option(form.Value, 'primary_rgbm', _('Main Background color(RGB)'),
-			_("RGB values, such as red being '255,0,0', or using a preset scheme (which includes fence color values)"));
+		o = themeSection.option(form.Value, 'primary_rgbm', _('Background Color'),
+			_("RGB values like '255,0,0' for red, or use preset names"));
 		o.value('blue', _('RoyalBlue'));
 		o.value('green', _('MediumSeaGreen'));
 		o.value('orange', _('SandyBrown'));
@@ -165,95 +167,35 @@ return view.extend({
 		o.value('bluets', _('Cool Ocean Heart (transparent and bright)'));
 		o.rmempty = false;
 		o.default = '74,161,133';
-
-		o = s.option(form.ListValue, 'primary_rgbm_ts', _('Wallpaper transparency'),
-			_('0: Transparent, 1: Opaque (Suggestion: Mild Transparent 0.9)'));
-		ts_sets.forEach(function(value) {
-			o.value(value.toString(), value.toString());
-		});
+		o = themeSection.option(form.ListValue, 'primary_rgbm_ts', _('Transparency'),
+			_('Wallpaper transparency level (0: Transparent, 1: Opaque)'));
+		for (var i = 0; i < ts_sets.length; i++) {
+			o.value(ts_sets[i].toString(), ts_sets[i].toString());
+		}
 		o.rmempty = false;
 		o.default = '0.9';
 
-		o = s.option(form.ListValue, 'primary_opacity', _('Wallpaper blur radius'),
-			_('The larger the value, the more blurry it becomes (0: not blurry, suggestion: 0, blurry values may cause slower reflection)'));
-		opacity_sets.forEach(function(value) {
-			o.value(value.toString(), value.toString());
-		});
+		o = themeSection.option(form.ListValue, 'primary_opacity', _('Blur Radius'),
+			_('Wallpaper blur effect (0: no blur)'));
+		for (var i = 0; i < opacity_sets.length; i++) {
+			o.value(opacity_sets[i].toString(), opacity_sets[i].toString());
+		}
 		o.datatype = 'ufloat';
 		o.rmempty = false;
 		o.default = '0';
-
-		o = s.option(form.Value, 'primary_rgbs', _('Fence Color Value (RGB)'),
-			_("RGB values, such as '255,0,0' for red, suggest dark values"));
+		o = themeSection.option(form.Value, 'primary_rgbs', _('Fence Color'),
+			_("Fence background color in RGB (suggest dark values)"));
 		o.default = '225,112,88';
 		o.rmempty = false;
-		
-		o = s.option(form.ListValue, 'primary_rgbs_ts', _('Fence color transparency'),
-			_("0: Transparent, 1: Opaque (Recommendation: Heavy Transparency 0.1)"));
-		ts_sets.forEach(function(value) {
-			o.value(value.toString(), value.toString());
-		});
+
+		o = themeSection.option(form.ListValue, 'primary_rgbs_ts', _('Fence Transparency'),
+			_('Fence background transparency (0: Transparent, 1: Opaque)'));
+		for (var i = 0; i < ts_sets.length; i++) {
+			o.value(ts_sets[i].toString(), ts_sets[i].toString());
+		}
 		o.datatype = 'ufloat';
 		o.rmempty = false;
 		o.default = '0.1';
-
-		s = m.section(form.TypedSection, null, _('Upload background (available space: %1024.2mB)')
-			.format(data[1].avail * 1024),
-			_('You can upload files such as gif/jpg/png/webm files, to change the desktop page background.'));
-		s.addremove = false;
-		s.anonymous = true;
-
-		o = s.option(form.Button, '_upload_bg', _('Upload desktop background'),
-			_('Files will be uploaded to <code>%s</code>.').format(bg_path));
-		o.inputstyle = 'action';
-		o.inputtitle = _('Upload...');
-		o.onclick = function(ev, section_id) {
-			var file = '/tmp/kucat_desktop_bg.tmp';
-			return ui.uploadFile(file, ev.target).then(function(res) {
-				return L.resolveDefault(callRenamekucat(res.name), {}).then(function(ret) {
-					if (ret.result === 0)
-						return location.reload();
-					else {
-						ui.addNotification(null, E('p', _('Failed to upload file: %s.').format(res.name)));
-						return L.resolveDefault(fs.remove(file), {});
-					}
-				});
-			})
-			.catch(function(e) { ui.addNotification(null, E('p', e.message)); });
-		};
-		o.modalonly = true;
-
-		s = m.section(form.TableSection);
-		s.render = function() {
-			var tbl = E('table', { 'class': 'table cbi-section-table' },
-				E('tr', { 'class': 'tr table-titles' }, [
-					E('th', { 'class': 'th' }, [ _('Filename') ]),
-					E('th', { 'class': 'th' }, [ _('Modified date') ]),
-					E('th', { 'class': 'th' }, [ _('Size') ]),
-					E('th', { 'class': 'th' }, [ _('Action') ])
-				])
-			);
-
-			cbi_update_table(tbl, data[2].map(L.bind(function(file) {
-				return [
-					file.name,
-					new Date(file.mtime * 1000).toLocaleString(),
-					String.format('%1024.2mB', file.size),
-					E('button', {
-						'class': 'btn cbi-button cbi-button-remove',
-						'click': ui.createHandlerFn(this, function() {
-							return L.resolveDefault(callRemovekucat(file.name), {})
-							.then(function() { return location.reload(); });
-						})
-					}, [ _('Delete') ])
-				];
-			}, this)), E('em', _('No files found.')));
-
-			return E('div', { 'class': 'cbi-map', 'id': 'cbi-filelist' }, [
-				E('h3', _('Background file list')),
-				tbl
-			]);
-		};
 
 		return m.render();
 	}

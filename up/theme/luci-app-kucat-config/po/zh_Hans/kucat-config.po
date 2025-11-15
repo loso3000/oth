@@ -83,8 +83,8 @@ msgstr "保存更改"
 msgid "Save current settings"
 msgstr "保存当前设置"
 
-msgid "Color Schemes list"
-msgstr "颜色配置方案列表"
+msgid "Color Schemes"
+msgstr "颜色配置方案"
 
 msgid "Remarks"
 msgstr "备注"
@@ -161,9 +161,6 @@ msgstr "0：透明，1：不透明（建议：重度透明0.1）"
 msgid "RGB values, such as '255,0,0' for red, suggest dark values"
 msgstr "RGB值，例如红色为'255,0,0'，建议深色值"
 
-msgid "Upload desktop background"
-msgstr "上传桌面背景"
-
 msgid "Upload background (available space: %1024.2mB)"
 msgstr "上传背景（可用空间：%1024.2mB）"
 
@@ -205,11 +202,8 @@ msgstr "文件将被上传至<code>%s</code>。"
 msgid "No files found."
 msgstr "没有找到文件。"
 
-msgid "Login Background Upload"
-msgstr "登录壁纸上传"
-
-msgid "Desktop background upload"
-msgstr "桌面壁纸上传"
+msgid "Upload desktop background"
+msgstr "上传桌面背景"
 
 msgid "Upload Login background"
 msgstr "上传登录背景"

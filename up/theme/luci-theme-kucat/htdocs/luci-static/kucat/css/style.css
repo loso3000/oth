@@ -779,13 +779,16 @@ body[class*="node-"]>.main>.main-left>.nav>.slide>.menu.active::before {
   color: var(--menu-hover-color);
 }
 .main .main-left .sidenav-header {
-  text-align: center;
+  display: flex;
   height: 4.8rem;
   margin: 0rem 1rem;
   padding: 2rem;
   background-clip: padding-box;
   border-bottom: 1px solid var(--input-boxcolor);
+  justify-content: center;
+  align-items: center;
 }
+
 
 .main .main-left .sidenav-header .brand {
   color: var(--menu-fontcolor);
@@ -1132,11 +1135,6 @@ button:hover, .btn:hover, .cbi-button:hover {
   box-shadow: none;
 }
 
-.td.cbi-section-actions>*>*,.td.cbi-section-actions>*>form>* {
-  margin: 0 2px;
-  display: flex;
-  align-items: center
-}
 
 .cbi-dynlist>.add-item:not([ondrop])>input,.cbi-dynlist>.item>span,.cbi-dynlist>.add-item input {
   min-width: 8rem;
@@ -1874,14 +1872,15 @@ table>tbody>tr>td, table>tbody>tr>th, table>tfoot>tr>td, table>tfoot>tr>th, tabl
 
 table .tr>.td.cbi-value-field, table .tr>.th.cbi-section-table-cell {
   font-size: var(--font-x);
-  padding: 0.7rem 0.4rem;
+  padding: 0.2rem 0.2rem;
+  letter-spacing: 1px;
   display: table-cell !important;
   color: var(--body-color);
   white-space: nowrap;
 }
 
 table .tr>.td.cbi-value-field>[id*="ifc-description"] {
-  text-align: left;
+  text-align: center;
   font-weight: normal !important;
 }
 
@@ -1933,9 +1932,21 @@ fieldset>table>tbody>tr:nth-of-type(2n+1):hover, table>tbody>tr:nth-of-type(2n+1
   text-align: right !important;
   vertical-align: middle;
 }
+
+.td.cbi-section-actions>*>*,.td.cbi-section-actions>*>form>* {
+  margin: 2px;
+  display: flex;
+  align-items: center
+}
+
 .td.cbi-section-actions>* {
   display: inline-flex;
   align-items: center;
+}
+
+#cbi-network .td.cbi-section-actions>* {
+  display: inline-flex;
+  flex-wrap: wrap;
 }
 .td.cbi-section-actions>*>form {
   display: inline-flex;
@@ -1952,18 +1963,6 @@ fieldset>table>tbody>tr:nth-of-type(2n+1):hover, table>tbody>tr:nth-of-type(2n+1
 }
 .tr.placeholder .td[data-title]::before { display: none; }
 
-.tr[data-title]::before, .tr.cbi-section-table-titles.named::before {
-  font-size: var(--font-x);
-  display: table-cell;
-  align-self: center;
-  flex: 1 1 5%;
-  padding: .25rem;
-  content: attr(data-title) "\20";
-  text-align: center;
-  vertical-align: middle;
-  white-space: nowrap;
-  word-wrap: break-word;
-}
 
 .th[data-type="button"], .td[data-type="button"], .th[data-type="fvalue"], .td[data-type="fvalue"] {
   flex: 1 1 2em;
@@ -1983,7 +1982,7 @@ fieldset>table>tbody>tr:nth-of-type(2n+1):hover, table>tbody>tr:nth-of-type(2n+1
   font-size: 0.75rem;
   font-weight: 300;
   padding: 0.5rem 0;
-  opacity: .6;
+  opacity: .7;
   display: table-cell;
   line-height: 1.2;
 }
@@ -2168,11 +2167,9 @@ td>.ifacebadge, .td>.ifacebadge {
 }
 .cbi-button-up {
   background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzY4IiBoZWlnaHQ9Ijc2OCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiPgogPHRpdGxlLz4KCiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPGcgaWQ9Imljb21vb24taWdub3JlIi8+CiAgPHBhdGggZmlsbD0iI2ZmZmZmZiIgaWQ9InN2Z18xIiBkPSJtNTk4LjYzLDQ1Ny4zNzVsLTE5MiwtMTkyYy0xMi41MTIsLTEyLjUxMiAtMzIuNzY4LC0xMi41MTIgLTQ1LjI0OCwwbC0xOTIsMTkyYy0xMi41MTIsMTIuNTEyIC0xMi41MTIsMzIuNzY4IDAsNDUuMjQ4czMyLjc2OCwxMi41MTIgNDUuMjQ4LDBsMTY5LjM3NiwtMTY5LjM3NmwxNjkuMzc2LDE2OS4zNzZjMTIuNTEyLDEyLjUxMiAzMi43NjgsMTIuNTEyIDQ1LjI0OCwwczEyLjUxMiwtMzIuNzY4IDAsLTQ1LjI0OHoiLz4KIDwvZz4KPC9zdmc+");
-  filter: var(--filter-color);
 }
 .cbi-button-down {
   background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzY4IiBoZWlnaHQ9Ijc2OCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiPgogPHRpdGxlLz4KCiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPGcgaWQ9Imljb21vb24taWdub3JlIi8+CiAgPHBhdGggZmlsbD0iI2ZmZmZmZiIgaWQ9InN2Z18xIiBkPSJtMTY5LjM3LDMxMC42MjRsMTkyLDE5MmMxMi41MTIsMTIuNTEyIDMyLjc2OCwxMi41MTIgNDUuMjQ4LDBsMTkyLC0xOTJjMTIuNTEyLC0xMi41MTIgMTIuNTEyLC0zMi43NjggMCwtNDUuMjQ4cy0zMi43NjgsLTEyLjUxMiAtNDUuMjQ4LDBsLTE2OS4zNzYsMTY5LjM3NmwtMTY5LjM3NiwtMTY5LjM3NmMtMTIuNTEyLC0xMi41MTIgLTMyLjc2OCwtMTIuNTEyIC00NS4yNDgsMHMtMTIuNTEyLDMyLjc2OCAwLDQ1LjI0OHoiLz4KIDwvZz4KPC9zdmc+");
-  filter: var(--filter-color);
 }
 
 .cbi-button-up, .cbi-button-down, .cbi-value-helpicon, .showSide, .main>.loading>span {
@@ -3080,7 +3077,6 @@ background-color: #9E9E9E!important;
   .tr[data-title]::before, .tr.cbi-section-table-titles.named::before { flex: 1 1 100%; }
   [data-page^="admin-status-realtime"] .td[id] { text-align: left; }
   .cbi-tab-descr { padding: 0 0.3rem; }
-  .td.cbi-section-actions>*>*, .td.cbi-section-actions>*>form>* { margin: 0 2px; }
   
   .cbi-section>h3:first-child, .panel-title {
     font-size: var(--font-z);
@@ -3148,6 +3144,9 @@ background-color: #9E9E9E!important;
     white-space: normal !important;
   }
 
+  table .tr>.td.cbi-value-field>[id*="ifc-description"] {
+    font-size: 0.78rem;
+  }
   .hide-sm, .hide-xs:not([data-title="MAC-Address"]) { display: none; }
   [data-page^="admin-system-admin-password"] .control-group { flex-wrap: nowrap; }
   

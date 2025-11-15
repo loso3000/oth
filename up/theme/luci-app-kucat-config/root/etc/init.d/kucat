@@ -40,7 +40,7 @@ config theme
 	option primary_rgbs '76,157,69'
 	option remarks '隔栏经典蓝色'
 	option primary_opacity '0'
-	option primary_rgbm_ts '0.9'
+	option primary_rgbm_ts '0.95'
 	option bkuse '1'
 	option primary_rgbs_ts '0.1'
 	option mode 'auto'
@@ -50,7 +50,7 @@ config theme
 config theme
 	option primary_rgbbody '33,45,60'
 	option primary_rgbs '76,157,69'
-	option primary_rgbm_ts '0.9'
+	option primary_rgbm_ts '0.95'
 	option primary_opacity '0'
 	option bkuse '1'
 	option remarks '无隔栏清爽绿'
@@ -89,7 +89,7 @@ config theme
 	option primary_rgbs_ts '0'
 	option remarks '灰无隔栏无背景'
 	option bkuse '0'
-	option primary_rgbm_ts '0.9'
+	option primary_rgbm_ts '0.95'
 	option mode 'auto'
 	option use '0'
 
@@ -136,7 +136,7 @@ do
 		blue)
 			uci set kucat.@basic[0].primary_rgbm='20,109,179'
 			uci set kucat.@basic[0].bkuse=`uci -q get kucat.@theme[$i].bkuse`
-			uci set kucat.@basic[0].primary_rgbm_ts='0.9'
+			uci set kucat.@basic[0].primary_rgbm_ts='0.95'
 			uci set kucat.@basic[0].primary_opacity='0'
 			uci set kucat.@basic[0].primary_rgbs_ts=`uci -q get kucat.@theme[$i].primary_rgbs_ts`
 			uci set kucat.@basic[0].primary_rgbs='28,66,188'
@@ -144,7 +144,7 @@ do
 		;;
 		green)
 			uci set kucat.@basic[0].bkuse=`uci -q get kucat.@theme[$i].bkuse`
-			uci set kucat.@basic[0].primary_rgbm_ts='0.9'
+			uci set kucat.@basic[0].primary_rgbm_ts='0.95'
 			uci set kucat.@basic[0].primary_opacity='0'
 			uci set kucat.@basic[0].primary_rgbm='26,131,97'
 			uci set kucat.@basic[0].primary_rgbs_ts=`uci -q get kucat.@theme[$i].primary_rgbs_ts`
@@ -153,7 +153,7 @@ do
 		;;
 		orange)
 			uci set kucat.@basic[0].bkuse=`uci -q get kucat.@theme[$i].bkuse`
-			uci set kucat.@basic[0].primary_rgbm_ts='0.9'
+			uci set kucat.@basic[0].primary_rgbm_ts='0.95'
 			uci set kucat.@basic[0].primary_opacity='0'
 			uci set kucat.@basic[0].primary_rgbm='163,71,6'
 			uci set kucat.@basic[0].primary_rgbs_ts=`uci -q get kucat.@theme[$i].primary_rgbs_ts`
@@ -161,7 +161,7 @@ do
 		;;
 		red)
 			uci set kucat.@basic[0].bkuse=`uci -q get kucat.@theme[$i].bkuse`
-			uci set kucat.@basic[0].primary_rgbm_ts='0.9'
+			uci set kucat.@basic[0].primary_rgbm_ts='0.95'
 			uci set kucat.@basic[0].primary_opacity='0'
 			uci set kucat.@basic[0].primary_rgbm='143,32,13'
 			uci set kucat.@basic[0].primary_rgbs_ts=`uci -q get kucat.@theme[$i].primary_rgbs_ts`
@@ -169,7 +169,7 @@ do
 		;;
 		black)
 			uci set kucat.@basic[0].bkuse=`uci -q get kucat.@theme[$i].bkuse`
-			uci set kucat.@basic[0].primary_rgbm_ts='0.8'
+			uci set kucat.@basic[0].primary_rgbm_ts='0.95'
 			uci set kucat.@basic[0].primary_opacity='0'
 			uci set kucat.@basic[0].primary_rgbm='25,25,26'
 			uci set kucat.@basic[0].primary_rgbs_ts=`uci -q get kucat.@theme[$i].primary_rgbs_ts`
@@ -210,8 +210,8 @@ if [ "x$useset" == "x0" ] ; then
 	uci set kucat.@basic[0].primary_rgbs_ts='0.1'
 	uci set kucat.@basic[0].primary_rgbs='225,112,88'
 	uci set kucat.@basic[0].bkuse='1'
-	uci set kucat.@basic[0].primary_rgbm_ts='0.7'
-	uci set kucat.@basic[0].primary_opacity='5'
+	uci set kucat.@basic[0].primary_rgbm_ts='0.95'
+	uci set kucat.@basic[0].primary_opacity='0'
 fi
 [ $mode == dark ] && uci set kucat.@basic[0].primary_rgbbody='33,45,60' || uci set kucat.@basic[0].primary_rgbbody='244,245,247'
 case "x$(uci -q get kucat.@basic[0].fontmode)" in
@@ -226,9 +226,9 @@ case "x$(uci -q get kucat.@basic[0].fontmode)" in
 	uci set kucat.@basic[0].font_x='0.92rem'
 	;;
 	*)
-	uci set kucat.@basic[0].font_d='0.92rem'
+	uci set kucat.@basic[0].font_d='1rem'
 	uci set kucat.@basic[0].font_z='0.875rem'
-	uci set kucat.@basic[0].font_x='0.78rem'
+	uci set kucat.@basic[0].font_x='0.82rem'
 	;;
 esac
 uci commit kucat

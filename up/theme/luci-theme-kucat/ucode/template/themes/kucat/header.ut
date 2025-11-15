@@ -48,7 +48,8 @@ if (access('/etc/config/advancedplus')) {
         config_exists = true;
 }
     
-if (config_exists) {
+if (config_exists && kucat) {
+    try {
         let config = uci_cursor.get_all(kucat, "@basic[0]");
         primary_rgbm = config.primary_rgbm || "45,102,147";
         primary_rgbbody= config.primary_rgbbody || "244,245,247";
@@ -69,7 +70,8 @@ if (config_exists) {
         fontd = config.font_d || '0.92rem';
         fontz = config.font_z || '0.875rem';
         fontx = config.font_x || '0.825rem';
-} 
+    } catch (e) {} 
+} else {}
 let ufilter = "blur(" + primary_opacity + "px)";
 if (primary_opacity == '0') {
         ufilter = 'none';
@@ -78,7 +80,7 @@ if (primary_opacity == '0') {
 let automode = mode;
 if ( mode == 'auto' ) {
         let auto_theme = ubus.call("luci.kucatget", "get_auto_theme") || {};
-        automode = 'dark';
+        automode = auto_theme.auto_theme;
 } 
 
 function fetchPIC(path, themeDir) {
@@ -230,8 +232,8 @@ if (dayword == "1") {
 	{% endif %}
     </style>
 <script src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}?v={{ version.luciversion }}"></script>
-<script src="{{ resource }}/cbi.js"></script>
-<script src="{{ media }}/js/style.js"></script>
+<script src="{{ resource }}/cbi.js?v={{ version.luciversion }}"></script>
+<script src="{{ media }}/js/style.js?v={{ version.luciversion }}"></script>
 </head>
 <body
 class="lang_{{ dispatcher.lang }} {{ ctx.authsession ? 'logged-in' : '' }} {{ length(ctx.path) ? `node-${join('-', ctx.path)}` : 'node-main-login' }}"
