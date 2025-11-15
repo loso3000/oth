@@ -246,7 +246,7 @@ if has_wifi then
 end
 
 e = s:taboption("wansetup", Flag, 'https', translate('Enables SSL secure access'))
-e.default = 1
+e.default = 0
 e.anonymous = false
 
 -- e = s:taboption("wansetup", DummyValue, 'ssl_cert', translate('SSL cert'))
