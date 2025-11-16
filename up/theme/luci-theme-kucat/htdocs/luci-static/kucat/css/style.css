@@ -177,6 +177,7 @@ body {
   display: table-cell;
   padding: .78rem;
   font-size: var(--font-x);
+  color: var(--body-color);
   text-align: center;
   vertical-align: middle;
   white-space: nowrap;
@@ -242,8 +243,7 @@ h5 { font-size: var(--font-z); color: var(--primary-title-color); margin: 1rem 0
 
 ::-webkit-scrollbar-track {
   box-shadow: inset 0 0 0px rgba(240,240,240,.5);
-  background-color: rgb(255 255 255 / 0%);
-  background-color: rgba(var(--primary-rgbbody),0.9);
+
   background-color: rgba(var(--primary-rgbbody),var(--primary-rgbm-ts));
 }
 ::-webkit-scrollbar { width: 10px; height: 8px; }
@@ -253,8 +253,8 @@ h5 { font-size: var(--font-z); color: var(--primary-title-color); margin: 1rem 0
   -moz-border-radius: var(--radius0);
   border-radius: var(--radius0);
   background-clip: content-box;
-  background: rgba(var(--primary-rgbm), 0.4);
-  border: 1px solid rgba(var(--primary-rgbm), 0.6);
+  background: rgba(var(--primary-rgbm), 0.5);
+  border: 1px solid rgba(var(--primary-rgbm), 0.8);
 }
 ::-webkit-scrollbar-thumb:hover { background-color: rgba(var(--primary-rgbm),0.9); }
 
@@ -784,7 +784,7 @@ body[class*="node-"]>.main>.main-left>.nav>.slide>.menu.active::before {
   margin: 0rem 1rem;
   padding: 2rem;
   background-clip: padding-box;
-  border-bottom: 1px solid var(--input-boxcolor);
+  border-bottom: 1px solid var(--menu-fontcolor);
   justify-content: center;
   align-items: center;
 }
@@ -1900,8 +1900,10 @@ div.cbi-value var, td.cbi-value-field var, .td.cbi-value-field var {
 #cbi-wireless .td, .table[width="100%"] > .tr:first-child > .td, 
 [data-page^="admin-network-diagnostics"] .tr > .td, .tr.table-titles > .th, 
 .tr.cbi-section-table-titles > .th {
-  background-color: var(--menu-item-titlebg-color);
-  color: var(--title-color);
+  font-size: var(--font-z);
+  padding: 0.7rem 0.2rem !important;
+  background-color: var(--menu-item-titlebg-color)!important;
+  color: var(--title-color)!important;
   border-top: 0 !important;
 
 }
@@ -1980,7 +1982,6 @@ fieldset>table>tbody>tr:nth-of-type(2n+1):hover, table>tbody>tr:nth-of-type(2n+1
 }
 .cbi-value-description {
   font-size: 0.75rem;
-  font-weight: 300;
   padding: 0.5rem 0;
   opacity: .7;
   display: table-cell;
@@ -2606,7 +2607,7 @@ width: 100%;
   box-shadow: 0 0.1rem 0.5rem var(--input-boxcolor) !important
 }
 
-.main>.main-left,.cbi-section,[data-tab-title],[data-page^="admin-system-admin"]:not(.node-main-login) .cbi-map:not(#cbi-dropbear),#maincontent>.container>form,#maincontent>.container>form>div,.tabs,.cbi-tabmenu,.cbi-tooltip,#view>p,#view>div,#view>table {
+#mainmenu,[data-tab-title],[data-page^="admin-system-admin"]:not(.node-main-login) .cbi-map:not(#cbi-dropbear),#maincontent>.container>.cbi-map form,#maincontent>.container>form,.tabs,.cbi-tabmenu,.cbi-tooltip,#view>p,#view>div,#view>table {
   backdrop-filter: var(--ufilter);
   -webkit-backdrop-filter: var(--ufilter)
 }
@@ -2622,11 +2623,13 @@ padding: 0 0.8rem;
   display: inline-block;
   width: 100%;
 }
+
+[data-page^="admin-system-kucat"] #view>div>button,
 [data-page^="admin-system-poweroff"] .container>#view>button,
 [data-page^="admin-system-reboot"] .container>#view>button {
-  max-width: 10rem !important;
+  max-width: 12rem !important;
+  margin: 0 1rem !important;
 }
-
 
 [data-page^="admin-status-processes"] #view td:nth-child(3)>span,.cbi-map>.cbi-section .cbi-value:nth-of-type(4) td:nth-child(2),.Interfaces>.main #view td:nth-child(3),[data-page^="admin-network-network"]>.main #view td:nth-child(3),[data-page^="admin-status-processes"]>.main #view td:nth-child(3),[data-page^="admin-status-overview"]>.main #view td:nth-child(2) {
   white-space: normal !important;
@@ -2734,6 +2737,7 @@ padding: 0 0.8rem;
   border-radius: var(--radius2) !important;
   min-height: 600px !important
 }
+
 
 /* passwall样式 */
 .pure-g .block h4 {
@@ -3128,7 +3132,7 @@ background-color: #9E9E9E!important;
   }
   
   .cbi-section { padding-bottom: 0.5rem; }
-  .td, .th { padding: 10px; margin: 0; line-height: 1; }
+  .td, .th { padding: 10px; margin: 0;line-height: 1; }
   h2 { padding: 0.5rem 0.5rem 0.2rem; }
   #upgrade_log { padding: 0.5rem 0.2rem 0.5rem !important; }
   

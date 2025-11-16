@@ -18,7 +18,7 @@ msgid "KuCat Theme Config"
 msgstr "KuCat主题设置"
 
 msgid "KuCat Config"
-msgstr "KuCat主题设置"
+msgstr "KuCat设置"
 
 msgid "You can set KuCat theme font size, color scheme, shortcut tools, and manage login and desktop background images here."
 msgstr "您可以在这里设置KuCat主题字体大小,颜色方案,快捷工具,并管理登录背景和桌面背景图片."
@@ -46,6 +46,15 @@ msgstr "自动下载小鸟4K高清壁纸(每日4千张随机选)"
 
 msgid "Set font size"
 msgstr "字体大小"
+
+msgid "Small font"
+msgstr "小号字体"
+
+msgid "Normal font"
+msgstr "中号字体"
+
+msgid "Large font"
+msgstr "大号字体"
 
 msgid "Wallpaper synchronization"
 msgstr "壁纸同步"
@@ -77,14 +86,16 @@ msgstr "系统相关快捷键设置"
 msgid "Status Homekey settings"
 msgstr "状态相关快捷键设置"
 
-msgid "Save settings"
-msgstr "保存更改"
+msgid "KuCat Theme Color Schemes List"
+msgstr "KuCat主题颜色配置列表"
 
-msgid "Save current settings"
-msgstr "保存当前设置"
+msgid "Pre set 6 color schemes, enable wallpaper as desktop wallpaper, theme RGB values such as 255,0,0 (representing red), dark mode with wallpaper blur for better effect. No matter how many schemes are enabled, "
+"only the first scheme should be used"
+msgstr "预置6种颜色方案，启用壁纸是桌面壁纸，主题RGB值如：255,0,0(表示红色)，暗色模式配合壁纸模糊开启效果更好。"
+"不管启用几个方案只用最前面方案"
 
 msgid "Color Schemes"
-msgstr "颜色配置方案"
+msgstr "颜色方案"
 
 msgid "Remarks"
 msgstr "备注"
@@ -95,8 +106,8 @@ msgstr "启用此配色"
 msgid "Light dark mode"
 msgstr "亮暗模式"
 
-msgid "Main Background color(RGB)"
-msgstr "主背景色(RGB)"
+msgid "Main color(RGB)"
+msgstr "主题色值(RGB)"
 
 msgid "RGB values, such as red being '255,0,0', or using a preset scheme (which includes fence color values)"
 msgstr "RGB值，如红色为'255,0,0'，或使用预设方案（预设方案包含栅栏色值）"
@@ -131,8 +142,8 @@ msgstr "炫酷黑夜时空(灰度暗)"
 msgid "Cool Ocean Heart (transparent and bright)"
 msgstr "炫酷海洋之心(透明亮)"
 
-msgid "Enable wallpaper"
-msgstr "启用壁纸"
+msgid "Use wallpaper"
+msgstr "使用壁纸"
 
 msgid "Use desktop wallpaper"
 msgstr "使用桌面壁纸"
@@ -149,8 +160,8 @@ msgstr "壁纸模糊半径"
 msgid "The larger the value, the more blurry it becomes (0: not blurry, suggestion: 0, blurry values may cause slower reflection)"
 msgstr "值越大越模糊（0：不模糊，建议：0，模糊值可能导致反映变慢）"
 
-msgid "Fence Color Value (RGB)"
-msgstr "栅栏颜色色值(RGB)"
+msgid "Fence Color(RGB)"
+msgstr "栅栏色值(RGB)"
 
 msgid "Fence color transparency"
 msgstr "栅栏颜色透明度"
@@ -161,19 +172,15 @@ msgstr "0：透明，1：不透明（建议：重度透明0.1）"
 msgid "RGB values, such as '255,0,0' for red, suggest dark values"
 msgstr "RGB值，例如红色为'255,0,0'，建议深色值"
 
-msgid "Upload background (available space: %1024.2mB)"
-msgstr "上传背景（可用空间：%1024.2mB）"
 
 msgid "Upload..."
 msgstr "上传..."
 
 msgid ""
-"You can upload files such as gif/jpg/png/webm files, to change the desktop page background."
+"You can upload files in formats such as gif/jpg/png/webm to create your favorite wallpapers"
 msgstr ""
-"你可以上传 gif/jpg/png/webm 等格式的文件，以创建自己喜欢的桌面壁纸。"
+"你可以上传gif/jpg/png/webm等格式文件，以创建自己喜欢壁纸。"
 
-msgid "Failed to upload file: %s."
-msgstr "上传文件失败：%s。"
 
 msgid "Background file list"
 msgstr "背景文件列表"
@@ -193,24 +200,76 @@ msgstr "操作"
 msgid "Delete"
 msgstr "删除"
 
-msgid "Expecting: %s"
-msgstr "请输入：%s"
-
 msgid "Files will be uploaded to <code>%s</code>."
 msgstr "文件将被上传至<code>%s</code>。"
 
-msgid "No files found."
-msgstr "没有找到文件。"
+msgid "Desktop Wallpaper Upload"
+msgstr "桌面壁纸上传"
 
-msgid "Upload desktop background"
-msgstr "上传桌面背景"
-
-msgid "Upload Login background"
-msgstr "上传登录背景"
+msgid "Login Wallpaper Upload"
+msgstr "登录壁纸上传"
 
 msgid "Kucat Theme Desktop Background Wallpaper Upload and Management."
 msgstr "kucat主题桌面背景壁纸文件上传和管理。"
 
-msgid "Kucat theme login background wallpaper upload and management."
+msgid "Kucat theme Login background wallpaper upload and management."
 msgstr "kucat主题登录背景壁纸上传和管理"
+
+msgid ""
+"File uploaded successfully!"
+msgstr ""
+"文件上传成功！"
+
+msgid "Failed to delete file."
+msgstr "删除文件失败."
+
+msgid "File deleted successfully!"
+msgstr "文件删除成功！"
+
+msgid "Are you sure you want to delete %s?"
+msgstr "你确定要删除%s?"
+
+msgid "Failed to upload file: %s"
+msgstr "文件上传失败：%s"
+
+msgid "No file selected or upload failed"
+msgstr "未选择文件或上传失败"
+
+msgid "Available space: %1024.2mB"
+msgstr "可用空间: %1024.2mB"
+
+msgid "No files found."
+msgstr "没有文件"
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+
 

@@ -40,10 +40,7 @@ let gohome = bar + "status/", gouser = bar + "system/", gossr = bar + "services/
 let background = '0', bkuse = '0', bklock = '1', fontd = '0.92rem', fontz = '0.875rem', fontx = '0.825rem';
 let bg_url = media + "/img/bg1.jpg";
 
-if (access('/etc/config/advancedplus')) {
-        kucat = "advancedplus";
-        config_exists = true;
-} else if (access('/etc/config/kucat')) {
+if (access('/etc/config/kucat')) {
         kucat = "kucat";
         config_exists = true;
 }
@@ -112,7 +109,7 @@ function Getwallpaper(themeDir, num) {
          if (!access(physicalPath)) { return { url: bgUrl };}
          let bgpath = fetchPIC(physicalPath, themeDir);
          if (length(bgpath) > 0) {
-               let randomIndex = rand() % length(bgpath);
+               let randomIndex = srand() % length(bgpath);
                let currentBg = bgpath[randomIndex];
                bgUrl = currentBg.url;
            } 
@@ -205,8 +202,8 @@ if (dayword == "1") {
             --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.32);--body-hover-bgcolor: rgba(255,255,255,0.05);--menu-hover-color: #f5f5f5f5;--menu-fontcolor: #ddd;--primarytextcolor: #bbb;--primary-title-color: #ccc;--menu-color: #ddd;--title-color: #ddd;--body-color: #bbb;
             --primary-rgbbody:33,45,60;--inputtext-color: #ccc;  --inputborder-color: rgba(255,255,255,0.2);  --input-bgcolor: rgba(0,0,0,0.2);  --input-boxcolor: rgba(255,255,255,0.22);  --input-boxhovercolor: rgba(255,255,255,0.32);  --input-checkcolor: rgba(255,255,255,0.7);--filter-color:invert(90%);
         {% else %}
-            --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.12);--body-hover-bgcolor: rgba(50,50,50,0.05);--menu-hover-color: #fff;--menu-fontcolor: #f5f5f5f5;--primarytextcolor: #677087;--primary-title-color: #4d4d5d;--menu-color: #eee;--title-color: #65656b;--body-color: #65656b;
-            --primary-rgbbody:244,245,247;--inputtext-color: #4d5256;  --inputborder-color: rgba(0,0,0,0.2);  --input-bgcolor: rgba(255,255,255,0.2);  --input-boxcolor: rgba(0,0,0,0.22);  --input-boxhovercolor: rgba(0,0,0,0.32);  --input-checkcolor: rgba(var(--primary-rgbm),1);--filter-color:invert(10%);
+            --menu-item-titlebg-color: rgba(var(--primary-rgbm),0.12);--body-hover-bgcolor: rgba(50,50,50,0.05);--menu-hover-color: #fff;--menu-fontcolor: #f5f5f5f5;--primarytextcolor: #505063;--primary-title-color: #4d4d5d;--menu-color: #eee;--title-color: #3c3c3c;--body-color: #424242;
+            --primary-rgbbody:244,245,247;--inputtext-color: #383838;  --inputborder-color: rgba(0,0,0,0.2);  --input-bgcolor: rgba(255,255,255,0.2);  --input-boxcolor: rgba(0,0,0,0.22);  --input-boxhovercolor: rgba(0,0,0,0.32);  --input-checkcolor: rgba(var(--primary-rgbm),1);--filter-color:invert(10%);
 	{% endif %}
         {% if (bgqs == '0'): %}
             --bgqs-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
@@ -216,7 +213,7 @@ if (dayword == "1") {
             {% if (automode == 'dark'): %}
                       --menu-fontcolor: #ddd;
             {% else %}
-                      --menu-fontcolor: #4d4d5d;
+                      --menu-fontcolor: #333333;
             {% endif %}
 
     }

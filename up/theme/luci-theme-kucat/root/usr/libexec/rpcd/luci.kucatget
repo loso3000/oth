@@ -14,7 +14,6 @@
 . /usr/share/libubox/jshn.sh
 
 kucat='kucat'
-[ -s "/etc/config/advancedplus" ] && kucat='advancedplus'
 background="$(uci -q get $kucat.@basic[0].background || echo '0')"
 
 PIC_TMP_DIR="/var/kucat"
