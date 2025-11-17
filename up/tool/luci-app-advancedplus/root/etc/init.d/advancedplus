@@ -109,7 +109,6 @@ advancedset(){
 }
 
 start() {
-    [ "x$(uci -q get advancedplus.@basic[0].mode)" = "x" ]  && /etc/config/advancedplus reset 
     [ -f $LOCK ] && exit
     [ "x$XBOOT" = "x1" ] && exit 0
     touch $LOCK
