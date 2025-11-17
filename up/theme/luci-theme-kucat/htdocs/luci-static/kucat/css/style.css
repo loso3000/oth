@@ -2880,78 +2880,7 @@ background-color: #9E9E9E!important;
   max-width: 14rem;
     width: 10rem;
 }
-/* Bandix 样式 */
-.bandix-dns-container,
-.bandix-connection-container, .bandix-container {
-  padding: 5px!important; 
-  background-color: rgba(255,255,255,0) !important;
-  color: var(--primary-title-color)!important;
-}
-.bandix-badge {
-  color: var(--primary-title-color)!important;
-  background-color: var(--input-bgcolor)!important;
-  border: 1px solid var(--input-boxcolor)!important;
-}
-.history-tabs { background-color: rgba(255, 255, 255, 0)!important; }
-.stats-card-title, .stats-card>div, .history-tooltip>div, .history-tooltip>div>span,
-.bandix-container .form-label, .bandix-card-title, .bandix-card>div, .stats-title, .bandix-title {
-  color: var(--primary-title-color)!important;
-  background-color: rgba(255, 255, 255, 0)!important;
-  border: 0px solid #333!important;
-  border-bottom: 0px solid var(--input-boxcolor)!important;
-  margin-bottom: 0 !important;
-}
-.bandix-card-body { padding: 0!important; }
-.history-tooltip {
-  background-color: rgba(var(--primary-rgbbody),1)!important;
-  color: var(--body-color) !important;
-  border: 1px solid var(--input-boxcolor)!important;
-  width: 300px!important;
-}
-.bandix-card, .stats-card {
-  background-color: rgba(var(--primary-rgbm), 0.05)!important;
-  box-shadow: 0 0px 1px 0 var(--input-boxcolor) !important;
-  border: 0px solid #333!important;
-  border-bottom: 0px solid var(--input-boxcolor)!important;
-  margin-bottom: 0 !important;
-  overflow: auto!important;
-}
-.stats-card>ul>li, .modal-header, .device-summary, .bandix-card .history-controls {
-  border: 0px solid var(--input-boxcolor)!important;
-  border-bottom: 1px solid var(--input-boxcolor)!important;
-  background-color: rgba(255, 255, 255, 0)!important;
-  color: var(--primary-title-color)!important;
-  border-radius: 0!important;
-}
-.stats-card>ul>li>span, .form-label, .modal-title, .device-summary>div,
-.bandix-container .device-name, .bandix-container .legend-item, .stats-card>div>div>span{
-  color: var(--primary-title-color)!important;
-}
-.bandix-table { table-layout: auto!important; }
-.bandix-table td, .bandix-table th {
-  padding: 10px 15px!important;
-  border-bottom: 0px solid #f1f5f9!important;
-}
-.history-tabs>button.active { background-color: rgba(var(--primary-rgbm), 0.5); }
 
-[data-page^="admin-status-bandix"] .filter-select,
-[data-page^="admin-status-bandix"] .filter-input,
-[data-page^="admin-status-bandix"] .form-input,
-[data-page^="admin-status-bandix"] .form-select {
-  border: 0px solid var(--input-boxcolor)!important;
-  border-bottom: 0px solid var(--input-boxcolor)!important;
-  background-color: var(--input-bgcolor)!important;
-  color: var(--body-color) !important;
-}
-[data-page^="admin-status-bandix"] .action-button { background-color: rgba(var(--primary-rgbm), 0.9)!important;
-  color: var(--menu-color) !important;}
-[data-page^="admin-status-bandix"] .history-tabs>button { background-color: rgba(var(--primary-rgbm), 0.2)!important; }
-.bandix-table>tbody>tr>td, .bandix-table>tbody>tr>th,
-.bandix-table>thead>tr>td, .bandix-table>thead>tr>th {
-  background-color: rgba(255, 255, 255, 0) !important;
-  color: var(--body-color) !important;
-  border-top: 1px solid var(--inputborder-color)!important;
-}
 #dialog_reslov .dialog_box { width: 90%!important; background-color: rgba(var(--primary-rgbbody),1); }
 #cbi-dockerd .shadow { background-color: rgba(var(--primary-rgbm), 0.1) !important; }
 
