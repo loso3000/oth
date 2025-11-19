@@ -42,7 +42,7 @@ read_ezota_json(){
     }
 	EZ_NAME=$(jq -r --arg arch "$OS_ARCH" '.[$arch][0].name // empty' < "$EZOTA")
 	if echo "$EZ_NAME" | grep -q "$OS_ARCH"; then
-		     if ! echo "$EZ_NAME" | grep -q "$EZVER" && ! echo "$EZ_NAME" | grep -q "Vip-Super"; then
+		     if ! echo "$EZ_NAME" | grep -q "$EZVER" && ! echo "$EZ_NAME" | grep -q "Vip_Super"; then
  		         return 1
 		     else
  		         EZ_URL=$(jq -r --arg arch "$OS_ARCH" '.[$arch][0].url // empty' < "$EZOTA")
@@ -186,7 +186,7 @@ GIT_API() {
 	    name=$(jq -r --argjson idx "$i" '.[$idx].assets[0].name // empty' "$ApiFile")
 	    # eval name=$(jq ".[${i}].assets[0].name" ${ApiFile} 2> /dev/null) #不安全
 	    if echo "$name" | grep -q "$OS_ARCH"; then
-		     if ! echo "$name" | grep -q "$EZVER" && ! echo "$name" | grep -q "Vip-Super"; then
+		     if ! echo "$name" | grep -q "$EZVER" && ! echo "$name" | grep -q "Vip_Super"; then
  		              continue
 		     fi
 		     case ${name} in
