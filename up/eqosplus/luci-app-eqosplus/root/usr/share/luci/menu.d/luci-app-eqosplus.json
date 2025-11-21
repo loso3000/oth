@@ -1,0 +1,32 @@
+{
+	"admin/control/eqosplus": {
+		"title": "Eqosplus",
+		"order": 20,
+		"action": {
+			"type": "view",
+			"path": "eqosplus/eqosplus"
+		},
+		"depends": {
+			"acl": [ "luci-app-eqosplus" ],
+			"uci": { "eqosplus": true }
+		}
+	},
+
+	"admin/control/eqosplus/eqosplus": {
+		"title": "Eqosplus",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "eqosplus/eqosplus"
+		}
+	},
+	"admin/control/eqosplus/log": {
+		"title": "Log",
+		"order": 40,
+		"action": {
+			"type": "view",
+			"path": "eqosplus/log"
+		}
+	}
+
+}
