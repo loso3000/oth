@@ -1,3 +1,4 @@
+/*   Copyright (C) 2022-2025 sirpdboy herboy2008@gmail.com https://github.com/sirpdboy/luci-app-eqosplus */
 'use strict';
 'require form';
 'require network';
@@ -6,6 +7,61 @@
 'require rpc';
 'require ui';
 'require fs';
+'require poll';
+
+function checkProcess() {
+    return fs.exec('/bin/pidof', ['eqosplusctl']).then(function(res) {
+        return {
+            running: res.code === 0,
+            pid: res.code === 0 ? res.stdout.trim() : null
+        };
+    }).catch(function() {
+        return { running: false, pid: null };
+    });
+}
+
+function renderStatus(isRunning) {
+    var statusText = isRunning ? _('RUNNING') : _('NOT RUNNING');
+    var color = isRunning ? 'green' : 'red';
+    var icon = isRunning ? '✓' : '✗'; 
+    
+    return String.format(
+        '<em><span style="color:%s">%s <strong>%s %s</strong></span></em>',
+        color, icon, _('eqosplus'), statusText
+    );
+}
+var cbiRichListValue = form.ListValue.extend({
+	renderWidget: function (section_id, option_index, cfgvalue) {
+		var choices = this.transformChoices();
+		var widget = new ui.Dropdown((cfgvalue != null) ? cfgvalue : this.default, choices, {
+			id: this.cbid(section_id),
+			sort: this.keylist,
+			optional: true,
+			select_placeholder: this.select_placeholder || this.placeholder,
+			custom_placeholder: this.custom_placeholder || this.placeholder,
+			validate: L.bind(this.validate, this, section_id),
+			disabled: (this.readonly != null) ? this.readonly : this.map.readonly
+		});
+
+		return widget.render();
+	},
+
+	value: function (value, title, description) {
+		if (description) {
+			form.ListValue.prototype.value.call(this, value, E([], [
+				E('span', { 'class': 'hide-open' }, [title]),
+				E('div', { 'class': 'hide-close', 'style': 'min-width:25vw' }, [
+					E('strong', [title]),
+					E('br'),
+					E('span', { 'style': 'white-space:normal' }, description)
+				])
+			]));
+		}
+		else {
+			form.ListValue.prototype.value.call(this, value, title);
+		}
+	}
+});
 
 return view.extend({
     load: function() {
@@ -56,7 +112,6 @@ return view.extend({
             var allDevices = [];
             var seenIPs = {};
 
-            // 合并设备，去除重复
             dhcpDevices.forEach(function(dev) {
                 allDevices.push(dev);
                 seenIPs[dev.ip] = true;
@@ -69,7 +124,6 @@ return view.extend({
                 }
             });
 
-            // 按IP地址排序
             allDevices.sort(function(a, b) {
                 return a.ip.localeCompare(b.ip);
             });
@@ -133,13 +187,6 @@ return view.extend({
             });
     },
 
-    validateTime: function(value) {
-        var timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
-        if (!timeRegex.test(value)) {
-            return 'Time format should be HH:MM';
-        }
-        return true;
-    },
 
     render: function(data) {
         var m, s, o, t;
@@ -150,18 +197,53 @@ return view.extend({
         var networkDevices = data[3];
 
         m = new form.Map('eqosplus', _('Network Speed Limit'),
-            _('Users can limit the network speed for uploading/downloading through MAC, IP. The speed unit is MB/second.') + ' ' +
-            _('Suggested feedback:') + ' ' +
-            _('<a href="https://github.com/sirpdboy/luci-app-eqosplus.git" target="_blank">GitHub @sirpdboy/luci-app-eqosplus</a>'));
+            _('Users can limit the network speed for uploading/downloading through MAC, IP. The speed unit is MB/second.'));
+        s = m.section(form.TypedSection);
+        s.anonymous = true;
+	
+       s.render = function() {
+            var statusView = E('p', { id: 'control_status' }, 
+                '<span class="spinning"> </span> ' + _('Checking status...'));
+            
+            poll.add(function() {
+                return checkProcess()
+                    .then(function(res) {
+                        var status = renderStatus(res.running);
+                        if (res.running && res.pid) {
+                            status += ' <small>(PID: ' + res.pid + ')</small>';
+                        }
+                        statusView.innerHTML = status;
+                    })
+                    .catch(function(err) {
+                        statusView.innerHTML = '<span style="color:orange">⚠ ' + 
+                            _('Status check failed') + '</span>';
+                        console.error('Status check error:', err);
+                    });
+            });
 
-        // Status section
-        s = m.section(form.NamedSection, 'eqosplus', 'eqosplus');
+            poll.start();
+            return E('div', { class: 'cbi-section', id: 'status_bar' }, [ statusView ,
+	       E('div', { 'style': 'text-align: right; font-style: italic;' }, [
+                    E('span', {}, [
+                    _('© github '),
+                    E('a', { 
+                        'href': 'https://github.com/sirpdboy', 
+                        'target': '_blank',
+                        'style': 'text-decoration: none;'
+                    }, 'by sirpdboy')
+                ])
+            ])
+]);
+        }
+        s = m.section(form.TypedSection, 'eqosplus', '');
         s.anonymous = true;
 
-        o = s.option(form.DummyValue, 'eqosplus_status', _('Status'));
-        o.default = _('Collecting data...');
+        // 启用开关
+        o = s.option(form.Flag, 'enabled', _('Enable'));
+        o.default = '0';
+        o.rmempty = false;
 
-        // Interface selection
+        // 接口选择
         o = s.option(form.ListValue, 'ifname', _('Interface'),
             _('Set the interface used for restriction, use pppoe-wan for dialing, use WAN hardware interface for DHCP mode (such as eth1), and use br-lan for bypass mode'));
         o.default = '1';
@@ -172,7 +254,7 @@ return view.extend({
             o.value(iface.name, iface.display);
         });
 
-        // Devices table section
+        // 限速规则部分
         t = m.section(form.TableSection, 'device', _('Speed Limit Rules'));
         t.template = 'cbi/tblsection';
         t.anonymous = true;
@@ -197,18 +279,15 @@ return view.extend({
             o.value(dev.ip, dev.display);
         });
 
-        // Add manual MAC option for devices not in the list
-        o.value('manual', _('Manual MAC entry'));
-
         // Download speed
-        o = t.option(form.Value, 'download', _('Downloads'));
+        o = t.option(form.Value, 'download', _('Downloads (MB/s)'));
         o.default = '0.1';
         o.size = 4;
         o.datatype = 'float';
         o.placeholder = '0.1';
 
         // Upload speed
-        o = t.option(form.Value, 'upload', _('Uploads'));
+        o = t.option(form.Value, 'upload', _('Uploads (MB/s)'));
         o.default = '0.1';
         o.size = 4;
         o.datatype = 'float';
@@ -220,7 +299,6 @@ return view.extend({
         o.default = '00:00';
         o.size = 4;
         o.rmempty = true;
-        o.validate = this.validateTime;
 
         // Stop control time
         o = t.option(form.Value, 'timeend', _('Stop control time'));
@@ -228,10 +306,9 @@ return view.extend({
         o.default = '00:00';
         o.size = 4;
         o.rmempty = true;
-        o.validate = this.validateTime;
 
         // Week days
-        o = t.option(form.ListValue, 'week', _('Week Day(1~7)'));
+        o = t.option(form.Value, 'week', _('Week Day(1~7)'));
         o.rmempty = true;
         o.size = 6;
         o.value('0', _('Everyday'));
@@ -246,32 +323,8 @@ return view.extend({
         o.value('6,7', _('Rest Day'));
         o.default = '0';
 
-        // Add JavaScript for dynamic MAC input
-        m.on('init', function() {
-            var sections = document.querySelectorAll('.cbi-section-table-row');
-            sections.forEach(function(section) {
-                var macInput = section.querySelector('input[name="mac"]');
-                if (macInput && macInput.value === 'manual') {
-                    macInput.type = 'text';
-                    macInput.placeholder = 'Enter MAC address';
-                    macInput.pattern = '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$';
-                }
-            });
-        });
+	        
+		return m.render();
 
-        // Handle MAC input changes
-        m.on('change', function(ev) {
-            var target = ev.target;
-            if (target.name === 'mac' && target.value === 'manual') {
-                target.type = 'text';
-                target.placeholder = 'Enter MAC address';
-                target.pattern = '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$';
-                target.value = '';
-            } else if (target.name === 'mac' && target.value !== 'manual') {
-                target.type = 'select';
-            }
-        });
-
-        return m.render();
-    }
+	}
 });

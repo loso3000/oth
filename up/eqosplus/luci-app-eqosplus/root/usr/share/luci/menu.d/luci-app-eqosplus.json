@@ -1,15 +1,15 @@
 {
-	"admin/control/eqosplus": {
-		"title": "Eqosplus",
-		"order": 20,
-		"action": {
-			"type": "view",
-			"path": "eqosplus/eqosplus"
-		},
-		"depends": {
-			"acl": [ "luci-app-eqosplus" ],
-			"uci": { "eqosplus": true }
-		}
+  "admin/control/eqosplus": {
+    "title": "EQoS Plus",
+    "order": 20,
+    "action": {
+      "type": "firstchild",
+      "preferred": "eqosplus"
+    },
+    "acl": [
+      "luci-app-eqosplus"
+    ],
+    "recurse": true
 	},
 
 	"admin/control/eqosplus/eqosplus": {
