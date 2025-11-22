@@ -46,9 +46,15 @@ service_triggers() {
 }
 
 stop_service(){
-	kill -9 $(busybox ps -w | grep 'eqosplusctrl' | grep -v 'grep' | awk '{print $1}') >/dev/null 2>&1
+	kill -9 $(busybox ps -w | grep 'eqosplus' | grep -v 'grep' | awk '{print $1}') >/dev/null 2>&1
 	sed -i '/eqosplus/d' $CR >/dev/null 2>&1
 	rm -f $LOCK 2>/dev/null
-	eqosplus stop
+	/usr/bin/eqosplus stop
 }
 
+
+restart() {
+    stop
+    sleep 2
+    start
+}

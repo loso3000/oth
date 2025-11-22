@@ -9,35 +9,40 @@ PKG_NAME:=eqosplus
 PKG_VERSION:=2.0.1
 PKG_RELEASE:=20251121
 
+PKG_MAINTAINER:=sirpdboy <herboy2008@gmail.com>
+PKG_LICENSE:=Apache-2.0
+
 include $(INCLUDE_DIR)/package.mk
 
-define Package/$(PKG_NAME)
-	SECTION:=utils
-	CATEGORY:=Utilities
-	TITLE:=Routing Security eqosplus for OpenWrt
-	DEPENDS:=+tc +kmod-sched-core +kmod-ifb +nftables +kmod-sched-htb +kmod-sched-ingress +kmod-act-mirred +bc +coreutils-sort +coreutils-uniq
+define Package/eqosplus
+  SECTION:=net
+  CATEGORY:=Network
+  TITLE:=EQoS Plus - Network Speed Limit
+  DEPENDS:=+ip-full +tc +nftables +bc +kmod-sched-core +kmod-sched-htb +kmod-ifb
+  PKGARCH:=all
 endef
 
-define Package/$(PKG_NAME)/description
-	Routing Security eqosplus for OpenWrt  @sirpdboy  <herboy2008@gmail.com>
+define Package/eqosplus/description
+  Users can limit the network speed for uploading/downloading through MAC, IP.
+  The speed unit is MB/second.
 endef
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/eqosplus
 endef
 
-define Package/$(PKG_NAME)/install
+define Package/eqosplus/install
+	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/config
-	$(CP) ./files/eqosplus.config $(1)/etc/config/eqosplus
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.init $(1)/etc/init.d/eqosplus
 	$(INSTALL_DIR) $(1)/usr/libexec
-	$(INSTALL_BIN) $(CURDIR)/files/eqosplus-call.libexec $(1)/usr/libexec/eqosplus-call
-	$(INSTALL_DIR) $(1)/usr/bin/
-	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.bin $(1)/usr/bin/eqosplus
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.bin $(1)/usr/bin/eqosplus
+	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.init $(1)/etc/init.d/eqosplus
+	$(CP) ./files/eqosplus.config $(1)/etc/config/eqosplus
+	$(INSTALL_BIN) $(CURDIR)/files/eqosplus-call.libexec $(1)/usr/libexec/eqosplus-call
 	$(INSTALL_BIN) $(CURDIR)/files/10-eqosplus.iface $(1)/etc/hotplug.d/iface/10-eqosplus
 	
 endef
 
-$(eval $(call BuildPackage,$(PKG_NAME)))
+$(eval $(call BuildPackage,eqosplus))
