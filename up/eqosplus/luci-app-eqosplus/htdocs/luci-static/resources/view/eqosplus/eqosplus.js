@@ -5,6 +5,7 @@
 'require view';
 'require rpc';
 'require ui';
+'require fs';
 
 return view.extend({
     load: function() {

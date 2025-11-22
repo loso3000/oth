@@ -15,7 +15,7 @@ define Package/$(PKG_NAME)
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=Routing Security eqosplus for OpenWrt
-	DEPENDS:=+bash +tc +kmod-sched-core +kmod-sched-connmark +kmod-ifb +nftables +kmod-sched-htb +kmod-sched-ingress +kmod-act-mirred +bc
+	DEPENDS:=+tc +kmod-sched-core +kmod-ifb +nftables +kmod-sched-htb +kmod-sched-ingress +kmod-act-mirred +bc +coreutils-sort +coreutils-uniq
 endef
 
 define Package/$(PKG_NAME)/description
