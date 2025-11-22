@@ -14,7 +14,7 @@ PKG_LICENSE:=Apache-2.0
 
 LUCI_TITLE:=LuCI support for eqosplus.
 LUCI_DESCRIPTION:=LuCI support for Easy eqosplus(Support speed limit based on IP address).
-LUCI_DEPENDS:=+eqosplus
+LUCI_DEPENDS:=+tc +kmod-sched-core +kmod-ifb +nftables +kmod-sched-htb +kmod-sched-ingress +kmod-act-mirred +bc +coreutils-sort +coreutils-uniq
 LUCI_PKGARCH:=all
 
 PKG_VERSION:=2.0.1
@@ -22,6 +22,10 @@ PKG_RELEASE:=20251121
 PKG_MAINTAINER:=sirpdboy <herboy2008@gmail.com>
 
 define Build/Compile
+endef
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/eqosplus
 endef
 
 define Package/$(PKG_NAME)/postinst
