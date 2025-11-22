@@ -15,7 +15,7 @@ define Package/$(PKG_NAME)
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=Routing Security eqosplus for OpenWrt
-	DEPENDS:=+bash +ip-full +tc +kmod-sched-core +kmod-sched-connmark +kmod-ifb +nftables +kmod-sched-htb +kmod-sched-ingress +kmod-act-mirred +bc
+	DEPENDS:=+bash +tc +kmod-sched-core +kmod-sched-connmark +kmod-ifb +nftables +kmod-sched-htb +kmod-sched-ingress +kmod-act-mirred +bc
 endef
 
 define Package/$(PKG_NAME)/description
@@ -33,7 +33,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.init $(1)/etc/init.d/eqosplus
 	$(INSTALL_DIR) $(1)/usr/libexec
 	$(INSTALL_BIN) $(CURDIR)/files/eqosplus-call.libexec $(1)/usr/libexec/eqosplus-call
-	$(INSTALL_DIR) $(1)/usr/bin/eqosplus
+	$(INSTALL_DIR) $(1)/usr/bin/
 	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.bin $(1)/usr/bin/eqosplus
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) $(CURDIR)/files/10-eqosplus.iface $(1)/etc/hotplug.d/iface/10-eqosplus
