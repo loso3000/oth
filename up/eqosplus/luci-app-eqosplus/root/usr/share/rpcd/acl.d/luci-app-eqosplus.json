@@ -6,6 +6,7 @@
         			"/etc/init.d/eqosplus": [ "exec" ],
         			"/usr/bin/eqosplus": [ "exec" ],
         			"/usr/bin/eqosplusctrl": [ "exec" ],
+        			"/usr/libexec/eqosplus-call": [ "exec" ],
 				"/bin/pidof": [ "exec" ],
         			"/var/*": [ "read" ]
 			},
