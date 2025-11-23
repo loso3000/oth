@@ -36,7 +36,7 @@ _eqosplus_start() {
 start_service(){
 	[ -f $LOCK ] && exit
 	stop_service
-	enable_value=$(uci get eqosplus..@eqosplus[0].enable 2>/dev/null || echo "0")
+	enable_value=$(uci get eqosplus.@eqosplus[0].enabled 2>/dev/null || echo "0")
 	[ "x$enable_value" == "x1" ] &&  _eqosplus_start
 	rm -f $LOCK
 }
