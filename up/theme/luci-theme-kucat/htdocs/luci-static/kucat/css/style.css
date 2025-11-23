@@ -1104,6 +1104,10 @@ li {
     filter: var(--filter-color)
 }
 
+.cbi-button.spinning::before {
+    filter: invert(90%)
+}
+
 .alert,
 .alert-message {
     border: 0;
@@ -2558,12 +2562,13 @@ td>.ifacebadge,
 }
 
 .ifacebox-head {
-    min-width: 7rem;
+    width: 7rem;
+    min-width: 100%;
     background-color: rgba(var(--primary-rgbm), 0.3);
     transform: translate(-50, -50%);
     color: var(--menu-fontcolor);
     text-align: center !important;
-    padding: 1rem
+    padding: 0.5rem
 }
 
 .ifacebox-head.active {
