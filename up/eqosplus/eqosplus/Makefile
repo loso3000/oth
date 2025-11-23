@@ -18,7 +18,7 @@ define Package/eqosplus
   SECTION:=net
   CATEGORY:=Network
   TITLE:=EQoS Plus - Network Speed Limit
-  DEPENDS:=+ip-full +tc +nftables +bc +kmod-sched-core +kmod-sched-htb +kmod-ifb
+  DEPENDS:=+ip-full +tc +nftables +bc +kmod-sched-core +kmod-ifb
   PKGARCH:=all
 endef
 
@@ -37,7 +37,7 @@ define Package/eqosplus/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/usr/libexec
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
-	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.bin $(1)/usr/bin/eqosplus
+	$(INSTALL_BIN) $(CURDIR)/files/eqosplusctl.bin $(1)/usr/bin/eqosplusctl
 	$(INSTALL_BIN) $(CURDIR)/files/eqosplus.init $(1)/etc/init.d/eqosplus
 	$(CP) ./files/eqosplus.config $(1)/etc/config/eqosplus
 	$(INSTALL_BIN) $(CURDIR)/files/eqosplus-call.libexec $(1)/usr/libexec/eqosplus-call
