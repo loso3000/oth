@@ -196,8 +196,8 @@ return view.extend({
         var wanInterfaces = data[2];
         var networkDevices = data[3];
 
-        m = new form.Map('eqosplus', _('Network Speed Limit'),
-            _('Users can limit the network speed for uploading/downloading through MAC, IP. The speed unit is MB/second.'));
+        m = new form.Map('eqosplus', ''),
+            _('Users can limit the network speed for uploading/downloading through MAC, IP, and IP segments (192.168.110.00-192.168.10.200). The speed unit is MB/second.'));
         s = m.section(form.TypedSection);
         s.anonymous = true;
 	

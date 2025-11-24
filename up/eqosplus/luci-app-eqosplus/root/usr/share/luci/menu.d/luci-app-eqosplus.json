@@ -1,6 +1,6 @@
 {
   "admin/control/eqosplus": {
-    "title": "EQoS Plus",
+    "title": "Eqosplus",
     "order": 20,
     "action": {
       "type": "firstchild",
