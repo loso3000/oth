@@ -115,7 +115,7 @@ sed -i '/option disabled/d' /etc/config/wireless  >/dev/null 2>&1
 sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh   >/dev/null 2>&1
 wifi up
 
-frmware=`cat /etc/ezopenwrt_version | awk -F '-' '{printf $2}'`
+frmware=`cat /etc/ezopenwrt_version | awk -F '_' '{printf $2}'`
 if [ "$frmware" = "Super" ] || [ "$frmware" = "Mini"  ] ; then
 sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
 sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-samba4.json
