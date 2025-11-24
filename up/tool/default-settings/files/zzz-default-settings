@@ -17,12 +17,6 @@ is_x86_64() {
         
 }
 
-is_vip() {
-     eval $(cat /etc/ezopenwrt_version | grep -o -e "EZVER=\S*")
-    [[ "$EZVER" = "Vip*" ]] &&  return 0 ||  return 1
-
-}
-
 # stop avahi cups
 # /etc/init.d/avahi-daemon disable  && /etc/init.d/avahi-daemon stop  
 debug=0
@@ -125,6 +119,8 @@ sed -i 's/network/status/g' /www/luci-static/resources/view/bandix/connection.js
 sed -i 's/network/status/g' /usr/share/luci/menu.d/luci-app-bandix.json
 #samba4 share
 sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
+
+rm -rf /usr/share/luci/menu.d/luci-app-attendedsysupgrade.json
 
 #wifi net
 test $ver -lt 1 && {
