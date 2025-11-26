@@ -14,7 +14,7 @@ PKG_LICENSE:=Apache-2.0
 
 LUCI_TITLE:=LuCI support for eqosplus.
 LUCI_DESCRIPTION:=LuCI support for Easy eqosplus(Support speed limit based on IP address).
-LUCI_DEPENDS:=+ip-full +tc +nftables +bc +kmod-ifb +kmod-sched-htb
+LUCI_DEPENDS:=+ip-full +tc +nftables +bc +kmod-ifb +kmod-sched-htb-core +kmod-sched-htb-extras
 LUCI_PKGARCH:=all
 
 PKG_VERSION:=2.0.2
