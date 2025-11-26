@@ -52,9 +52,6 @@ istore_install(){
 	/tmp/is-opkg opkg install --force-reinstall luci-app-store || exit $?
 	[ -s "/etc/init.d/tasks" ] || /tmp/is-opkg opkg install --force-reinstall taskd
 	[ -s "/usr/lib/lua/luci/cbi.lua" ] || /tmp/is-opkg opkg install luci-compat >/dev/null 2>&1
-            uci set system.@system[0].hostname='iStoreOS'
-            uci commit system
-            /etc/init.d/system reload
             if is_x86_64; then
                 extra_info="with iStoreOS Style"
 		echo "src/gz is_store https://istore.linkease.com/repo/all/store" >/etc/opkg/customfeeds.conf
