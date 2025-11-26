@@ -30,37 +30,38 @@ function renderStatus(isRunning) {
         color, icon, _('eqosplus'), statusText
     );
 }
+
 var cbiRichListValue = form.ListValue.extend({
-	renderWidget: function (section_id, option_index, cfgvalue) {
-		var choices = this.transformChoices();
-		var widget = new ui.Dropdown((cfgvalue != null) ? cfgvalue : this.default, choices, {
-			id: this.cbid(section_id),
-			sort: this.keylist,
-			optional: true,
-			select_placeholder: this.select_placeholder || this.placeholder,
-			custom_placeholder: this.custom_placeholder || this.placeholder,
-			validate: L.bind(this.validate, this, section_id),
-			disabled: (this.readonly != null) ? this.readonly : this.map.readonly
-		});
+    renderWidget: function (section_id, option_index, cfgvalue) {
+        var choices = this.transformChoices();
+        var widget = new ui.Dropdown((cfgvalue != null) ? cfgvalue : this.default, choices, {
+            id: this.cbid(section_id),
+            sort: this.keylist,
+            optional: true,
+            select_placeholder: this.select_placeholder || this.placeholder,
+            custom_placeholder: this.custom_placeholder || this.placeholder,
+            validate: L.bind(this.validate, this, section_id),
+            disabled: (this.readonly != null) ? this.readonly : this.map.readonly
+        });
 
-		return widget.render();
-	},
+        return widget.render();
+    },
 
-	value: function (value, title, description) {
-		if (description) {
-			form.ListValue.prototype.value.call(this, value, E([], [
-				E('span', { 'class': 'hide-open' }, [title]),
-				E('div', { 'class': 'hide-close', 'style': 'min-width:25vw' }, [
-					E('strong', [title]),
-					E('br'),
-					E('span', { 'style': 'white-space:normal' }, description)
-				])
-			]));
-		}
-		else {
-			form.ListValue.prototype.value.call(this, value, title);
-		}
-	}
+    value: function (value, title, description) {
+        if (description) {
+            form.ListValue.prototype.value.call(this, value, E([], [
+                E('span', { 'class': 'hide-open' }, [title]),
+                E('div', { 'class': 'hide-close', 'style': 'min-width:25vw' }, [
+                    E('strong', [title]),
+                    E('br'),
+                    E('span', { 'style': 'white-space:normal' }, description)
+                ])
+            ]));
+        }
+        else {
+            form.ListValue.prototype.value.call(this, value, title);
+        }
+    }
 });
 
 return view.extend({
@@ -187,7 +188,6 @@ return view.extend({
             });
     },
 
-
     render: function(data) {
         var m, s, o, t;
 
@@ -196,12 +196,13 @@ return view.extend({
         var wanInterfaces = data[2];
         var networkDevices = data[3];
 
-        m = new form.Map('eqosplus', ''),
+        m = new form.Map('eqosplus', '',
             _('Users can limit the network speed for uploading/downloading through MAC, IP, and IP segments (192.168.110.00-192.168.10.200). The speed unit is MB/second.'));
+        
         s = m.section(form.TypedSection);
         s.anonymous = true;
-	
-       s.render = function() {
+    
+        s.render = function() {
             var statusView = E('p', { id: 'control_status' }, 
                 '<span class="spinning"> </span> ' + _('Checking status...'));
             
@@ -222,19 +223,22 @@ return view.extend({
             });
 
             poll.start();
-            return E('div', { class: 'cbi-section', id: 'status_bar' }, [ statusView ,
-	       E('div', { 'style': 'text-align: right; font-style: italic;' }, [
+            
+            return E('div', { class: 'cbi-section', id: 'status_bar' }, [ 
+                statusView,
+                E('div', { 'style': 'text-align: right; font-style: italic;' }, [
                     E('span', {}, [
-                    _('© github '),
-                    E('a', { 
-                        'href': 'https://github.com/sirpdboy', 
-                        'target': '_blank',
-                        'style': 'text-decoration: none;'
-                    }, 'by sirpdboy')
+                        _('© github '),
+                        E('a', { 
+                            'href': 'https://github.com/sirpdboy', 
+                            'target': '_blank',
+                            'style': 'text-decoration: none;'
+                        }, 'by sirpdboy')
+                    ])
                 ])
-            ])
-]);
-        }
+            ]);
+        };
+
         s = m.section(form.TypedSection, 'eqosplus', '');
         s.anonymous = true;
 
@@ -323,8 +327,6 @@ return view.extend({
         o.value('6,7', _('Rest Day'));
         o.default = '0';
 
-	        
-		return m.render();
-
-	}
+        return m.render();
+    }
 });
