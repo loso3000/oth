@@ -12,14 +12,26 @@ PKG_NAME:=luci-app-$(THEME_NAME)
 
 PKG_LICENSE:=Apache-2.0
 
-LUCI_TITLE:=LuCI support for timecontrol
-LUCI_DESCRIPTION:=LuCI support for timecontrol (Internet time control).
-LUCI_DEPENDS:=+bc +bash +timecontrol
+LUCI_TITLE:=LuCI support for timecontrol for nftables
+LUCI_DESCRIPTION:=LuCI support for Easy timecontrol for nftables(Internet time control).
+LUCI_DEPENDS:=+bc +nftables +bash
 LUCI_PKGARCH:=all
 
-PKG_VERSION:=3.0.1
-PKG_RELEASE:=20250710
+PKG_VERSION:=3.2.1
+PKG_RELEASE:=20251127
 PKG_MAINTAINER:=sirpdboy <herboy2008@gmail.com>
+
+define Build/Compile
+endef
+
+define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+rm -f /tmp/luci-*
+endef
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/timecontrol
+endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

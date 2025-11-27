@@ -174,8 +174,6 @@ return view.extend({
             });
         });
 
-
-
         // 开始时间
         o = s.option(form.Value, 'timestart', _('Start Control Time'));
         o.placeholder = '00:00';
