@@ -259,8 +259,7 @@ return view.extend({
         });
 
         // 限速规则部分
-        t = m.section(form.TableSection, 'device', _('Speed Limit Rules'));
-        t.template = 'cbi/tblsection';
+        t = m.section(form.TableSection, 'device', '');
         t.anonymous = true;
         t.addremove = true;
 

@@ -80,7 +80,6 @@ nft="dbg_nft"
 nft_type
 
 stop_qos() {
-    
     for face in $(tc qdisc show 2>/dev/null | grep htb | awk '{print $5}'); do
         $tc qdisc del dev $face root 2>/dev/null
     done
@@ -88,8 +87,8 @@ stop_qos() {
     $tc qdisc del dev ${dev} root 2>/dev/null
     $tc qdisc del dev ${dev}_ifb root 2>/dev/null
     $tc qdisc del dev ${dev} ingress 2>/dev/null
-    $ip link del dev ${dev}_ifb 2>/dev/null 2>&1
-    
+        $ip link del dev ${dev}_ifb 2>/dev/null 2>&1
+
     if [ -n "$nftables_ver" ]; then
         $nft delete table inet ${NAME} 2>/dev/null
         $nft delete table bridge ${NAME} 2>/dev/null
@@ -99,10 +98,11 @@ stop_qos() {
 }
 
 init_qosplus() {
+
     insmod sch_htb 2>/dev/null
     insmod act_mirred 2>/dev/null
     insmod ifb 2>/dev/null
-
+    
     $ip link del dev ${dev}_ifb 2>/dev/null
     $ip link add dev ${dev}_ifb name ${dev}_ifb type ifb
     $ip link set dev ${dev}_ifb up
@@ -114,8 +114,6 @@ init_qosplus() {
     $tc qdisc del dev ${dev}_ifb root 2>/dev/null
     $tc qdisc add dev ${dev}_ifb root handle 1:0 htb default 1
     $tc class add dev ${dev}_ifb parent 1:0 classid 1:1 htb rate 1000mbit ceil 1000mbit
-    
-    # 排除本地网络流量
     lanipaddr=$(uci -q get network.lan.ipaddr 2>/dev/null | awk -F '.' '{print $1"."$2"."$3".0/24"}')
     if [ -n "$lanipaddr" ]; then
         $tc filter add dev $dev parent 1:0 protocol ip prio 1 u32 match ip src "$lanipaddr" match ip dst "$lanipaddr" flowid 1:1
@@ -134,9 +132,11 @@ init_qosplus() {
         $nft add chain inet ${NAME} mark_forward { type filter hook forward priority -200\; policy accept\; }
         $nft add chain inet ${NAME} mark_output { type filter hook output priority -200\; policy accept\; }
         $nft add chain inet ${NAME} mark_postrouting { type filter hook postrouting priority -200\; policy accept\; }
-
     fi
+    
+    return 0
 }
+
 
 del_id() {
     local list_id=$1

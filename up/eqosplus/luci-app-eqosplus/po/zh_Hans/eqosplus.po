@@ -60,3 +60,9 @@ msgstr "自动设置"
 msgid "Speed Limit Rules"
 msgstr "限速规则"
 
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
