@@ -2085,6 +2085,8 @@ body.modal-overlay-active #modal_overlay {
 .cbi-map {
     display: flex;
     flex-direction: column;
+    
+	overflow-x: auto;
     gap: 1rem
 }
 
@@ -3852,7 +3854,6 @@ input,
 
     .cbi-section {
         padding-bottom: 0.5rem;
-	overflow-x: auto;
     }
     .cbi-tab-descr {
         padding: 0 0.3rem
