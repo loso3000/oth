@@ -210,7 +210,7 @@ sed -i 's/immortalwrt/openwrt/g' /etc/config/luci
 # docker mirror
 [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
 
-sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf"
+# sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf"
 #tv
 test $ver -lt 3 && {
 ver=3
