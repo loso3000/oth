@@ -2298,13 +2298,13 @@ table > tbody > tr, div > .table > .tr, .cbi-map >.cbi-section .cbi-value {
 
 .cbi-tabcontainer>.cbi-value:nth-of-type(4n+2),
 .cbi-map>.cbi-section .cbi-value:nth-of-type(4n+2),
-.cbi-map>div>.cbi-section>.cbi-section-node>.cbi-value:nth-of-type(2n),
+.cbi-map>div>.cbi-section>.cbi-section-node>.cbi-value:nth-of-type(4n+1),
 table>tbody>tr:nth-of-type(4n+2),
 div>.table>.tr:nth-of-type(4n+2) {
     background-color: rgba(var(--primary-rgbs), var(--primary-rgbs-ts));
     background-image: var(--bgqs-image)
 }
-.cbi-map>div>.cbi-section>.cbi-section-node>.cbi-value:nth-of-type(2n+1),
+.cbi-map>div>.cbi-section>.cbi-section-node>.cbi-value:nth-of-type(4n+2),
 .cbi-tabcontainer>.cbi-value:nth-of-type(4n),
 .cbi-map>.cbi-section .cbi-value:nth-of-type(4n),
 table>tbody>tr:nth-of-type(4n),
