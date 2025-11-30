@@ -2546,11 +2546,10 @@ td>.ifacebadge,
 .nft-rules tr>td,
 .nft-rules tr>th {
     text-align: left !important;
+      line-height: 1.5;
+      padding: 0.4rem 0.8rem !important;
 }
 
-.nft-rules tr>td{
-    line-height: 2rem;
-}
 
 .network-status-table {
     display: flex
