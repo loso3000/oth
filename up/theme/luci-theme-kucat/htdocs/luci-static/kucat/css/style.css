@@ -308,7 +308,7 @@ body {
 }
 
 .tr.placeholder {
-    height: 2rem
+    height: 1.9rem
 }
 #cbi-firewall .tr[data-title]::before, #cbi-firewall .tr.cbi-section-table-titles.named::before {
   font-weight: bold;
@@ -324,6 +324,13 @@ body {
   font-size: var(--font-z);
 }
 
+ #cbi-firewall .tr.cbi-section-table-titles.named::before {
+    background-color: var(--menu-item-titlebg-color) !important;
+}
+
+.cbi-section-table-row {
+  text-align: center !important;
+}
 .tr.placeholder>.td {
     position: absolute;
     right: 0;
@@ -502,11 +509,6 @@ a:hover {
     text-decoration: underline
 }
 
-em {
-    font-style: normal !important;
-    line-height: 1.5;
-    padding-left: 10px
-}
 
 code {
     font-size: var(--font-x);
@@ -582,10 +584,10 @@ footer a {
     padding: 1rem 3rem !important
 }
 
-.container .cbi-map>div,
-.container .cbi-map>fieldset.cbi-section,
+.container .cbi-map>div:not(.cbi-button),
+.container .cbi-map>fieldset.cbi-section:not(.cbi-button),
 #view>#content_syslog,
-#view>div>div {
+#view>div>div:not(.cbi-button) {
   padding: 0 1%;
 }
 
@@ -1325,7 +1327,7 @@ input[type='radio'] {
     appearance: none !important;
     -webkit-appearance: none !important;
     background-image: url('data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'-4 -4 8 8\'%3e%3ccircle r=\'3\' fill=\'%23ccc\'/%3e%3c/svg%3e');
-    background-color: rgba(var(--primary-rgbm), 0.2);
+    background-color: rgba(var(--primary-rgbm), 0.3);
     box-shadow: inset 0 2px 1px rgba(255, 255, 255, .6);
     border-radius: 70%;
     cursor: pointer;
@@ -1944,7 +1946,7 @@ textarea:focus {
 .cbi-page-actions>.cbi-dropdown.btn,
 .diag-action .cbi-dropdown.btn {
     width: auto;
-    padding: .2rem!important;
+    padding: .2rem
 }
 
 .cbi-dropdown[open]>ul.dropdown>li label {
@@ -2244,7 +2246,7 @@ table>thead>tr>th,
     letter-spacing: 1px;
     color: var(--body-color);
     white-space: nowrap;
-    padding: 0.7rem;
+    padding: 0.5rem;
 }
 
 table .tr>.td.cbi-value-field,
@@ -2255,9 +2257,11 @@ table .tr>.th.cbi-section-table-cell {
     color: var(--body-color);
     white-space: nowrap;
     width: auto;
-    padding: 0.2rem
+    padding: 0.5rem
 }
-
+tr>td, tr>th, .tr>.td, .tr>.th, .cbi-section-table-row::before, #cbi-wireless>#wifi_assoclist_table>.tr:nth-child(2) {
+  padding: 0.7rem 1rem;
+}
 table .tr>.td.cbi-value-field>[id*="ifc-description"] {
     text-align: center;
     font-weight: 400 !important
@@ -2287,10 +2291,12 @@ td.cbi-value-field var,
 .tr.cbi-section-table-titles>.th {
     font-size: var(--font-z);
     color: var(--title-color) !important;
+    border-top: 0 !important;
 }
-table > tbody > tr, div > .table > .tr, .cbi-map >.cbi-section .cbi-value {
-  background-color: rgba(255, 255, 255, 0);
-  transition: background-color .25s;
+
+.tr.table-titles>.th,
+.tr.cbi-section-table-titles>.th {
+    background-color: var(--menu-item-titlebg-color) !important;
 }
 .cbi-section-table .cbi-section-table-titles .cbi-section-table-cell {
     width: auto !important
@@ -2543,7 +2549,7 @@ td>.ifacebadge,
 }
 
 .nft-rules tr>td{
-    line-height: 1.8rem;
+    line-height: 2rem;
 }
 
 .network-status-table {
@@ -2902,7 +2908,8 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 .node-main-login>.main .cbi-map {
-    padding: 1rem !important
+    padding: 1rem !important;
+    overflow: hidden;
 }
 
 .node-main-login>.main .container h2 {
@@ -3595,6 +3602,12 @@ pre {
 #content_syslog>div,
 [data-page^="admin-status-firewall"] .nft-chain-hook>ul>li {
     padding: 0 0.8rem
+}
+
+.controls>*>.btn:not([aria-label$="page"]) {
+  flex-grow: initial !important;
+  margin-top: .25rem;
+    padding: 0.5rem 1.2rem;
 }
 
 [data-theme="dark"] .pdboy-light:before,
