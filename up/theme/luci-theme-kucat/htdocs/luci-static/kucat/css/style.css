@@ -583,10 +583,10 @@ footer a {
 }
 
 .container .cbi-map>div,
-.container .cbi-map>fieldset>textarea,
-#view>div>textarea ,
+.container .cbi-map>fieldset.cbi-section,
+#view>#content_syslog,
 #view>div>div {
-    padding: 0 1%;
+  padding: 0 1%;
 }
 
 .main {
@@ -1580,7 +1580,7 @@ textarea,
 }
 
 .container .cbi-tabmenu, .container #tabmenu {
-   margin-left: -2%!important;  
+  margin-left: -2%!important; 
 }
 
 ul.tabs, .tabmenu .tabs, #tabmenu .tabs, ul.cbi-tabmenu {
@@ -3100,7 +3100,7 @@ body.lang_pl.node-main-login .cbi-value-title {
 #view>div,
 #view>table {
     backdrop-filter: var(--ufilter);
-    width: 100%;
+    /* width: 100%; */
     -webkit-backdrop-filter: var(--ufilter)
 }
 
