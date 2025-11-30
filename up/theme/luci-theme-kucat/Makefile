@@ -15,7 +15,6 @@ PKG_RELEASE:=20251130
 
 define Package/luci-theme-$(THEME_NAME)/conffiles
 /www/luci-static/resources/background/
-/www/luci-static/kucat/background/
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
