@@ -208,7 +208,7 @@ sed -i 's/immortalwrt/openwrt/g' /etc/config/luci
 # uci set firewall.@defaults[0].flow_offloading='1'
 
 # docker mirror
-[ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
+# [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
 
 # sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf"
 #tv
