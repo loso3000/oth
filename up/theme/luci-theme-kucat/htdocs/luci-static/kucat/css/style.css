@@ -1223,7 +1223,7 @@ input,
     line-height: 1;
     background-image: none;
     background-color: var(--input-bgcolor);
-    color: var(--inputtext-color);
+    color: var(--body-color);
     border: 1px solid var(--inputborder-color);
     border-radius: var(--radius2);
     transition: box-shadow 0.3s ease;
@@ -1357,6 +1357,7 @@ select:not([multiple="multiple"]):focus,
 input:not(.cbi-button):focus,
 .cbi-dropdown:focus {
     border: 1px solid rgba(var(--primary-rgbm), 0.7);
+    color: var(--inputtext-color);
     box-shadow: 0 1px 6px var(--input-boxhovercolor)
 }
 
@@ -1661,17 +1662,13 @@ textarea {
     -webkit-transition: color 100ms ease, border-color 100ms ease, opacity 100ms ease;
     outline: none;
     background-color: var(--input-bgcolor);
-    color: var(--inputtext-color);
+    color: var(--body-color);
     border: 1px solid var(--inputborder-color);
     word-wrap: break-word;
     white-space: pre-wrap;
     padding: 10px
 }
 
-.cbi-input-textarea:focus,
-textarea:focus {
-    box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor)
-}
 
 .cbi-dynlist {
     line-height: 1.3;
@@ -2406,9 +2403,10 @@ div>.table>.tr:nth-of-type(2n+1):hover {
 .cbi-value {
     display: inline-block;
     width: 100%;
-    line-height: 2.3rem;
 }
-
+.cbi-value .cbi-value-title {
+  line-height: 2.3rem;
+}
 .cbi-value:first-child {
     padding-top: 1rem
 }
@@ -3376,13 +3374,17 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 [data-page^="admin-services-openclash"] .cbi-section,
-[data-page^="admin-services-openclash"] .cbi-section>div,
-[data-page^="admin-services-openclash"] .cbi-tabmenu {
+[data-page^="admin-services-openclash"] .cbi-section>div{
     background-color: rgba(var(--primary-rgbbody), 0.2) !important;
     border: 0px solid #ddd !important;
     box-shadow: none !important
 }
 
+[data-page^="admin-services-openclash"] .cbi-tabmenu {
+    background-color: rgba(var(--primary-rgbbody), 0.2) !important;
+    border: 0px solid #ddd !important;
+
+}
 [data-page^="admin-services-openclash"] #tab {
     border: 0px solid #ddd !important;
     box-shadow: none !important
@@ -4049,7 +4051,7 @@ input,
 
     .cbi-dropdown[open]>ul.dropdown {
         overflow: auto;
-       /* max-width: 100%; */
+        max-width: 100%;
         margin: auto;
         padding: 0 !important
     }
