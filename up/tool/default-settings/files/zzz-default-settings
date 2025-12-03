@@ -1,24 +1,27 @@
 #!/bin/sh
-. /etc/
+. /etc/openwrt_release
 ver=$(uci -q get base_config.@base[0].ver 2>/dev/null)
 test -n "$ver" || {
 touch /etc/config/base_config
 uci -q add base_config base >/dev/null 2>&1
 ver=0
 }
-#argon
-sed -i 's,media .. \"\/b,resource .. \"\/b,g' /usr/lib/lua/luci/view/themes/argon/sysauth.htm
 uci -q set luci.main.lang='auto'
 uci -q set luci.main.mediaurlbase='/luci-static/kucat'
 
 is_x86_64() {
-    eval $(cat /etc/os-release  | grep -o -e "DISTRIB_ARCH=\S*")
-    [[ "$DISTRIB_ARCH" = "x86_64" ]] &&  return 0 ||  return 1
-        
+    DISTRIB_ARCH=$(grep -o "DISTRIB_ARCH=\S*" /etc/os-release 2>/dev/null | cut -d'=' -f2)
+    [[ "$DISTRIB_ARCH" = "x86_64" ]] && return 0 || return 1
 }
 
-# stop avahi cups
-# /etc/init.d/avahi-daemon disable  && /etc/init.d/avahi-daemon stop  
+
+is_vip() {
+     eval $(cat /etc/ezopenwrt_version | grep -o -e "EZVER=\S*")
+    [[ "$EZVER" == "Vip"* ]] && return 0 || return 1
+
+}
+
+
 debug=0
 setup_ssid()
 {
@@ -31,10 +34,11 @@ HTMODE50='VHT80'
 HTMODE24='HT20'
 NETWORKID=lan
 local r="$1"
-uci -q delete wireless.default_${r}
+
  if ! uci show wireless.${r} >/dev/null 2>&1; then
         return
  fi
+uci -q delete wireless.default_${r}
     SUBFIX=`echo -n $MACADDR | sed 's/://g' | tr a-z A-Z | tail -c4`
     SSID=${DISTRIB_ID}_${SUBFIX}
     # local s="wlan$1"
@@ -91,7 +95,6 @@ setup_network()
     fi
 }
 
-. /etc/openwrt_release
 test -n "${DISTRIB_ID}" || DISTRIB_ID=EzOpWrt
 DISTRIB_ID=$(echo -n $DISTRIB_ID | tr a-z A-Z)
 uci -q set fstab.@global[0].check_fs=1
@@ -136,7 +139,6 @@ test $ver -lt 1 && {
     uci del dhcp.lan.ra_slaac
     uci del network.lan.delegate
     uci -q set network.lan.proto='static'
-    setup_network
     uci -q commit network
     sed -i '/lcp-echo/d' /etc/ppp/options
     echo "lcp-echo-failure 10" >>  /etc/ppp/options 
