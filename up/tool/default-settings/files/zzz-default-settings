@@ -115,8 +115,8 @@ sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
 sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-samba4.json
 sed -i 's/vpn/services/g' /usr/share/luci/menu.d/luci-app-zerotier.json
 fi
-sed -i 's/network/status/g' /www/luci-static/resources/view/bandix/connection.js
-sed -i 's/network/status/g' /usr/share/luci/menu.d/luci-app-bandix.json
+# sed -i 's/network/status/g' /www/luci-static/resources/view/bandix/connection.js
+# sed -i 's/network/status/g' /usr/share/luci/menu.d/luci-app-bandix.json
 #samba4 share
 sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
 
@@ -293,6 +293,31 @@ EOF
 service nginx restart
 fi
 
+if [[ -f /etc/config/uhttpd ]] ;then
+uci -q batch <<-EOF >/dev/null
+    set luci.main.sessiontime='86400'
+    set luci.main.sessionkeep='1'
+    set luci.main.reqtimeout='60'
+    set uhttpd.main.rfc1918_filter=0
+    set uhttpd.main.session_timeout='86400'
+    set uhttpd.main.session_keepalive='1'
+    set uhttpd.main.cookie_lifetime='86400'
+    set uhttpd.main.instances=4
+    set uhttpd.main.max_connections=100
+    set uhttpd.main.max_requests=500
+    set uhttpd.main.network_timeout=30
+    set uhttpd.main.script_timeout='60'
+    set uhttpd.main.network_timeout='30'
+    set uhttpd.main.http_keepalive='20'
+ commit luci
+ commit uhttpd
+EOF
+/etc/init.d/uhttpd restart
+/etc/init.d/system restart
+/etc/init.d/network restart
+/etc/init.d/dnsmasq restart
+fi
+
 if [[ -f /etc/config/snmpd ]] ;then
 
 uci -q batch <<-EOF >/dev/null
@@ -346,26 +371,12 @@ case "$DISTRIB_TARGET" in
 	fi
 	;;
 esac
+
+
+
+
 uci -q set base_config.@base[0].ver=$ver
 uci -q commit base_config
-uci set luci.main.sessiontime='86400'
-uci set luci.main.sessionkeep='1'
-uci set luci.main.reqtimeout='60'
-uci set uhttpd.main.session_timeout='86400'
-uci set uhttpd.main.session_keepalive='1'
-uci set uhttpd.main.cookie_lifetime='86400'
-uci set uhttpd.main.max_requests=50
-uci set uhttpd.main.max_connections=20
-uci set uhttpd.main.script_timeout=30
-uci set uhttpd.main.network_timeout=15
-uci set uhttpd.main.http_keepalive=10
-uci set uhttpd.main.rfc1918_filter=0
-uci commit luci
-uci commit uhttpd
-/etc/init.d/uhttpd restart
-/etc/init.d/system restart
-/etc/init.d/network restart
-/etc/init.d/dnsmasq restart
 
 check_service() {
     local service_name="$1"
