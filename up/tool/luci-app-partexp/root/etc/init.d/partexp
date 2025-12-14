@@ -336,7 +336,7 @@ fdiskB(){
 			    uci commit fstab
 			    log "保留数据overlay扩展/dev/$b成功！"
 			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
-			    echo $MOUNT  $a>> /etc/partexppath
+			    echo $MOUNT  $a> /etc/partexppath
 			    sleep 3
 			    log "设备重启才能生效"
 			    expquit 2
@@ -365,7 +365,7 @@ fdiskB(){
 			    uci commit fstab
 			    log "不保留数据overlay扩展/dev/$b成功！"
 			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
-			    echo $MOUNT  $a>> /etc/partexppath
+			    echo $MOUNT  $a> /etc/partexppath
 			    sleep 3
 			    log "设备重启才能生效"
 			    expquit 2
@@ -393,7 +393,7 @@ fdiskB(){
 		if is_disk_mounted "/opt"; then
 		    log "/dev/$b分区扩容和挂载到$target_function成功！"
 			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
-			    echo $MOUNT  $a>> /etc/partexppath
+			    echo $MOUNT  $a> /etc/partexppath
 		    log "如果没生效，请重启设备"
 		    expquit 2
 		else
@@ -425,7 +425,7 @@ fdiskB(){
          	    if [[ "$FREE_SPACE" -gt 2 ]]; then
  	      	   	rootfs_resize
 			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
-			    echo $MOUNT  $a>> /etc/partexppath
+			    echo $MOUNT  $a> /etc/partexppath
  	         	expquit 2
 	     	    else
  	         	log "目标盘 $SYSTEM_DISK $FSTYPE没有足够的剩余空间！"
@@ -459,7 +459,7 @@ fdiskB(){
 		if is_disk_mounted /mnt/$b ; then
 		    log "/dev/$b分区扩容和挂载到/mnt/$b成功！" 
 			    eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
-			    echo $MOUNT  $a>> /etc/partexppath
+			    echo $MOUNT  $a> /etc/partexppath
 		    log "如果没生效，请重启设备"
 		    expquit 2
 		else
