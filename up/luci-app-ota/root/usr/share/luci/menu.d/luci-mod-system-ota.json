@@ -1,0 +1,14 @@
+{
+    "admin/system/ota": {
+        "title": "OTA Upgrade",
+        "order": 69,
+        "action": {
+            "type": "view",
+            "path": "ota"
+        },
+        "depends": {
+            "acl": ["luci-mod-system-ota"],
+      "fs": ["/bin/ota"]
+        }
+    }
+}
