@@ -288,7 +288,7 @@ return view.extend({
 	    
             self.fetchFirmwareInfoFromRPC().then(function(firmwareInfo) {
                 if (firmwareInfo) {
-                    console.log('Preloaded firmware info:', firmwareInfo);
+                    //console.log('Preloaded firmware info:', firmwareInfo);
                     // 如果有固件信息，更新UI
                     if (self.dom.upgradeLog) {
                         self.displayFirmwareInfo(firmwareInfo);
@@ -501,7 +501,7 @@ fetchFirmwareInfoFromRPC: function() {
     var self = this;
     
     return callOTAInfo().then(function(response) {
-        console.log('OTA info RPC response:', response);
+        //console.log('OTA info RPC response:', response);
         
         if (response && response.code === 0) {
             var firmwareInfo = self.parseFirmwareInfo(response.msg);
@@ -666,7 +666,7 @@ fetchFirmwareInfoFromRPC: function() {
                         fs.stat('/tmp/firmware.img')
                             .then(function(newStats) {
                                 if (newStats && newStats.size > initialSize) {
-                                    console.log(_('Auto-resume: File is growing, download active'));
+                                    //console.log(_('Auto-resume: File is growing, download active'));
                                     self.dom.upgradeLog.innerHTML = 
                                                 '<div class="firmware-info" style="border-left-color: #28a745;">' +
                                                 '<div>' + _('Auto-resume: File is growing, download active') + '</div>' +
@@ -707,7 +707,7 @@ onCheck: function() {
             
             if (!response) {
                 result.textContent = _('No response');
-                    console.log(_('No response from OTA service'), 'error');
+                    //console.log(_('No response from OTA service'), 'error');
                 return;
             }
             var code = response.code;
@@ -725,19 +725,19 @@ onCheck: function() {
                     // 有更新
                     result.textContent = _('Update available!');
                     result.className = 'update-available';
-                        console.log(_('Update available! Click "Download firmware" to continue.'));
+                    //  console.log(_('Update available! Click "Download firmware" to continue.'));
                     self.switchState('checked');
                 } else {
                     // 没有更新或未知状态
                     result.textContent = _('Check completed');
                     result.className = '';
-                        console.log(_('Check completed. No update information found.'));
+                    // console.log(_('Check completed. No update information found.'));
                 }
             } else {
                 // 检查失败
                 result.textContent = _('Check failed');
                     result.className += ' error-message';
-                    console.log(_('Check failed with code') + ' ' + code);
+                    //console.log(_('Check failed with code') + ' ' + code);
                 }
         })
         .catch(function(error) {
@@ -747,7 +747,7 @@ onCheck: function() {
             btn.textContent = _('Check update');
             result.textContent = _('Check failed');
                 result.className += ' error-message';
-                console.log(_('Check failed:') + ' ' + error.message);
+                //console.log(_('Check failed:') + ' ' + error.message);
         });
 },
 
@@ -779,7 +779,7 @@ onCheck: function() {
                                                 '<div class="firmware-info" style="border-left-color: #28a745;">' +
                                                 '<div>' + _('Starting OTA download...') + '</div>' +
                                                 '</div>';
-        console.log(_('Starting OTA download...'));
+        //console.log(_('Starting OTA download...'));
         
         // 先启动进度监控
         this.startProgressMonitor();
@@ -787,7 +787,7 @@ onCheck: function() {
         // 然后启动下载
         L.resolveDefault(callOTADownload(), {})
             .then(function(response) {
-                console.log(_('Download response:'), response);
+                //console.log(_('Download response:'), response);
             
                 if (response && response.code === 0) {
                     
@@ -963,7 +963,7 @@ onCheck: function() {
             // 处理不同的返回码
             switch(code) {
                 case 0: // 下载完成
-                    console.log(_('Download complete!'));
+                    //console.log(_('Download complete!'));
                     self.updateProgressDisplay(100, _('Download complete!'));
 
                     
@@ -1017,7 +1017,7 @@ onCheck: function() {
                     break;
                     
                 case 2: // 已取消
-                    console.log(_('Download cancelled'));
+                    //console.log(_('Download cancelled'));
                     
                     self.updateProgressDisplay(0, _('Download cancelled'));
                     self.switchState('checked');
@@ -1035,7 +1035,7 @@ onCheck: function() {
                     break;
                     
                 case 254: // 下载未进行或出错
-                    console.log(_('Download not in progress or error'));
+                    //console.log(_('Download not in progress or error'));
                     // 检查是否已经下载完成
                     fs.stat('/tmp/firmware.img')
                         .then(function(stats) {
@@ -1079,7 +1079,7 @@ onCheck: function() {
     // 更新进度监控函数
     startProgressMonitor: function() {
         var self = this;
-        console.log(_('Starting progress monitor...'));
+        //console.log(_('Starting progress monitor...'));
         
         // 清除之前的定时器
         if (this.progressTimer) {
@@ -1100,7 +1100,7 @@ onCheck: function() {
             
             // 30分钟超时
             if (self.checkCount > 1800) {
-                console.log(_('Progress monitor timeout'));
+                //console.log(_('Progress monitor timeout'));
                 self.switchState('checked');
                 
                 if (self.progressTimer) {
@@ -1159,7 +1159,7 @@ onCheck: function() {
                                 '</div>';
                         }
                     }
-                    console.log(_('SUCCESS: Firmware file verified -') + ' ' + sizeMB + ' MB');
+                    //console.log(_('SUCCESS: Firmware file verified -') + ' ' + sizeMB + ' MB');
                 }
             })
             .catch(function(error) {
@@ -1181,7 +1181,7 @@ onCheck: function() {
         
         L.resolveDefault(callOTACancel(), {})
             .then(function(response) {
-                console.log(_('Cancel response:'), response);
+                //console.log(_('Cancel response:'), response);
                 
                 btn.disabled = false;
                 btn.textContent = _('Cancel download');
@@ -1260,10 +1260,10 @@ onCheck: function() {
         
         // 使用RPCD调用检查刷机进度
         callOTAFlashProgress().then(function(response) {
-            console.log(_('Flash progress RPC response:'), response);
+            //console.log(_('Flash progress RPC response:'), response);
             
             if (!response) {
-                console.log(_('No flash progress response'));
+                //console.log(_('No flash progress response'));
                 // 继续检查
                 setTimeout(function() {
                     self.checkFlashProgress();
@@ -1327,11 +1327,11 @@ onCheck: function() {
                 }, 2000);
             }
         }).catch(function(error) {
-            console.error(_('Flash progress RPC call failed:'), error);
+            //console.error(_('Flash progress RPC call failed:'), error);
             // RPC调用失败，可能是后端服务停止了，尝试重新连接
             if (error && error.message && (error.message.includes('not found') || 
                 error.message.includes('Access denied'))) {
-                console.log(_('RPC service not accessible, assuming flash is in progress'));
+                //console.log(_('RPC service not accessible, assuming flash is in progress'));
                 // 继续检查，但延长间隔
                 setTimeout(function() {
                     self.checkFlashProgress();
@@ -1370,11 +1370,11 @@ onCheck: function() {
             })
             .then(function() {
                 // 连接成功，跳转到新地址
-                console.log(_('Reconnect successful, redirecting to') + ' ' + self.targetIP);
+                //console.log(_('Reconnect successful, redirecting to') + ' ' + self.targetIP);
                 window.location.href = 'http://' + self.targetIP;
             })
             .catch(function(error) {
-                console.log(_('Reconnect attempt') + ' ' + reconnectAttempts + ' ' + _('failed:'), error);
+                //console.log(_('Reconnect attempt') + ' ' + reconnectAttempts + ' ' + _('failed:'), error);
                 
                 if (reconnectAttempts < maxReconnectAttempts) {
                     // 继续尝试
@@ -1460,7 +1460,7 @@ onCheck: function() {
         // 使用RPCD调用刷写
         L.resolveDefault(callOTAFlash(keep, expsize, bopkg), {})
             .then(function(response) {
-                console.log(_('Flash response:'), response);
+                //console.log(_('Flash response:'), response);
                 
                 if (response && response.code === 0) {
                     // 如果返回了目标IP，更新它
@@ -1500,31 +1500,31 @@ onCheck: function() {
         
         // 创建进度内容框
         var progressContent = document.createElement('div');
-        progressContent.style.cssText = 'background: rgba(39, 39, 39, 0.95);color: rgb(255, 255, 255,0.7);max-width: 800px;min-width: 300px;text-align: center;padding: 1%;border-radius: 12px;box-shadow: rgba(0, 0, 0, 0.5) 0px 15px 40px;position: relative;';
+        progressContent.style.cssText = 'background: rgba(39, 39, 39, 0.95);color: rgb(255, 255, 255,0.7);max-width: 800px;width: 600px;min-width: 300px;text-align: center;padding: 1%;border-radius: 12px;box-shadow: rgba(0, 0, 0, 0.5) 0px 15px 40px;position: relative;';
         
         var htmlParts = [
-            '<h1 style="margin-bottom: 25px; color: #fff; text-align: center; font-size: 28px;">' + _('Firmware Upgrade') + '</h1>',
+            '<h1 style="margin-bottom: 10px;color: #fff;text-align: center;font-size: 28px;">' + _('Firmware Upgrade') + '</h1>',
             '<div class="status-message" style="margin: 20px 0; font-size: 18px; text-align: center; color: #4CAF50;">' + _('Preparing flash process...') + '</div>',
             '',
             '<div style="display: flex; align-items: center; justify-content: center; margin: 25px 0;">',
             '    <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #007bff; animation: spin 1s ease-in-out infinite; margin-right: 20px;"></div>',
             '    <div style="flex: 1;">',
-            '        <div style="width: 100%; height: 25px; background: #333; border-radius: 12px; overflow: hidden; margin-bottom: 10px;">',
-            '            <div id="flash-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); border-radius: 12px; transition: width 0.5s ease-in-out; position: relative;">',
+            '        <div style="width: 100%;height: 20px;background: #333;border-radius: 12px;overflow: hidden;margin-bottom: 6px;">',
+            '            <div id="flash-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A);  transition: width 0.5s ease-in-out; position: relative;">',
             '                <div id="flash-progress-text" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #fff; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">0%</div>',
             '            </div>',
             '        </div>',
-            '    <div id="flash-status-message" class="status-message" style="margin: 0;font-size: 16px;text-align: center;padding: 10px;background: rgba(0,0,0,0.2);border-radius: 8px;color: #ddd;"></div>',
+            '    <div id="flash-status-message" class="status-message" style="margin: 0;text-align: center;color: #bbb;"></div>',
             '',
             '    </div>',
             '</div>',
             '',
             '',
             '<div style="margin-top: 25px;">',
-            '    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">',
+            '    <div style="display: flex;justify-content: flex-end;align-items: center;margin-bottom: 10px;">',
             '        <div id="flash-log-count" style="background: #444; text-align: left;font-size: small;color: #aaa; padding: 3px 10px; border-radius: 12px; font-size: 12px;">0 ' + _('lines') + '</div>',
             '    </div>',
-            '    <pre id="flash-log-output" style="max-height: 250px; overflow-y: auto; background: #222; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.4; color: #eee; margin: 0; white-space: pre-wrap;"></pre>',
+            '    <pre id="flash-log-output" style="max-height: 250px; text-align: left;height: 200px;overflow-y: auto; background: #222; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.4; color: #eee; margin: 0; white-space: pre-wrap;"></pre>',
             '</div>',
             '',
             '<div id="flash-buttons" style="margin-top: 25px; display: none; text-align: center;">',
