@@ -77,14 +77,13 @@ return view.extend({
             '}',
             '.keep-options { display: block; }',
             '.hide-keep-options { display: none !important; }',
-            '',
             '.progress-container {',
-            '    width: 300px;',
+            '    width: 100%;',
             '    height: 20px;',
-            '    background: #ddd;',
+            '    background: rgba(0,0,0,0.2);',
             '    border-radius: 10px;',
             '    display: inline-block;',
-            '    margin-right: 10px;',
+            '    margin: 10px 0;',
             '    vertical-align: middle;',
             '    position: relative;',
             '    overflow: hidden;',
@@ -103,8 +102,11 @@ return view.extend({
             '    text-align: center;',
             '    line-height: 20px;',
             '    font-size: 12px;',
+            '    font-weight: bold;',
+            '    font-size: 12px;',
+            '    color: #eee;',
             '    z-index: 1;',
-            '    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);',
+            '    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);',
             '}',
             '.error-message {',
             '    color: #dc3545;',
@@ -112,7 +114,6 @@ return view.extend({
             '.firmware-info {',
             '    padding: 15px;',
             '}',
-            '',
             '.firmware-details {',
             '    margin-top: 10px;',
             '    padding: 10px;',
@@ -147,9 +148,7 @@ return view.extend({
             '    border-radius: 4px;',
             '}',
             '</style>',
-            '',
             '<h2 name="content">' + _('OTA Upgrade') + '</h2>',
-            '',
             '<div class="state-ctl state-ctl-unchecked" id="state-container">',
             '    <div class="cbi-section-descr">',
             '        <div class="info-note">',
@@ -158,9 +157,7 @@ return view.extend({
             '            3. ' + _('Expansion firmware DD does not retain configuration flashing') + '<br>',
             '            4. ' + _('Not expanding to the default flashing mode of the system can retain configuration upgrades'),
             '        </div>',
-            '',
             '    </div>',
-            '',
             '    <div class="cbi-section cbi-section-node">',
             '        <div class="state state-unchecked">',
             '            <form>',
@@ -188,7 +185,6 @@ return view.extend({
             '                </div>',
             '            </form>',
             '        </div>',
-            '',
             '        <div class="state state-downloading">',
             '            <form>',
             '                <div class="cbi-value">',
@@ -204,7 +200,6 @@ return view.extend({
             '                        <div class="cbi-value-description">' + _('Step 2/3: Download firmware') + '</div>',
             '                    </div>',
             '                </div>',
-            '',
             '            </form>',
             '        </div>',
             '        <div class="state state-downloaded">',
@@ -222,32 +217,28 @@ return view.extend({
             '                        </select>',
             '                    </div>',
             '                </div>',
-            '',
             '                <div class="cbi-value keep-options" id="keep-settings">',
             '                    <label class="cbi-value-title" for="keep">' + _('Keep settings configuration') + '</label>',
             '                    <div class="cbi-value-field">',
             '                        <input type="checkbox" name="keep" value="1" id="keep" checked="checked" />',
             '                    </div>',
             '                </div>',
-            '',
             '                <div class="cbi-value keep-options" id="keep-plugins">',
             '                    <label class="cbi-value-title" for="bopkg">' + _('Keep installed plugins (test)') + '</label>',
             '                    <div class="cbi-value-field">',
             '                        <input type="checkbox" name="bopkg" value="1" id="bopkg" checked="checked" />',
             '                    </div>',
             '                </div>',
-            '',
             '                <div class="cbi-value">',
             '                    <label class="cbi-value-title">' + _('Flash Mode Information') + '</label>',
             '                    <div class="cbi-value-field">',
             '                        <div id="flash-mode-info" >',
             '                            <strong>' + _('Current selection:') + '</strong> <span id="current-mode">' + _('Sysupgrade mode') + '</span><br>',
             '                            <strong>' + _('Default IP after flash:') + '</strong> <span id="target-ip">' + _('Loading...') + '</span><br>',
-            '                            <strong>' + _('Settings preservation:') + '</strong> <span id="settings-preservation">' + _('Enabled') + '</span>',
+            '                            <strong>' + _('Settings Save:') + '</strong> <span id="settings-preservation">' + _('Enabled') + '</span>',
             '                        </div>',
             '                    </div>',
             '                </div>',
-            '',
             '                <div class="cbi-value cbi-value-last">',
             '                    <label class="cbi-value-title">' + _('Firmware downloaded') + '</label>',
             '                    <div class="cbi-value-field">',
@@ -260,8 +251,6 @@ return view.extend({
             '            </form>',
             '        </div>',
             '    </div>',
-            '',
-            '    <!-- 日志显示区域 -->',
             '    <div class="state state-checked state-downloading state-downloaded">',
             '        <div class="cbi-section-descr">',
             '            <h2>' + _('Upgrade Log') + '</h2>',
@@ -275,29 +264,23 @@ return view.extend({
 
         var self = this;
         
-        // 立即初始化DOM和绑定事件
         setTimeout(function() {
             self.initDOM();
             self.bindEvents();
-            
-            // 检查是否已有固件文件或正在下载
             self.checkFirmwareFile();
 	    
             self.fetchFirmwareInfoFromRPC().then(function(firmwareInfo) {
                 if (firmwareInfo) {
-                    //console.log('Preloaded firmware info:', firmwareInfo);
-                    // 如果有固件信息，更新UI
+
                     if (self.dom.upgradeLog) {
                         self.displayFirmwareInfo(firmwareInfo);
                     }
                 }
             });
-            // 额外检查一次下载状态（双重保障）
             setTimeout(function() {
                 self.checkForActiveDownload();
             }, 500);
             
-            // 尝试自动恢复下载监控
             setTimeout(function() {
                 self.autoResumeDownload();
             }, 1500);
@@ -498,8 +481,6 @@ fetchFirmwareInfoFromRPC: function() {
     var self = this;
     
     return callOTAInfo().then(function(response) {
-        //console.log('OTA info RPC response:', response);
-        
         if (response && response.code === 0) {
             var firmwareInfo = self.parseFirmwareInfo(response.msg);
             
@@ -663,7 +644,6 @@ fetchFirmwareInfoFromRPC: function() {
                         fs.stat('/tmp/firmware.img')
                             .then(function(newStats) {
                                 if (newStats && newStats.size > initialSize) {
-                                    //console.log(_('Auto-resume: File is growing, download active'));
                                     self.dom.upgradeLog.innerHTML = 
                                                 '<div class="firmware-info" style="border-left-color: #28a745;">' +
                                                 '<div>' + _('Auto-resume: File is growing, download active') + '</div>' +
@@ -704,7 +684,6 @@ onCheck: function() {
             
             if (!response) {
                 result.textContent = _('No response');
-                    //console.log(_('No response from OTA service'), 'error');
                 return;
             }
             var code = response.code;
@@ -722,19 +701,16 @@ onCheck: function() {
                     // 有更新
                     result.textContent = _('Update available!');
                     result.className = 'update-available';
-                    //  console.log(_('Update available! Click "Download firmware" to continue.'));
                     self.switchState('checked');
                 } else {
                     // 没有更新或未知状态
                     result.textContent = _('Check completed');
                     result.className = '';
-                    // console.log(_('Check completed. No update information found.'));
                 }
             } else {
                 // 检查失败
                 result.textContent = _('Check failed');
                     result.className += ' error-message';
-                    //console.log(_('Check failed with code') + ' ' + code);
                 }
         })
         .catch(function(error) {
@@ -744,7 +720,6 @@ onCheck: function() {
             btn.textContent = _('Check update');
             result.textContent = _('Check failed');
                 result.className += ' error-message';
-                //console.log(_('Check failed:') + ' ' + error.message);
         });
 },
 
@@ -776,7 +751,6 @@ onCheck: function() {
                                                 '<div class="firmware-info" style="border-left-color: #28a745;">' +
                                                 '<div>' + _('Starting OTA download...') + '</div>' +
                                                 '</div>';
-        //console.log(_('Starting OTA download...'));
         
         // 先启动进度监控
         this.startProgressMonitor();
@@ -784,7 +758,6 @@ onCheck: function() {
         // 然后启动下载
         L.resolveDefault(callOTADownload(), {})
             .then(function(response) {
-                //console.log(_('Download response:'), response);
             
                 if (response && response.code === 0) {
                     
@@ -892,8 +865,6 @@ onCheck: function() {
                 return percent;
             }
         }
-        
-        // 格式7: 数字范围 "10 of 100" 或 "30/100"
         var rangeMatch = message.match(/(\d+)\s+(?:of|out of|from)\s+(\d+)/i);
         if (rangeMatch) {
             var current = parseFloat(rangeMatch[1]);
@@ -935,8 +906,6 @@ onCheck: function() {
                 return parseFloat(match[2]);
             }
         }
-        
-        // 如果没有匹配到，回退到通用解析
         return this.parseProgressPercent(message);
     },
 
@@ -945,39 +914,23 @@ onCheck: function() {
         var self = this;
         
         if (!this.progressTimer) return;
-        
-        // 使用RPCD调用检查进度
         callOTAProgress().then(function(response) {
             
             if (!response) {
                 return;
             }
-            
-            // 解析响应 - 直接使用response对象
             var code = response.code;
             var message = response.msg;
-            
-            // 处理不同的返回码
             switch(code) {
                 case 0: // 下载完成
-                    //console.log(_('Download complete!'));
                     self.updateProgressDisplay(100, _('Download complete!'));
-
-                    
-                    // 检查并显示下载的文件
                     self.checkDownloadedFile();
-                    
-                    // 清除定时器
                     if (self.progressTimer) {
                         clearInterval(self.progressTimer);
                         self.progressTimer = null;
                     }
-                    
-                    // 切换到已下载状态
                     setTimeout(function() {
                         self.switchState('downloaded');
-                        
-                        // 恢复下载按钮
                         if (self.dom.downloadBtn) {
                             self.dom.downloadBtn.disabled = false;
                             self.dom.downloadBtn.textContent = _('Download firmware');
@@ -985,26 +938,19 @@ onCheck: function() {
                     }, 1500);
                     break;
                     
-                case 1: // 下载中
-                    // 提取进度百分比 - 使用改进的解析函数
+                case 1: 
                     var percent = self.parseProgressBar(message);
                     
                     if (percent > 0) {
                         if (percent > self.lastProgress) {
                             self.lastProgress = percent;
                         }
-                        
-                        // 更新进度显示
                         self.updateProgressDisplay(percent, message);
 
                     } else {
-                        
-                        // 显示时间进度作为备份
                         var timePercent = Math.min(95, Math.floor(self.checkCount / 18)); // 30分钟对应100%
                         self.updateProgressDisplay(timePercent, _('Downloading...') + ' (' + self.checkCount + 's)');
                     }
-                    
-                    // 显示原始消息在日志区域
                     if (self.dom.upgradeLog) {
                         var displayMsg = message;
                         if (displayMsg.length > 300) {
@@ -1014,12 +960,9 @@ onCheck: function() {
                     break;
                     
                 case 2: // 已取消
-                    //console.log(_('Download cancelled'));
                     
                     self.updateProgressDisplay(0, _('Download cancelled'));
                     self.switchState('checked');
-                    
-                    // 恢复下载按钮
                     if (self.dom.downloadBtn) {
                         self.dom.downloadBtn.disabled = false;
                         self.dom.downloadBtn.textContent = _('Download firmware');
@@ -1032,8 +975,6 @@ onCheck: function() {
                     break;
                     
                 case 254: // 下载未进行或出错
-                    //console.log(_('Download not in progress or error'));
-                    // 检查是否已经下载完成
                     fs.stat('/tmp/firmware.img')
                         .then(function(stats) {
                             if (stats && stats.size > 10 * 1024 * 1024) {
@@ -1055,8 +996,6 @@ onCheck: function() {
                     
                 default:
                     console.log(_('Unknown progress code:'), code, _('message:'), message.substring(0, 100));
-                    
-                    // 检查文件是否存在
                     fs.stat('/tmp/firmware.img')
                         .then(function(stats) {
                             if (stats && stats.size > 10 * 1024 * 1024) {
@@ -1065,7 +1004,6 @@ onCheck: function() {
                             }
                         })
                         .catch(function() {
-                            // 继续监控
                         });
             }
         }).catch(function(error) {
@@ -1073,12 +1011,8 @@ onCheck: function() {
         });
     },
 
-    // 更新进度监控函数
     startProgressMonitor: function() {
         var self = this;
-        //console.log(_('Starting progress monitor...'));
-        
-        // 清除之前的定时器
         if (this.progressTimer) {
             clearInterval(this.progressTimer);
             this.progressTimer = null;
@@ -1097,7 +1031,6 @@ onCheck: function() {
             
             // 30分钟超时
             if (self.checkCount > 1800) {
-                //console.log(_('Progress monitor timeout'));
                 self.switchState('checked');
                 
                 if (self.progressTimer) {
@@ -1126,8 +1059,6 @@ onCheck: function() {
             .then(function(stats) {
                 if (stats && stats.size > 10 * 1024 * 1024) {
                     var sizeMB = Math.round(stats.size / 1024 / 1024);
-                    
-                    // 显示成功信息
                     if (self.dom.upgradeLog) {
                         // 如果有固件信息，显示详细信息
                         if (self.firmwareInfo) {
@@ -1178,7 +1109,6 @@ onCheck: function() {
         
         L.resolveDefault(callOTACancel(), {})
             .then(function(response) {
-                //console.log(_('Cancel response:'), response);
                 
                 btn.disabled = false;
                 btn.textContent = _('Cancel download');
@@ -1189,14 +1119,11 @@ onCheck: function() {
                                                 '</div>';
                 
                 self.switchState('checked');
-                
-                // 恢复下载按钮
                 if (self.dom.downloadBtn) {
                     self.dom.downloadBtn.disabled = false;
                     self.dom.downloadBtn.textContent = _('Download firmware');
                 }
                 
-                // 清除定时器
                 if (self.progressTimer) {
                     clearInterval(self.progressTimer);
                     self.progressTimer = null;
@@ -1213,8 +1140,7 @@ onCheck: function() {
     // 切换状态
     switchState: function(to) {
         if (!this.dom.stateCtl) return;
-        
-        // 移除所有状态类
+
         this.dom.stateCtl.classList.remove(
             'state-ctl-unchecked',
             'state-ctl-checked', 
@@ -1251,24 +1177,16 @@ onCheck: function() {
         return div.innerHTML;
     },
 
-    // 检查刷机进度
     checkFlashProgress: function() {
         var self = this;
-        
-        // 使用RPCD调用检查刷机进度
         callOTAFlashProgress().then(function(response) {
-            //console.log(_('Flash progress RPC response:'), response);
             
             if (!response) {
-                //console.log(_('No flash progress response'));
-                // 继续检查
                 setTimeout(function() {
                     self.checkFlashProgress();
                 }, 2000);
                 return;
             }
-            
-            // 更新进度显示
             if (response.progress !== undefined && self.dom.flashProgressBar) {
                 var progress = Math.min(100, Math.max(0, response.progress));
                 self.dom.flashProgressBar.style.width = progress + '%';
@@ -1276,17 +1194,12 @@ onCheck: function() {
                     self.dom.flashProgressText.textContent = progress.toFixed(0) + '%';
                 }
             }
-            
-            // 更新状态消息
             if (response.message && self.dom.flashStatusMessage) {
                 self.dom.flashStatusMessage.textContent = response.message;
             }
-            
-            // 更新日志输出
             if (response.log && self.dom.flashLogOutput) {
                 self.dom.flashLogOutput.textContent = response.log;
                 self.dom.flashLogOutput.scrollTop = self.dom.flashLogOutput.scrollHeight;
-                // 更新日志行数
                 if (self.dom.flashLogCount) {
                     var lines = response.log.split('\n').length;
                     self.dom.flashLogCount.textContent = lines + ' ' + _('lines');
@@ -1295,11 +1208,8 @@ onCheck: function() {
             
 // 处理状态变化
 if (response.status === 'complete' || response.status === 'rebooting') {
-    // 显示正在重启的消息
     var rebootMessage = response.message || _('Flash completed! Device is rebooting...');
     self.dom.flashStatusMessage.textContent = rebootMessage;
-    
-    // 显示按钮
     if (self.dom.flashButtons) {
         self.dom.flashButtons.style.display = 'block';
     }
@@ -1310,7 +1220,7 @@ if (response.status === 'complete' || response.status === 'rebooting') {
     countdownElement.style.fontWeight = 'bold';
     countdownElement.style.color = '#4CAF50';
     countdownElement.id = 'reconnect-countdown';
-    countdownElement.textContent = _('Will attempt to reconnect in') + ' ' + delaySeconds + ' ' + _('seconds...');
+    countdownElement.textContent = _('Will attempt to reconnect in') + ' ' + delaySeconds + ' ' + _('seconds');
     self.dom.flashStatusMessage.parentNode.appendChild(countdownElement);
     
     // 开始倒计时
@@ -1318,7 +1228,7 @@ if (response.status === 'complete' || response.status === 'rebooting') {
     var countdownTimer = setInterval(function() {
         countdown--;
         if (countdown > 0) {
-            countdownElement.textContent = _('Will attempt to reconnect in') + ' ' + countdown + ' ' + _('seconds...');
+            countdownElement.textContent = _('Will attempt to reconnect in') + ' ' + countdown + ' ' + _('seconds');
         } else {
             clearInterval(countdownTimer);
             countdownElement.textContent = _('Attempting to reconnect now...');
@@ -1326,11 +1236,11 @@ if (response.status === 'complete' || response.status === 'rebooting') {
         }
     }, 1000);
     
-    return; // 停止检查
+    return; 
 
             } else if (response.status === 'failed') {
                 self.showFlashError(response.message);
-                return; // 停止检查
+                return; 
             } else if (response.status === 'running' || response.status === 'upgrading' || 
                        response.status === 'flashing' || response.status === 'preparing' ||
                        response.status === 'verifying' || response.status === 'expanding' ||
@@ -1346,17 +1256,12 @@ if (response.status === 'complete' || response.status === 'rebooting') {
                 }, 2000);
             }
         }).catch(function(error) {
-            //console.error(_('Flash progress RPC call failed:'), error);
-            // RPC调用失败，可能是后端服务停止了，尝试重新连接
             if (error && error.message && (error.message.includes('not found') || 
                 error.message.includes('Access denied'))) {
-                //console.log(_('RPC service not accessible, assuming flash is in progress'));
-                // 继续检查，但延长间隔
                 setTimeout(function() {
                     self.checkFlashProgress();
                 }, 3000);
             } else {
-                // 其他错误，继续检查
                 setTimeout(function() {
                     self.checkFlashProgress();
                 }, 2000);
@@ -1372,14 +1277,10 @@ if (response.status === 'complete' || response.status === 'rebooting') {
         
         function checkConnection() {
             reconnectAttempts++;
-            
-            // 更新状态显示
             if (self.dom.flashStatusMessage) {
                 self.dom.flashStatusMessage.textContent = 
                     _('Device rebooting... Attempting to reconnect (') + reconnectAttempts + '/' + maxReconnectAttempts + ')';
             }
-            
-            // 尝试访问设备
             fetch('http://' + self.targetIP + '/cgi-bin/luci', {
                 mode: 'no-cors',
                 cache: 'no-store',
@@ -1389,24 +1290,19 @@ if (response.status === 'complete' || response.status === 'rebooting') {
             })
             .then(function() {
                 // 连接成功，跳转到新地址
-                //console.log(_('Reconnect successful, redirecting to') + ' ' + self.targetIP);
                 window.location.href = 'http://' + self.targetIP;
             })
             .catch(function(error) {
-                //console.log(_('Reconnect attempt') + ' ' + reconnectAttempts + ' ' + _('failed:'), error);
                 
                 if (reconnectAttempts < maxReconnectAttempts) {
                     // 继续尝试
                     setTimeout(checkConnection, 2000);
                 } else {
-                    // 重试次数用完
                     if (self.dom.flashStatusMessage) {
                         self.dom.flashStatusMessage.textContent = 
                             _('Could not reconnect automatically. Please try to access:') + ' ' + 
                             self.targetIP + ' ' + _('manually.');
                     }
-                    
-                    // 显示手动访问按钮
                     var manualBtn = document.createElement('button');
                     manualBtn.className = 'cbi-button cbi-input-apply';
                     manualBtn.textContent = _('Go to') + ' ' + self.targetIP;
@@ -1416,25 +1312,11 @@ if (response.status === 'complete' || response.status === 'rebooting') {
                     });
                     self.dom.flashStatusMessage.parentNode.appendChild(manualBtn);
                     
-                    // 显示重新加载按钮
-                    var reloadBtn = document.createElement('button');
-                    reloadBtn.className = 'cbi-button cbi-input-reset';
-                    reloadBtn.textContent = _('Reload Page');
-                    reloadBtn.style.marginTop = '10px';
-                    reloadBtn.style.marginLeft = '10px';
-                    reloadBtn.addEventListener('click', function() {
-                        window.location.reload();
-                    });
-                    self.dom.flashStatusMessage.parentNode.appendChild(reloadBtn);
                 }
             });
         }
-        
-        // 等待5秒后开始尝试重新连接
         setTimeout(checkConnection, 5000);
     },
-
-    // 刷写固件
     onFlash: function(e) {
         e.preventDefault();
         
@@ -1446,14 +1328,12 @@ if (response.status === 'complete' || response.status === 'rebooting') {
         
         var confirmMessage;
         if (expsize === 0) {
-            // Sysupgrade模式
             confirmMessage = _('Are you sure you want to flash the firmware using %s mode?').format(mode) + '\n\n' +
-                           _('Settings preservation:') + ' ' + (keep ? _('YES') : _('NO')) + '\n' +
+                           _('Settings Save:') + ' ' + (keep ? _('YES') : _('NO')) + '\n' +
                            _('Plugins preservation:') + ' ' + (bopkg ? _('YES') : _('NO')) + '\n' +
                            _('Default IP after flash:') + ' ' + this.targetIP + '\n\n' +
                            _('The device will reboot!');
         } else {
-            // DD模式
             var sizes = ['0', '1G', '2G', '5G', '10G', '20G'];
             var size = sizes[expsize];
             confirmMessage = _('Are you sure you want to flash the firmware using %s mode?').format(mode) + '\n\n' +
@@ -1472,27 +1352,16 @@ if (response.status === 'complete' || response.status === 'rebooting') {
         flashBtn.textContent = _('Flashing...');
         
         var self = this;
-        
-        // 显示状态信息
         this.showFlashProgress();
-        
-        // 使用RPCD调用刷写
         L.resolveDefault(callOTAFlash(keep, expsize, bopkg), {})
             .then(function(response) {
-                //console.log(_('Flash response:'), response);
-                
                 if (response && response.code === 0) {
-                    // 如果返回了目标IP，更新它
                     if (response.target_ip) {
                         self.targetIP = response.target_ip;
                     }
-                    
-                    // 更新进度显示
                     if (self.dom.flashStatusMessage) {
                         self.dom.flashStatusMessage.textContent = response.msg || _('Flash process started');
                     }
-                    
-                    // 开始检查刷机进度
                     setTimeout(function() {
                         self.checkFlashProgress();
                     }, 1000);
@@ -1509,48 +1378,40 @@ if (response.status === 'complete' || response.status === 'rebooting') {
 
     // 显示刷机进度页面
     showFlashProgress: function() {
-        // 创建全屏遮罩层
         var overlay = document.createElement('div');
         overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9998;';
-        
-        // 创建刷写进度页面容器
         var progressPage = document.createElement('div');
         progressPage.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%;  height: 100%; z-index: 9999; display: flex; align-items: center; justify-content: center;';
-        
-        // 创建进度内容框
         var progressContent = document.createElement('div');
         progressContent.style.cssText = 'background: rgba(39, 39, 39, 0.95);color: rgb(255, 255, 255,0.7);max-width: 800px;width: 600px;min-width: 300px;text-align: center;padding: 1%;border-radius: 12px;box-shadow: rgba(0, 0, 0, 0.5) 0px 15px 40px;position: relative;';
         
         var htmlParts = [
-            '<h1 style="margin-bottom: 10px;color: #fff;text-align: center;font-size: 28px;">' + _('Firmware Upgrade') + '</h1>',
-            '<div class="status-message" style="margin: 20px 0; font-size: 18px; text-align: center; color: #4CAF50;">' + _('Preparing flash process...') + '</div>',
-            '',
-            '<div style="display: flex; align-items: center; justify-content: center; margin: 25px 0;">',
-            '    <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #007bff; animation: spin 1s ease-in-out infinite; margin-right: 20px;"></div>',
-            '    <div style="flex: 1;">',
-            '        <div style="width: 100%;height: 20px;background: #333;border-radius: 12px;overflow: hidden;margin-bottom: 6px;">',
-            '            <div id="flash-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A);  transition: width 0.5s ease-in-out; position: relative;">',
-            '                <div id="flash-progress-text" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #fff; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">0%</div>',
-            '            </div>',
+            '<h1 style="margin-bottom: 5px;color: #ddd;text-align: center;font-size: 1.1rem;">' + _('Firmware Upgrade') + '</h1>',
+            '<div class="status-message" style="font-size: 0.92rem;text-align: center;color: #4CAF50;margin-bottom: 10px;">' + _('Preparing flash process...') + '</div>',
+            '<div style="display: flex;align-items: center;justify-content: center;flex-direction: column;">',
+            '    <div style="width: 100%;">',
+            '        <div class="progress-container">',
+            '              <div id="flash-progress-bar" class="progress-bar" style="width: 0%"></div>',
+            '                    <div id="flash-progress-text" class="progress-text">0%</div>',
+            '         </div>',
+
+            '        <div style="display: flex;flex-direction: column;align-items: center;justify-content: center;">',
+	    '           <div class="spinner" style="width: 50px;height: 50px;border: 6px solid rgba(255,255,255,0.1);border-radius: 50%;border-top-color: #007bff;animation: spin 1s ease-in-out infinite;"></div>',
+            '           <div style="margin: 0;text-align: center;"> ',
+	    '                  <div id="flash-status-message" class="status-message" style="margin: 0;margin-top: 10px;text-align: center;color: #bbb;"></div>',
+            '           </div>',
             '        </div>',
-            '    <div id="flash-status-message" class="status-message" style="margin: 0;text-align: center;color: #bbb;"></div>',
-            '',
             '    </div>',
             '</div>',
-            '',
-            '',
-            '<div style="margin-top: 25px;">',
-            '    <div style="display: flex;justify-content: flex-end;align-items: center;margin-bottom: 10px;">',
+            '<div style="margin-top: 5px;">',
+            '    <div style="display: flex;justify-content: flex-end;align-items: center;margin-bottom: 5px;">',
             '        <div id="flash-log-count" style="background: #444; text-align: left;font-size: small;color: #aaa; padding: 3px 10px; border-radius: 12px; font-size: 12px;">0 ' + _('lines') + '</div>',
             '    </div>',
-            '    <pre id="flash-log-output" style="max-height: 250px; text-align: left;height: 200px;overflow-y: auto; background: #222; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.4; color: #eee; margin: 0; white-space: pre-wrap;"></pre>',
+            '    <pre id="flash-log-output" style="max-height: 250px; text-align: left;height: 200px;overflow-y: auto; background: #222; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.4; color: #eee; margin: 0; white-space: pre-wrap;"></pre>',
             '</div>',
-            '',
             '<div id="flash-buttons" style="margin-top: 25px; display: none; text-align: center;">',
-            '    <button id="flash-reload-btn" class="cbi-button cbi-input-apply" style="padding: 10px 30px; font-size: 16px; margin-right: 10px;">' + _('Reload Page') + '</button>',
             '    <button id="flash-manual-btn" class="cbi-button cbi-input-reset" style="padding: 10px 30px; font-size: 16px;">' + _('Manual Access') + '</button>',
             '</div>',
-            '',
             '<style>',
             '@keyframes spin { to { transform: rotate(360deg); } }',
             '#flash-log-output::-webkit-scrollbar { width: 8px; }',
@@ -1568,40 +1429,24 @@ if (response.status === 'complete' || response.status === 'rebooting') {
         
         // 将内容添加到页面
         progressPage.appendChild(progressContent);
-        
-        // 替换当前页面内容
         if (this.dom.contentContainer) {
-            // 先清除可能存在的旧遮罩
             var oldOverlay = document.querySelector('.flash-overlay');
             var oldProgress = document.querySelector('.flash-progress-container');
             if (oldOverlay) oldOverlay.remove();
             if (oldProgress) oldProgress.remove();
-            
-            // 添加类名便于识别
             overlay.className = 'flash-overlay';
             progressPage.className = 'flash-progress-container';
-            
-            // 添加到页面
             document.body.appendChild(overlay);
             document.body.appendChild(progressPage);
-            
-            // 保存DOM元素引用
             this.dom.flashProgressBar = document.querySelector('#flash-progress-bar');
             this.dom.flashProgressText = document.querySelector('#flash-progress-text');
             this.dom.flashStatusMessage = document.querySelector('#flash-status-message');
             this.dom.flashLogOutput = document.querySelector('#flash-log-output');
             this.dom.flashLogCount = document.querySelector('#flash-log-count');
             this.dom.flashButtons = document.querySelector('#flash-buttons');
-            
-            // 绑定按钮事件
-            var reloadBtn = document.querySelector('#flash-reload-btn');
             var manualBtn = document.querySelector('#flash-manual-btn');
             var self = this;
-            if (reloadBtn) {
-                reloadBtn.addEventListener('click', function() {
-                    window.location.reload();
-                });
-            }
+
             if (manualBtn) {
                 manualBtn.addEventListener('click', function() {
                     window.open('http://' + self.targetIP, '_blank');
@@ -1610,20 +1455,15 @@ if (response.status === 'complete' || response.status === 'rebooting') {
         }
     },
 
-    // 显示刷机错误
     showFlashError: function(errorMsg) {
         if (this.dom.flashStatusMessage) {
             this.dom.flashStatusMessage.textContent = _('Error:') + ' ' + errorMsg;
             this.dom.flashStatusMessage.style.color = '#ff6b6b';
-            
-            // 显示按钮
             if (this.dom.flashButtons) {
                 this.dom.flashButtons.style.display = 'block';
             }
         }
     },
-
-    // 清理遮罩层
     cleanupFlashOverlay: function() {
         var overlay = document.querySelector('.flash-overlay');
         var progress = document.querySelector('.flash-progress-container');

@@ -58,7 +58,7 @@ execute_flash_script() {
     local bopkg="$3"
     LOG_FILE="/tmp/ezotaflash.log"
 
-    echo "Starting flash at \$(date)" > \$LOG_FILE
+    echo "Starting flash at $(date)" > $LOG_FILE
     chmod 644 $LOG_FILE
     echo "Verify firmware files" >> $LOG_FILE
     sleep 1
@@ -79,7 +79,7 @@ IMAGE_TMP="/tmp/firmware.img"
 EOF
     
     if [ "$expsize" -gt 0 ]; then
-        echo "DD flash mode with expansion" >> $LOG_FILE
+        echo "DD flash mode" >> $LOG_FILE
         local image_extractedpath=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
         local image_extracteddev=$(echo -n "/dev/$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $2}')" | tr -d '\n')
         local image_extracted=$(echo -n "$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}')/image_extracted.img" | tr -d '\n')
@@ -148,7 +148,7 @@ echo "Stopping services..." >> \$LOG_FILE
 killall dropbear uhttpd nginx 2>/dev/null || true
 sleep 2
 echo "Upgrade completed" >> \$LOG_FILE
-sleep 3
+sleep 5
 
 echo "Rebooting system" >> \$LOG_FILE
 sync
@@ -303,10 +303,18 @@ EOF
                         progress=25
                         status="expanding"
                         message="Adding expansion capacity"
+                    elif echo "$log_content" | grep -q "flash mode"; then
+                        progress=20
+                        status="flashing"
+                        message="Flash mode"
                     elif echo "$log_content" | grep -q "Verify firmware files"; then
                         progress=10
                         status="verifying"
                         message="Verifying firmware files"
+                    elif echo "$log_content" | grep -q "Starting flash at"; then
+                        progress=5
+                        status="running"
+                        message="Starting flash process"
                     # 检查失败状态
                     elif echo "$log_content" | grep -qi "error\|fail"; then
                         progress=0

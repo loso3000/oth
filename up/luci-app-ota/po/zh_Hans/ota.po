@@ -84,7 +84,7 @@ msgstr "刷机后默认 IP:"
 msgid "Loading..."
 msgstr "加载中..."
 
-msgid "Settings preservation:"
+msgid "Settings Save:"
 msgstr "设置保留:"
 
 msgid "Enabled"
@@ -341,3 +341,35 @@ msgstr "手动访问"
 
 msgid "Error:"
 msgstr "错误:"
+
+msgid "Will attempt to reconnect in"
+msgstr "将尝试重新连接"
+
+msgid "seconds"
+msgstr "秒"
+
+msgid "Attempting to reconnect now..."
+msgstr "正在尝试立即重新连接"
+
+msgid "Flash completed! Device is rebooting..."
+msgstr "刷写完成！设备正在重新启动."
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+
