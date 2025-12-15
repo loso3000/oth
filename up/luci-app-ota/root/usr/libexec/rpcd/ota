@@ -79,7 +79,7 @@ IMAGE_TMP="/tmp/firmware.img"
 EOF
     
     if [ "$expsize" -gt 0 ]; then
-        echo "DD flash mode with expansion: $expsize" >> $LOG_FILE
+        echo "DD flash mode with expansion" >> $LOG_FILE
         local image_extractedpath=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
         local image_extracteddev=$(echo -n "/dev/$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $2}')" | tr -d '\n')
         local image_extracted=$(echo -n "$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}')/image_extracted.img" | tr -d '\n')
@@ -119,16 +119,17 @@ fi
 echo "Fix GPT expansion partition" >> \$LOG_FILE
 sgdisk -e "$image_extracted" >/dev/null 2>&1 || true
 echo "Expand partition" >> \$LOG_FILE
-echo -e "resizepart 2 -1\\nq" | parted "\$image_extracted" >/dev/null 2>&1
+echo -e "resizepart 2 -1\\nq" | parted "$image_extracted" >/dev/null 2>&1
 echo "Writing image to flash" >> \$LOG_FILE
 sleep 2
+echo "Stopping services..." >> \$LOG_FILE
+killall dropbear uhttpd nginx 2>/dev/null || true
 sleep 2
 sync
 echo "Rebooting system" >> \$LOG_FILE
 sleep 5
 echo "DD writing image to $image_extracteddev..." >> \$LOG_FILE
-# dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync 2>>\$LOG_FILE
-dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync,noerror status=progress 2>>\$LOG_FILE
+dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync 2>>\$LOG_FILE
 echo "DD write completed" >> \$LOG_FILE
 sleep 5
 echo b > /proc/sysrq-trigger
@@ -140,10 +141,12 @@ EOF
         [ "$bopkg" != "1" ] && args="$args -k"
         
         cat >> /tmp/otaflash.sh << EOF
-sleep 2
 
 echo "Running sysupgrade command" >> \$LOG_FILE
 sleep 3
+echo "Stopping services..." >> \$LOG_FILE
+killall dropbear uhttpd nginx 2>/dev/null || true
+sleep 2
 echo "Upgrade completed" >> \$LOG_FILE
 sleep 3
 
@@ -274,8 +277,8 @@ EOF
                         message="Flash complete!"
                     elif echo "$log_content" | grep -q "Rebooting system"; then
                         progress=100
-                        status="complete"
-                        message="Flash complete!"
+                        status="rebooting"
+                        message="Flash complete! Rebooting"
                     elif echo "$log_content" | grep -q "Upgrade completed"; then
                         progress=90
                         status="finalizing"

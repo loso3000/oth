@@ -92,7 +92,6 @@ return view.extend({
             '.progress-bar {',
             '    height: 100%;',
             '    background: linear-gradient(90deg, #4CAF50, #8BC34A);',
-            '    border-radius: 10px;',
             '    transition: width 0.3s ease-out;',
             '    position: absolute;',
             '    left: 0;',
@@ -104,8 +103,6 @@ return view.extend({
             '    text-align: center;',
             '    line-height: 20px;',
             '    font-size: 12px;',
-            '    font-weight: bold;',
-            '    color: #333;',
             '    z-index: 1;',
             '    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);',
             '}',
@@ -164,7 +161,7 @@ return view.extend({
             '',
             '    </div>',
             '',
-            '    <div class="cbi-section-node">',
+            '    <div class="cbi-section cbi-section-node">',
             '        <div class="state state-unchecked">',
             '            <form>',
             '                <div class="cbi-value">',
@@ -1296,19 +1293,41 @@ onCheck: function() {
                 }
             }
             
-            // 处理状态变化
-            if (response.status === 'complete' || response.status === 'rebooting') {
-                self.dom.flashStatusMessage.textContent = response.message + '\n\n' + _('Device will reboot shortly. Trying to reconnect...');
-                
-                // 显示按钮
-                if (self.dom.flashButtons) {
-                    self.dom.flashButtons.style.display = 'block';
-                }
-                
-                // 开始尝试重新连接
-                self.startReconnect();
-                
-                return; // 停止检查
+// 处理状态变化
+if (response.status === 'complete' || response.status === 'rebooting') {
+    // 显示正在重启的消息
+    var rebootMessage = response.message || _('Flash completed! Device is rebooting...');
+    self.dom.flashStatusMessage.textContent = rebootMessage;
+    
+    // 显示按钮
+    if (self.dom.flashButtons) {
+        self.dom.flashButtons.style.display = 'block';
+    }
+    
+    var delaySeconds = 45;
+    var countdownElement = document.createElement('div');
+    countdownElement.style.marginTop = '10px';
+    countdownElement.style.fontWeight = 'bold';
+    countdownElement.style.color = '#4CAF50';
+    countdownElement.id = 'reconnect-countdown';
+    countdownElement.textContent = _('Will attempt to reconnect in') + ' ' + delaySeconds + ' ' + _('seconds...');
+    self.dom.flashStatusMessage.parentNode.appendChild(countdownElement);
+    
+    // 开始倒计时
+    var countdown = delaySeconds;
+    var countdownTimer = setInterval(function() {
+        countdown--;
+        if (countdown > 0) {
+            countdownElement.textContent = _('Will attempt to reconnect in') + ' ' + countdown + ' ' + _('seconds...');
+        } else {
+            clearInterval(countdownTimer);
+            countdownElement.textContent = _('Attempting to reconnect now...');
+            self.startReconnect();
+        }
+    }, 1000);
+    
+    return; // 停止检查
+
             } else if (response.status === 'failed') {
                 self.showFlashError(response.message);
                 return; // 停止检查
