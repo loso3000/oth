@@ -1,0 +1,408 @@
+#!/bin/sh
+# RPCD插件 - OTA服务接口
+
+. /usr/share/libubox/jshn.sh
+
+# 日志函数
+log() {
+    logger -t ota-rpcd "[$$] $*"
+}
+
+# 验证固件支持
+image_supported() {
+    local image="$1"
+    /sbin/sysupgrade -T "$image" >/dev/null 2>&1
+    return $?
+}
+
+# 获取当前IP
+get_current_ip() {
+    local ip=""
+    ip=`uci -q get network.lan.ipaddr`
+    [ -z "$ip" ] && ip="${HTTP_HOST:-192.168.10.1}"
+    ip=$(echo "$ip" | cut -d: -f1)
+    [ -z "$ip" ] && ip="192.168.10.1"
+    echo "$ip"
+}
+
+get_firmware_ip() {
+    local json_file="/tmp/run/ezota/ezota.json"
+    local default_ip="192.168.10.1"
+    
+    if [ -f "$json_file" ]; then
+        local ip=$(cat "$json_file" | grep -o '"ip"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | cut -d'"' -f4)
+        [ -n "$ip" ] && echo "$ip" || echo "$default_ip"
+    else
+        echo "$default_ip"
+    fi
+}
+
+# 获取目标IP
+get_target_ip() {
+    local keep="$1"
+    local expsize="$2"
+    
+    local current_ip=$(get_current_ip)
+    local firmware_ip=$(get_firmware_ip)
+    
+    if [ "$keep" = "1" -a "$expsize" = "0" ]; then
+        echo "$current_ip"
+    else
+        echo "$firmware_ip"
+    fi
+}
+# 执行刷机脚本
+execute_flash_script() {
+    local keep="$1"
+    local expsize="$2"
+    local bopkg="$3"
+    LOG_FILE="/tmp/ezotaflash.log"
+    
+    # 清空日志文件
+    echo "Starting flash firmware at $(date)" > $LOG_FILE
+    chmod 644 $LOG_FILE
+    
+    # 验证固件文件
+    echo "Verify firmware files" >> $LOG_FILE
+    sleep 1
+    
+    if ! image_supported "/tmp/firmware.img"; then
+        echo "ERROR: Invalid firmware image" >> $LOG_FILE
+        return 1
+    fi
+    
+    # 获取目标IP并记录
+    target_ip=$(get_target_ip "$keep" "$expsize")
+    echo "WEB IP Address: $target_ip" >> $LOG_FILE
+
+    cat > /tmp/otaflash.sh << EOF
+#!/bin/sh
+LOG_FILE="/tmp/ezotaflash.log"
+IMAGE_TMP="/tmp/firmware.img"
+echo "Starting flash at \$(date)" >> \$LOG_FILE
+EOF
+    
+    if [ "$expsize" -gt 0 ]; then
+        # DD刷机模式（扩展分区）
+        echo "DD flash mode with expansion: $expsize" >> $LOG_FILE
+        
+        # 获取扩展路径信息
+        local image_extractedpath=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
+        local image_extracteddev=$(echo -n "/dev/$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $2}')" | tr -d '\n')
+        local image_extracted=$(echo -n "$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}')/image_extracted.img" | tr -d '\n')
+        
+        if [ -z "$image_extractedpath" ] || [ -z "$image_extracteddev" ]; then
+            echo "ERROR: Could not determine expansion path or device" >> $LOG_FILE
+            return 1
+        fi
+        
+        # 构建DD刷机脚本
+        cat >> /tmp/otaflash.sh << EOF
+echo "Preparing extracted image" >> \$LOG_FILE
+# 清理旧文件
+rm -f "$image_extracted" 2>/dev/null || true
+# 解压固件
+echo "Extracting firmware..." >> \$LOG_FILE
+gzip -dc "$IMAGE_TMP" > "$image_extracted" 2>>\$LOG_FILE
+if [ ! -f "$image_extracted" ]; then
+    echo "ERROR: Failed to extract firmware" >> \$LOG_FILE
+    exit 1
+fi
+echo "Additional expansion capacity" >> \$LOG_FILE
+# 扩展大小映射
+case $expsize in
+    1) dd_size=1024 ;;
+    2) dd_size=2048 ;;
+    3) dd_size=5120 ;;
+    4) dd_size=10240 ;;
+    5) dd_size=20480 ;;
+    *) dd_size=0 ;;
+esac
+if [ \$dd_size -gt 0 ]; then
+    echo "Adding \$dd_size MB expansion" >> \$LOG_FILE
+    dd if=/dev/zero bs=1M count=\$dd_size >> "$image_extracted" 2>>\$LOG_FILE
+fi
+# 安装sgdisk（如果需要）
+if ! command -v sgdisk >/dev/null 2>&1; then
+    echo "Installing sgdisk" >> \$LOG_FILE
+    opkg update >/dev/null 2>&1
+    opkg install sgdisk >/dev/null 2>&1
+fi
+echo "Fix GPT expansion partition" >> \$LOG_FILE
+sgdisk -e "$image_extracted" >/dev/null 2>&1 || true
+echo "Expand partition" >> \$LOG_FILE
+echo -e "resizepart 2 -1\\nq" | parted "$image_extracted" >/dev/null 2>&1
+echo "Writing image to flash" >> \$LOG_FILE
+sleep 2
+# 停止服务
+echo "Stopping services..." >> \$LOG_FILE
+killall dropbear uhttpd nginx 2>/dev/null || true
+sleep 2
+sync
+echo "Rebooting system" >> \$LOG_FILE
+sleep 5
+# DD刷写固件
+echo "DD writing image to $image_extracteddev..." >> \$LOG_FILE
+dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync 2>>\$LOG_FILE
+echo "DD write completed" >> \$LOG_FILE
+sleep 5
+echo b > /proc/sysrq-trigger
+EOF
+    else
+        # Sysupgrade模式
+        echo "Sysupgrade flash mode" >> $LOG_FILE
+        
+        # 构建sysupgrade参数
+        local args=""
+        [ "$keep" != "1" ] && args="$args -n"
+        [ "$bopkg" != "1" ] && args="$args -k"
+        
+        cat >> /tmp/otaflash.sh << EOF
+echo "Running sysupgrade command" >> \$LOG_FILE
+sleep 2
+# 停止服务
+echo "Stopping services..." >> \$LOG_FILE
+killall dropbear uhttpd nginx 2>/dev/null || true
+sleep 2
+sync
+echo "Upgrade completed" >> \$LOG_FILE
+sleep 3
+# 执行sysupgrade
+echo "Executing: /sbin/sysupgrade -v $args " >> \$LOG_FILE
+/sbin/sysupgrade -v $args "\$IMAGE_TMP" 2>>\$LOG_FILE
+echo "Sysupgrade command executed" >> \$LOG_FILE
+sleep 5
+echo b > /proc/sysrq-trigger
+EOF
+    fi
+    
+    cat >> /tmp/otaflash.sh << 'EOF'
+echo "Flash script completed at $(date)" >> $LOG_FILE
+EOF
+    
+    chmod +x /tmp/otaflash.sh
+
+    # 执行刷机脚本（在后台运行）
+    echo "Executing flash script" >> $LOG_FILE
+    /bin/sh /tmp/otaflash.sh >/dev/null 2>&1 &
+    
+    # 记录进程ID
+    echo $! > /tmp/otaflash.pid
+    echo "Flash script started with PID: $!" >> $LOG_FILE
+    
+    return 0
+}
+
+
+case "$1" in
+    list)
+        # 返回可用的方法
+        cat << 'EOF'
+{
+    "check": {
+        "method": "check"
+    },
+    "info": {
+        "method": "info"
+    },
+    "download": {
+        "method": "download"
+    },
+    "progress": {
+        "method": "progress"
+    },
+    "cancel": {
+        "method": "cancel"
+    },
+    "do_flash": {
+        "method": "do_flash",
+        "params": ["keep", "expsize", "bopkg"]
+    },
+    "flash_progress": {
+        "method": "flash_progress"
+    },
+    "get_target_ip": {
+        "method": "get_target_ip",
+        "params": ["keep", "expsize"]
+    }
+}
+EOF
+        ;;
+        
+    call)
+        # 从参数中获取方法名
+        method="$2"
+        
+        if [ -z "$method" ]; then
+            json_init
+            json_add_int code 400
+            json_add_string msg "Method name is empty"
+            json_dump
+            exit 0
+        fi
+        
+        log "Processing method: $method"
+        
+        case "$method" in
+            check|download|cancel|progress)
+                # 调用原始的/bin/ota脚本
+                output=$(/bin/ota "$method" 2>&1)
+                ret=$?
+                json_init
+                json_add_int code $ret
+                json_add_string msg "$output"
+                json_dump
+                ;;
+                
+            info)
+                if [ -f "/tmp/run/ezota/ezota.json" ]; then
+                    output=$(cat /tmp/run/ezota/ezota.json)
+                    ret=0
+                else
+                    output="{}"
+                    ret=1
+                fi
+                json_init
+                json_add_int code $ret
+                json_add_string msg "$output"
+                json_dump
+                ;;
+                
+            flash_progress)
+                json_init
+                
+                if [ -f "/tmp/ezotaflash.log" ]; then
+                    # 读取日志
+                    log_content=$(tail -50 /tmp/ezotaflash.log 2>/dev/null)
+                    json_add_string log "$log_content"
+                    
+                    # 解析进度状态
+                    progress=0
+                    status="running"
+                    message="Starting flash process"
+                    
+                    # 检查各个阶段
+                    if echo "$log_content" | grep -q "Flash script completed|Upgrade completed"; then
+                        progress=100
+                        status="complete"
+                        message="Flash complete!"
+                    elif echo "$log_content" | grep -q "Rebooting system\|b > /proc/sysrq-trigger"; then
+                        progress=100
+                        status="rebooting"
+                        message="Flash complete! Rebooting"
+                    elif echo "$log_content" | grep -q "DD write completed\|Sysupgrade command executed"; then
+                        progress=90
+                        status="finalizing"
+                        message="Finalizing flash process"
+                    elif echo "$log_content" | grep -q "Writing image to flash\|DD writing image"; then
+                        progress=70
+                        status="flashing"
+                        message="Writing firmware to flash"
+                    elif echo "$log_content" | grep -q "Running sysupgrade command\|Executing.*sysupgrade"; then
+                        progress=50
+                        status="upgrading"
+                        message="Running sysupgrade command"
+                    elif echo "$log_content" | grep -q "Fix GPT expansion partition"; then
+                        progress=40
+                        status="expanding"
+                        message="Fixing GPT partition table"
+                    elif echo "$log_content" | grep -q "Preparing extracted image\|Extracting firmware"; then
+                        progress=30
+                        status="preparing"
+                        message="Preparing extracted image"
+                    elif echo "$log_content" | grep -q "Additional expansion capacity\|Adding.*MB expansion"; then
+                        progress=25
+                        status="expanding"
+                        message="Adding expansion capacity"
+                    elif echo "$log_content" | grep -q "Verify firmware files"; then
+                        progress=10
+                        status="verifying"
+                        message="Verifying firmware files"
+                    # 检查失败状态
+                    elif echo "$log_content" | grep -qi "error\|fail"; then
+                        progress=0
+                        status="failed"
+                        # 提取错误信息
+                        error_msg=$(echo "$log_content" | grep -i "error\|fail" | tail -1)
+                        if [ -n "$error_msg" ]; then
+                            message="Flash failed: $error_msg"
+                        else
+                            message="Flash failed! Check log for details"
+                        fi
+                    fi
+                    
+                    json_add_string status "$status"
+                    json_add_int progress "$progress"
+                    json_add_string message "$message"
+                else
+                    json_add_string status "idle"
+                    json_add_int progress 0
+                    json_add_string message "No flash in progress"
+                    json_add_string log ""
+                fi
+                
+                json_dump
+                ;;
+                
+            get_target_ip)
+                # 读取输入
+                json_input=$(cat)
+                keep="1"
+                expsize="0"
+                
+                if [ -n "$json_input" ]; then
+                    json_load "$json_input"
+                    json_get_var keep "keep" >/dev/null 2>&1 || keep="1"
+                    json_get_var expsize "expsize" >/dev/null 2>&1 || expsize="0"
+                fi
+                
+                target_ip=$(get_target_ip "$keep" "$expsize")
+                
+                json_init
+                json_add_int code 0
+                json_add_string target_ip "$target_ip"
+                json_dump
+                ;;
+                
+            do_flash)
+                # 读取输入
+                json_input=$(cat)
+                keep="1"
+                expsize="0"
+                bopkg="1"
+                
+                if [ -n "$json_input" ]; then
+                    json_load "$json_input"
+                    json_get_var keep "keep" >/dev/null 2>&1 || keep="1"
+                    json_get_var expsize "expsize" >/dev/null 2>&1 || expsize="0"
+                    json_get_var bopkg "bopkg" >/dev/null 2>&1 || bopkg="1"
+                fi
+                
+                log "Flash params: keep=$keep, expsize=$expsize, bopkg=$bopkg"
+                json_init
+                json_add_int code 0
+                json_add_string msg "Flash process started"
+                json_add_string target_ip "$(get_target_ip "$keep" "$expsize")"
+                json_dump
+                (
+                    sleep 1
+                    execute_flash_script "$keep" "$expsize" "$bopkg"
+                ) >/dev/null 2>&1 &
+                ;;
+                
+            *)
+                json_init
+                json_add_int code 404
+                json_add_string msg "Method not found: $method"
+                json_dump
+                ;;
+        esac
+        ;;
+        
+    *)
+        echo "Invalid command" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
