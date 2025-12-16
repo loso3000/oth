@@ -1,5 +1,9 @@
 #!/bin/sh
-# RPCD插件 - OTA服务接口 Copyright (C) 2022-2025 sirpdboy <herboy2008@gmail.com>
+# author github@sirpdboy
+
+#   Copyright (C) 2019-2025 The Sirpdboy Team <herboy2008@gmail.com> 
+# 
+# Licensed to the public under the Apache License 2.0
 
 . /usr/share/libubox/jshn.sh
 
@@ -100,11 +104,11 @@ fi
 echo "Additional expansion capacity" >> \$LOG_FILE
 # 扩展大小映射
 case $expsize in
-    1) dd_size=1024 ;;
-    2) dd_size=2048 ;;
-    3) dd_size=5120 ;;
-    4) dd_size=10240 ;;
-    5) dd_size=20480 ;;
+    1) dd_size=4096 ;;
+    2) dd_size=10240 ;;
+    3) dd_size=20480 ;;
+    4) dd_size=51200 ;;
+    5) dd_size=102400 ;;
     *) dd_size=0 ;;
 esac
 if [ \$dd_size -gt 0 ]; then
@@ -311,10 +315,6 @@ EOF
                         progress=10
                         status="verifying"
                         message="Verifying firmware files"
-                    elif echo "$log_content" | grep -q "Starting flash at"; then
-                        progress=5
-                        status="running"
-                        message="Starting flash process"
                     # 检查失败状态
                     elif echo "$log_content" | grep -qi "error\|fail"; then
                         progress=0

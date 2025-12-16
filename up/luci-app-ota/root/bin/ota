@@ -65,6 +65,7 @@ function clear_old_cache() {
 function do_clear() {
     local cache_dir="${TmpPath:-/tmp}"
     find "$cache_dir" -type f -mmin +3600 -exec rm -f {} \;
+    flock -u 300
 }
 
 function fcurl() {
@@ -227,7 +228,7 @@ download() {
         fi
     fi
     
-    local url=$EZ_URL
+    local url=${PROXY}$EZ_URL
     echo "Try $url" >>/tmp/firmware.img.progress
     flock 300
     echo "#=#=#" >>/tmp/firmware.img.progress
@@ -424,20 +425,44 @@ EZOTA="${TmpPath}/ezota.json"
 verFile="${TmpPath}/ver.latest"
 footFile="${TmpPath}/ota.footer"
 Author="sirpdboy/openwrt"
-Github="https://github.com/$Author"
+ezverfile="ezopenwrt_version"
+PROXY="https://ghproxy.net/"
+ota_init || exit 255
+PROXYLIST="gh-proxy.org  ghproxy.net  gh-proxy.com"
+max_retries=2
+for i in $(seq 1 $max_retries); do
+    http_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 10 "www.github.com")
+    if [[ "$http_code" =~ ^2[0-9]{2}$ ]]; then
+        PROXY=""
+        break
+    fi
+done
+
+if [[ ! "$http_code" =~ ^2[0-9]{2}$ ]]; then
+
+   for xy in $PROXYLIST; do
+        http_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 "${xy}")
+       if [[ "$http_code" =~ ^2[0-9]{2}$ ]]; then
+        PROXY="https://${xy}/"
+        break
+       fi
+   done
+fi
+
+Github="${PROXY}https://github.com/$Author"
 API_URL="https://api.github.com/repos/$Author/releases"
 mirror="https://gh-api.p3terx.com/repos/$Author/releases"
-ezverfile="ezopenwrt_version"
+rawGithub="${PROXY}https://raw.githubusercontent.com"
+apiGithub="https://api.github.com/repositories"
 
-ota_init || exit 255
-curl -fsSL https://raw.githubusercontent.com/$Author/ver/$ezverfile >${TmpPath}/$ezverfile
+curl -fsSL ${rawGithub}/$Author/ver/$ezverfile >${TmpPath}/$ezverfile
 . ${TmpPath}/$ezverfile
-EZOTAURL="$Github/releases/download/${EZVER}/ezota.json"
+EZOTAURL="${Github}/releases/download/${EZVER}/ezota.json"
 eval OS_ARCH=$OPENWRT_ARCH
 
 [ -f "/etc/ezgithub" ] && GITHUB_TOKEN=$(base64 -d /etc/ezgithub)
 [ -n "$GITHUB_TOKEN" ] && CURL_AUTH_HEADER="Authorization: token $GITHUB_TOKEN" || CURL_AUTH_HEADER=""
-[ -n "$GITHUB_TOKEN" ] && EZAPI=https://api.github.com/repositories/256094735/releases
+EZAPI=${apiGithub}/256094735/releases
 
 clear_old_cache
 

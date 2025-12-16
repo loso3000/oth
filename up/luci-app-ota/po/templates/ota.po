@@ -3,338 +3,373 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "OTA"
+msgstr ""  
+
 msgid "OTA Upgrade"
-msgstr ""
+msgstr ""  
 
 msgid "Before expanding and upgrading, use the [Expand Partition] to expand the mnt partition"
-msgstr ""
+msgstr ""  
 
 msgid "The remaining space is more than twice that of the firmware expansion"
-msgstr ""
+msgstr ""  
 
 msgid "Expansion firmware DD does not retain configuration flashing"
-msgstr ""
+msgstr ""  
 
 msgid "Not expanding to the default flashing mode of the system can retain configuration upgrades"
-msgstr ""
+msgstr ""  
 
 msgid "Check update"
-msgstr ""
+msgstr ""  
 
 msgid "Step 1/3: Check update"
-msgstr ""
+msgstr ""  
 
 msgid "Found new firmware"
-msgstr ""
+msgstr ""  
 
 msgid "Download firmware"
-msgstr ""
+msgstr ""  
 
 msgid "Step 2/3: Download firmware"
-msgstr ""
+msgstr ""  
 
 msgid "Starting download..."
-msgstr ""
+msgstr ""  
 
 msgid "Cancel download"
-msgstr ""
+msgstr ""  
 
 msgid "Select expansion mode"
-msgstr ""
+msgstr ""  
 
 msgid "No expansion (Sysupgrade)"
-msgstr ""
+msgstr ""  
 
-msgid "Expand by 1G (DD Mode)"
-msgstr ""
-
-msgid "Expand by 2G (DD Mode)"
-msgstr ""
-
-msgid "Expand by 5G (DD Mode)"
-msgstr ""
+msgid "Expand by 4G (DD Mode)"
+msgstr ""  
 
 msgid "Expand by 10G (DD Mode)"
-msgstr ""
+msgstr ""  
 
 msgid "Expand by 20G (DD Mode)"
-msgstr ""
+msgstr ""  
+
+msgid "Expand by 50G (DD Mode)"
+msgstr ""  
+
+msgid "Expand by 100G (DD Mode)"
+msgstr ""  
 
 msgid "Keep settings configuration"
-msgstr ""
+msgstr ""  
 
 msgid "Keep installed plugins (test)"
-msgstr ""
+msgstr ""  
 
 msgid "Flash Mode Information"
-msgstr ""
+msgstr ""  
 
 msgid "Current selection:"
-msgstr ""
+msgstr ""  
 
 msgid "Sysupgrade mode"
-msgstr ""
+msgstr ""  
 
 msgid "Default IP after flash:"
-msgstr ""
+msgstr ""  
 
 msgid "Loading..."
-msgstr ""
+msgstr ""  
 
-msgid "Settings preservation:"
-msgstr ""
+msgid "Settings Save:"
+msgstr ""  
 
 msgid "Enabled"
-msgstr ""
+msgstr ""  
 
 msgid "Firmware downloaded"
-msgstr ""
+msgstr ""  
 
 msgid "Flash image"
-msgstr ""
+msgstr ""  
 
 msgid "Step 3/3: Flash image"
-msgstr ""
+msgstr ""  
 
-msgid "firmware Log"
-msgstr ""
+msgid "Upgrade Log"
+msgstr ""  
 
 msgid "Checking..."
-msgstr ""
+msgstr ""  
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr ""  
 
 msgid "No response"
-msgstr ""
+msgstr ""  
 
 msgid "Update available!"
-msgstr ""
+msgstr ""  
 
 msgid "Check completed"
-msgstr ""
+msgstr ""  
 
 msgid "Check failed"
-msgstr ""
+msgstr ""  
 
 msgid "Downloading..."
-msgstr ""
+msgstr ""  
 
 msgid "Resuming download monitoring..."
-msgstr ""
+msgstr ""  
 
 msgid "Download completed but firmware file not found"
-msgstr ""
+msgstr ""  
 
 msgid "No active download detected"
-msgstr ""
+msgstr ""  
 
 msgid "Progress check failed"
-msgstr ""
+msgstr ""  
 
 msgid "Auto-resume: File is growing, download active"
-msgstr ""
+msgstr ""  
 
 msgid "Resuming download..."
-msgstr ""
+msgstr ""  
 
 msgid "Firmware Ready"
-msgstr ""
+msgstr ""  
 
 msgid "File:"
-msgstr ""
+msgstr ""  
 
 msgid "Size:"
-msgstr ""
+msgstr ""  
 
 msgid "Expected:"
-msgstr ""
+msgstr ""  
 
 msgid "Version:"
-msgstr ""
+msgstr ""  
 
 msgid "Release Date:"
-msgstr ""
+msgstr ""  
 
 msgid "MD5:"
-msgstr ""
+msgstr ""  
 
 msgid "Default IP:"
-msgstr ""
+msgstr ""  
 
-msgid "Starting OTA download..."
-msgstr ""
+msgid "Starting download..."
+msgstr ""  
 
 msgid "Downloading:"
-msgstr ""
+msgstr ""  
 
 msgid "Download complete!"
-msgstr ""
+msgstr ""  
 
 msgid "Download cancelled"
-msgstr ""
+msgstr ""  
 
 msgid "Starting progress monitor..."
-msgstr ""
+msgstr ""  
 
 msgid "Progress monitor timeout"
-msgstr ""
+msgstr ""  
 
 msgid "Download not in progress or error"
-msgstr ""
+msgstr ""  
 
 msgid "ERROR: No download in progress and no firmware file found"
-msgstr ""
+msgstr ""  
 
 msgid "ERROR: No firmware file found"
-msgstr ""
+msgstr ""  
 
 msgid "Unknown progress code:"
-msgstr ""
+msgstr ""  
 
 msgid "message:"
-msgstr ""
+msgstr ""  
 
 msgid "Progress check error:"
-msgstr ""
+msgstr ""  
 
 msgid "SUCCESS: Firmware file verified -"
-msgstr ""
+msgstr ""  
 
 msgid "ERROR: Failed to access firmware file:"
-msgstr ""
+msgstr ""  
 
 msgid "Cancelling..."
-msgstr ""
+msgstr ""  
 
 msgid "Cancel response:"
-msgstr ""
+msgstr ""  
 
 msgid "Download cancellation confirmed"
-msgstr ""
+msgstr ""  
 
 msgid "Cancel failed"
-msgstr ""
+msgstr ""  
 
 msgid "Unknown"
-msgstr ""
+msgstr ""  
 
 msgid "Failed to parse firmware info:"
-msgstr ""
+msgstr ""  
 
 msgid "Failed to get firmware info from RPC:"
-msgstr ""
+msgstr ""  
 
 msgid "RPC call failed:"
-msgstr ""
+msgstr ""  
 
 msgid "Failed to get target IP:"
-msgstr ""
+msgstr ""  
 
 msgid "Enabled (Settings preserved)"
-msgstr ""
+msgstr ""  
 
 msgid "Disabled (Fresh install)"
-msgstr ""
+msgstr ""  
 
 msgid "Disabled (DD mode does not preserve settings)"
-msgstr ""
+msgstr ""  
 
 msgid "lines"
-msgstr ""
+msgstr ""  
 
 msgid "Flash progress RPC response:"
-msgstr ""
+msgstr ""  
 
 msgid "No flash progress response"
-msgstr ""
+msgstr ""  
 
 msgid "Device will reboot shortly. Trying to reconnect..."
-msgstr ""
+msgstr ""  
 
 msgid "Device rebooting... Attempting to reconnect ("
-msgstr ""
+msgstr ""  
 
 msgid "RPC service not accessible, assuming flash is in progress"
-msgstr ""
+msgstr ""  
 
 msgid "Flash progress RPC call failed:"
-msgstr ""
+msgstr ""  
 
 msgid "Reconnect successful, redirecting to"
-msgstr ""
+msgstr ""  
 
 msgid "Reconnect attempt"
-msgstr ""
+msgstr ""  
 
 msgid "failed:"
-msgstr ""
+msgstr ""  
 
 msgid "Could not reconnect automatically. Please try to access:"
-msgstr ""
+msgstr ""  
 
 msgid "manually."
-msgstr ""
+msgstr ""  
 
 msgid "Go to"
-msgstr ""
+msgstr ""  
 
 msgid "Reload Page"
-msgstr ""
+msgstr ""  
 
 msgid "Are you sure you want to flash the firmware using %s mode?"
-msgstr ""
+msgstr ""  
 
 msgid "Settings preservation:"
-msgstr ""
+msgstr ""  
 
 msgid "Plugins preservation:"
-msgstr ""
+msgstr ""  
 
 msgid "YES"
-msgstr ""
+msgstr ""  
 
 msgid "NO"
-msgstr ""
+msgstr ""  
 
 msgid "The device will reboot!"
-msgstr ""
+msgstr ""  
 
 msgid "⚠️ WARNING: DD mode does NOT preserve settings!"
-msgstr ""
+msgstr ""  
 
 msgid "Expansion size:"
-msgstr ""
+msgstr ""  
 
 msgid "Sysupgrade"
-msgstr ""
+msgstr ""  
 
 msgid "DD (Expansion)"
-msgstr ""
+msgstr ""  
 
 msgid "Flashing..."
-msgstr ""
+msgstr ""  
 
 msgid "Flash response:"
-msgstr ""
+msgstr ""  
 
 msgid "Flash process started"
-msgstr ""
+msgstr ""  
 
 msgid "Unknown error"
-msgstr ""
+msgstr ""  
 
 msgid "Flash request failed:"
-msgstr ""
+msgstr ""  
 
 msgid "Firmware Upgrade"
-msgstr ""
+msgstr ""  
 
 msgid "Preparing flash process..."
-msgstr ""
+msgstr ""  
 
 msgid "Manual Access"
-msgstr ""
+msgstr ""  
 
 msgid "Error:"
+msgstr ""  
+
+msgid "Will attempt to reconnect in"
+msgstr ""  
+
+msgid "seconds"
+msgstr ""  
+
+msgid "Attempting to reconnect now..."
+msgstr ""  
+
+msgid "Flash completed! Device is rebooting..."
+msgstr ""  
+
+msgid ""
 msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+

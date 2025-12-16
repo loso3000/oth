@@ -1,3 +1,9 @@
+/*
+ *  Copyright (C) 2019-2025 The Sirpdboy <herboy2008@gmail.com> 
+ *
+ *  Licensed to the public under the Apache License 2.0
+ */
+
 'use strict';
 
 'require form';
@@ -114,27 +120,7 @@ return view.extend({
             '.firmware-info {',
             '    padding: 15px;',
             '}',
-            '.firmware-details {',
-            '    margin-top: 10px;',
-            '    padding: 10px;',
-            '    border-radius: 4px;',
-            '}',
-            '.firmware-details h4 {',
-            '    margin-top: 0;',
-            '    margin-bottom: 10px;',
-            '    color: #007bff;',
-            '}',
-            '.firmware-details table {',
-            '    width: 100%;',
-            '    border-collapse: collapse;',
-            '}',
-            '.firmware-details td {',
-            '    padding: 10px;',
-            '}',
-            '',
-            '.firmware-details tr:last-child td {',
-            '    border-bottom: none;',
-            '}',
+
             '.info-note {',
             '    padding: 10px;',
             '    margin: 10px 0;',
@@ -209,11 +195,11 @@ return view.extend({
             '                    <div class="cbi-value-field">',
             '                        <select name="expsize" id="expsize" style="width: auto">',
             '                            <option value="0" selected="selected">' + _('No expansion (Sysupgrade)') + '</option>',
-            '                            <option value="1">' + _('Expand by 1G (DD Mode)') + '</option>',
-            '                            <option value="2">' + _('Expand by 2G (DD Mode)') + '</option>',
-            '                            <option value="3">' + _('Expand by 5G (DD Mode)') + '</option>',
-            '                            <option value="4">' + _('Expand by 10G (DD Mode)') + '</option>',
-            '                            <option value="5">' + _('Expand by 20G (DD Mode)') + '</option>',
+            '                            <option value="1">' + _('Expand by 4G (DD Mode)') + '</option>',
+            '                            <option value="2">' + _('Expand by 10G (DD Mode)') + '</option>',
+            '                            <option value="3">' + _('Expand by 20G (DD Mode)') + '</option>',
+            '                            <option value="4">' + _('Expand by 50G (DD Mode)') + '</option>',
+            '                            <option value="5">' + _('Expand by 100G (DD Mode)') + '</option>',
             '                        </select>',
             '                    </div>',
             '                </div>',
@@ -749,7 +735,7 @@ onCheck: function() {
 
         self.dom.upgradeLog.innerHTML = 
                                                 '<div class="firmware-info" style="border-left-color: #28a745;">' +
-                                                '<div>' + _('Starting OTA download...') + '</div>' +
+                                                '<div>' + _('Starting download...') + '</div>' +
                                                 '</div>';
         
         // 先启动进度监控
@@ -1334,7 +1320,7 @@ if (response.status === 'complete' || response.status === 'rebooting') {
                            _('Default IP after flash:') + ' ' + this.targetIP + '\n\n' +
                            _('The device will reboot!');
         } else {
-            var sizes = ['0', '1G', '2G', '5G', '10G', '20G'];
+            var sizes = ['0', '4G', '10G', '20G', '50G', '100G'];
             var size = sizes[expsize];
             confirmMessage = _('Are you sure you want to flash the firmware using %s mode?').format(mode) + '\n\n' +
                            _('⚠️ WARNING: DD mode does NOT preserve settings!') + '\n' +

@@ -48,20 +48,23 @@ msgstr "选择扩展模式"
 msgid "No expansion (Sysupgrade)"
 msgstr "不扩展 (系统升级)"
 
-msgid "Expand by 1G (DD Mode)"
-msgstr "扩展 1G (DD 模式)"
+msgid "DD mode (Expansion)"
+msgstr "DD 模式刷机 (扩展)"
 
-msgid "Expand by 2G (DD Mode)"
-msgstr "扩展 2G (DD 模式)"
-
-msgid "Expand by 5G (DD Mode)"
-msgstr "扩展 5G (DD 模式)"
+msgid "Expand by 4G (DD Mode)"
+msgstr "扩展 4G (DD 模式)"
 
 msgid "Expand by 10G (DD Mode)"
 msgstr "扩展 10G (DD 模式)"
 
 msgid "Expand by 20G (DD Mode)"
 msgstr "扩展 20G (DD 模式)"
+
+msgid "Expand by 50G (DD Mode)"
+msgstr "扩展 50G (DD 模式)"
+
+msgid "Expand by 100G (DD Mode)"
+msgstr "扩展 100G (DD 模式)"
 
 msgid "Keep settings configuration"
 msgstr "保留设置配置"
@@ -165,8 +168,8 @@ msgstr "MD5值:"
 msgid "Default IP:"
 msgstr "默认 IP:"
 
-msgid "Starting OTA download..."
-msgstr "开始 OTA 下载..."
+msgid "Starting download..."
+msgstr "开始下载..."
 
 msgid "Downloading:"
 msgstr "下载进度:"
