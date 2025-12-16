@@ -3416,6 +3416,25 @@ body.lang_pl.node-main-login .cbi-value-title {
   width: 300px!important;
 }
 
+.bandix-container select,
+.bandix-container input {
+    background-color: var(--input-bgcolor);
+    color: var(--body-color);
+    padding: 0 20px 0 10px;
+    border: 1px solid var(--inputborder-color);
+
+}
+
+
+.bandix-container button {
+ color: var(--menu-color);
+}
+
+.bandix-container button:hover:not(.active) {
+  color: var(--primarytextcolor);
+
+}
+
 #dialog_reslov .dialog_box {
     width: 90% !important;
     background-color: rgba(var(--primary-rgbbody), 1)
