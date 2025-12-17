@@ -117,6 +117,9 @@ msgstr "无响应"
 msgid "Update available!"
 msgstr "发现可用更新！"
 
+msgid "latest version"
+msgstr "检查完成"
+
 msgid "Check completed"
 msgstr "检查完成"
 

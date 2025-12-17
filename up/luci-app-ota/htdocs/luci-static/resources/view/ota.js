@@ -77,6 +77,7 @@ return view.extend({
             '.state-ctl .state { display: none !important; }',
             '.state-ctl.state-ctl-unchecked .state.state-unchecked,',
             '.state-ctl.state-ctl-checked .state.state-checked,',
+            '.state-ctl.state-ctl-uncheck .state.state-uncheck,',
             '.state-ctl.state-ctl-downloading .state.state-downloading,',
             '.state-ctl.state-ctl-downloaded .state.state-downloaded {',
             '    display: block !important;',
@@ -151,6 +152,19 @@ return view.extend({
             '                    <label class="cbi-value-title" id="check_result">' + _('Check update') + '</label>',
             '                    <div class="cbi-value-field">',
             '                        <button type="button" class="cbi-button cbi-button-reload" id="btn-check">',
+            '                            ' + _('Check update') + '',
+            '                        </button>',
+            '                        <div class="cbi-value-description">' + _('Step 1/3: Check update') + '</div>',
+            '                    </div>',
+            '                </div>',
+            '            </form>',
+            '        </div>',
+            '        <div class="state state-uncheck">',
+            '            <form>',
+            '                <div class="cbi-value">',
+            '                    <label class="cbi-value-title" id="check_uncheck">' + _('Check update') + '</label>',
+            '                    <div class="cbi-value-field">',
+            '                        <button type="button" class="cbi-button cbi-button-reload" id="btn-uncheck">',
             '                            ' + _('Check update') + '',
             '                        </button>',
             '                        <div class="cbi-value-description">' + _('Step 1/3: Check update') + '</div>',
@@ -237,7 +251,7 @@ return view.extend({
             '            </form>',
             '        </div>',
             '    </div>',
-            '    <div class="state state-checked state-downloading state-downloaded">',
+            '    <div class="state state-uncheck state-checked state-downloading state-downloaded">',
             '        <div class="cbi-section-descr">',
             '            <h2>' + _('Upgrade Log') + '</h2>',
             '            <div id="upgrade_log"></div>',
@@ -280,10 +294,12 @@ return view.extend({
         this.dom = {
             stateCtl: document.querySelector('#state-container'),
             checkBtn: document.querySelector('#btn-check'),
+            uncheckBtn: document.querySelector('#btn-uncheck'),
             downloadBtn: document.querySelector('#btn-download'),
             cancelBtn: document.querySelector('#btn-cancel'),
             flashBtn: document.querySelector('#flashimage-btn'),
             checkResult: document.querySelector('#check_result'),
+            checkuncheck: document.querySelector('#check_uncheck'),
             downloadProgress: document.querySelector('#download_progress'),
             upgradeLog: document.querySelector('#upgrade_log'),
             expsizeSelect: document.querySelector('#expsize'),
@@ -678,13 +694,11 @@ onCheck: function() {
             var code = response.code;
             var message = response.msg;
 
-                // 显示原始消息（如果有的话）
                 if (self.dom.upgradeLog) {
                         self.dom.upgradeLog.innerHTML = message;
                 }
-            
-            // 分析响应
-            if (code === 0) {
+           switch(code) {
+                case 0:  
                 // 检查是否有更新
                     if (message.includes('云端版本') && message.includes('当前版本') || firmwareInfo) {
                     // 有更新
@@ -692,15 +706,21 @@ onCheck: function() {
                     result.className = 'update-available';
                     self.switchState('checked');
                 } else {
-                    // 没有更新或未知状态
                     result.textContent = _('Check completed');
-                    result.className = '';
                 }
-            } else {
+             break; 
+	  case 1:  
+	     // 最新版
+		    self.switchState('uncheck');
+                    self.dom.checkuncheck.textContent = _('latest version');
+		    self.dom.uncheckBtn.disabled = true;
+                    break;
+          default:
                 // 检查失败
                 result.textContent = _('Check failed');
-                    result.className += ' error-message';
-                }
+                result.className += ' error-message';
+           }
+            
         })
         .catch(function(error) {
             console.error(_('Check failed:'), error);
@@ -1134,6 +1154,7 @@ onCheck: function() {
         this.dom.stateCtl.classList.remove(
             'state-ctl-unchecked',
             'state-ctl-checked', 
+            'state-ctl-uncheck', 
             'state-ctl-downloading',
             'state-ctl-downloaded'
         );
