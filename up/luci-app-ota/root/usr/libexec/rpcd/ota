@@ -24,7 +24,7 @@ get_current_ip() {
     local ip=""
     ip=`uci -q get network.lan.ipaddr`
     [ -z "$ip" ] && ip="${HTTP_HOST:-192.168.10.1}"
-    ip=$(echo "$ip" | cut -d: -f1)
+    ip=$(echo "$ip" | cut -d: -f1 | cut -d/ -f1)
     [ -z "$ip" ] && ip="192.168.10.1"
     echo "$ip"
 }

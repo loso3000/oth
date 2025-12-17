@@ -448,6 +448,7 @@ parseFirmwareInfo: function(message) {
                     version: firmware.ver || _('Unknown'),
                     name: firmware.name || _('Unknown'),
                     size: firmware.size || '0',
+		    partsize: firmware.partsize || '0',
                     date: this.formatDateString(firmware.date) || _('Unknown'),
                     md5: firmware.md5 || _('Unknown'),
                     ip: firmware.ip || '192.168.10.1',
@@ -497,6 +498,7 @@ fetchFirmwareInfoFromRPC: function() {
                    '<tr><td>' + _('Version:') + '</td><td>' + this.escapeHtml(firmwareInfo.version) + '</td></tr>' +
                    '<tr><td>' + _('File Name:') + '</td><td>' + this.escapeHtml(firmwareInfo.name) + '</td></tr>' +
                    '<tr><td>' + _('Size:') + '</td><td>' + this.escapeHtml(firmwareInfo.size) + ' MB</td></tr>' +
+                   '<tr><td>' + _('Part Size:') + '</td><td>' + this.escapeHtml(firmwareInfo.partsize) + ' MB</td></tr>' +
                    '<tr><td>' + _('Release Date:') + '</td><td>' + this.escapeHtml(firmwareInfo.date) + '</td></tr>' +
                    '<tr><td>' + _('MD5:') + '</td><td><code>' + this.escapeHtml(firmwareInfo.md5) + '</code></td></tr>' +
                    '<tr><td>' + _('Default IP:') + '</td><td>' + this.escapeHtml(firmwareInfo.ip) + '</td></tr>' +
@@ -544,6 +546,7 @@ fetchFirmwareInfoFromRPC: function() {
                                                 '<table>' +
                                                 '<tr><td>' + _('File:') + '</td><td>/tmp/firmware.img</td></tr>' +
                                                 '<tr><td>' + _('Size:') + '</td><td>' + sizeMB + ' MB</td></tr>' +
+                                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + '</td></tr>' +
                                                 '<tr><td>' + _('Version:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.version) + '</td></tr>' +
                                                 '<tr><td>' + _('Release Date:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.date) + '</td></tr>' +
                                                 '<tr><td>' + _('MD5:') + '</td><td><code>' + self.escapeHtml(self.firmwareInfo.md5) + '</code></td></tr>' +
@@ -1055,6 +1058,7 @@ onCheck: function() {
                                 '<table>' +
                                 '<tr><td>' + _('File:') + '</td><td>/tmp/firmware.img</td></tr>' +
                                 '<tr><td>' + _('Size:') + '</td><td>' + sizeMB + ' MB (' + _('Expected:') + ' ' + self.firmwareInfo.size + ' MB)</td></tr>' +
+                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + '</td></tr>' +
                                 '<tr><td>' + _('Version:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.version) + '</td></tr>' +
                                 '<tr><td>' + _('Release Date:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.date) + '</td></tr>' +
                                 '<tr><td>' + _('MD5:') + '</td><td><code>' + self.escapeHtml(self.firmwareInfo.md5) + '</code></td></tr>' +

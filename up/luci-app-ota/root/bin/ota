@@ -275,7 +275,7 @@ lock_download() {
 
 prepare_check() {
     [ $DEBUG = 1 ] && LOG   "prepare_check:  start"
-    if ! curl -fsSL  "$EZOTAURL" > $EZOTA ;then
+    if ! curl -fsSL  "$EZOTAURL" > $EZOTA  >/dev/null 2>&1;then
         exit 255
     fi
     read_ezota_json

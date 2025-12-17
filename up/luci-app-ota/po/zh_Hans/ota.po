@@ -153,6 +153,9 @@ msgstr "文件:"
 msgid "Size:"
 msgstr "大小:"
 
+msgid "Part Size:"
+msgstr "分区大小:"
+
 msgid "Expected:"
 msgstr "预期大小:"
 
