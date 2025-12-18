@@ -63,9 +63,7 @@ return view.extend({
     load: function() {
         return Promise.all([
             L.resolveDefault(fs.stat('/bin/ota'), null),
-            L.resolveDefault(fs.stat('/tmp/firmware.img'), null),
-            L.resolveDefault(callOTACheck(), {}),
-	    L.resolveDefault(callOTAInfo(), {})
+            L.resolveDefault(fs.stat('/tmp/firmware.img'), null)
         ]);
     },
 
