@@ -33,7 +33,7 @@ config theme
 	option bkuse '1'
 	option primary_rgbs_ts '0.1'
 	option mode 'auto'
-	option use '0'
+	option use '1'
 	option primary_rgbm 'blue'
 
 config theme
@@ -45,7 +45,7 @@ config theme
 	option remarks '无隔栏清爽绿'
 	option primary_rgbs_ts '0'
 	option mode 'auto'
-	option use '0'
+	option use '1'
 	option primary_rgbm 'green'
 
 config theme
