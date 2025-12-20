@@ -71,6 +71,8 @@ define Package/autocore-x86/install
 
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/x86/autocore $(1)/etc/init.d/
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/status/include
+	$(INSTALL_DATA) ./files/generic/10_ota.js $(1)/www/luci-static/resources/view/status/include/
 endef
 
 $(eval $(call BuildPackage,autocore-arm))
