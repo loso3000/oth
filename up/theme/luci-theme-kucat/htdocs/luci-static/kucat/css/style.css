@@ -658,8 +658,7 @@ header.pd-primary {
   margin: 0;
 }
 header .fill {
-
-  padding: 1rem 0;
+  margin: 1rem 1rem 1rem 0;
 }
 
 .pd-primary .fill .container {
@@ -668,14 +667,15 @@ header .fill {
     align-items: center;
     width: 100%;
     background-color: rgba(255, 255, 255, 0) !important;
-    padding: 0 1rem
 }
 
 header .fill .container .flex1 {
     white-space: nowrap;
     flex: 1
 }
-
+.pd-primary .fill .container>div {
+  margin-right: 1rem;
+}
 .main-right .bfill {
   padding: 0.6rem 0;
   background-color: rgba(var(--primary-rgbbody), var(--primary-rgbm-ts));
@@ -812,7 +812,6 @@ span[data-indicator="uci-changes"],
     font-weight: 400 !important;
     display: inline-block;
     margin: 0;
-    padding: 1rem
 }
 
 .pdboy-qlogout:before {
