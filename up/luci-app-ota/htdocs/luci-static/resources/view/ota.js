@@ -389,16 +389,12 @@ return view.extend({
         var expsize = parseInt(this.dom.expsizeSelect.value) || 0;
         var keepCheckbox = this.dom.keepSettings.querySelector('#keep');
         var keep = keepCheckbox ? keepCheckbox.checked : true;
-        
-        // 使用RPC调用获取目标IP
         callOTATargetIP(keep ? 1 : 0, expsize).then(function(response) {
             if (response && response.target_ip) {
                 this.targetIP = response.target_ip;
                 this.dom.targetIp.textContent = this.targetIP;
             }
         }.bind(this)).catch(function(error) {
-            console.error(_('Failed to get target IP:'), error);
-            // 如果RPC失败，使用逻辑计算
             if (keep && expsize === 0) {
                 this.targetIP = this.currentIP;
             } else {
@@ -406,12 +402,9 @@ return view.extend({
             }
             this.dom.targetIp.textContent = this.targetIP;
         }.bind(this));
-        
-        // 确定刷机模式
         var mode = expsize === 0 ? _('Sysupgrade mode') : _('DD mode (Expansion)');
         this.dom.currentMode.textContent = mode;
         
-        // 确定设置保留状态
         var settingsStatus;
         if (expsize === 0) {
             settingsStatus = keep ? _('Enabled (Settings preserved)') : _('Disabled (Fresh install)');
@@ -473,7 +466,6 @@ parseFirmwareInfo: function(message) {
         
         return null;
     } catch (error) {
-        console.error(_('Failed to parse firmware info:'), error);
         return null;
     }
 },
@@ -491,13 +483,11 @@ fetchFirmwareInfoFromRPC: function() {
                 return firmwareInfo;
             }
         } else {
-            console.log(_('Failed to get firmware info from RPC:'), response);
         }
         
         self.firmwareInfo = null;
         return null;
     }).catch(function(error) {
-        console.error(_('RPC call failed:'), error);
         self.firmwareInfo = null;
         return null;
     });
@@ -621,13 +611,10 @@ fetchFirmwareInfoFromRPC: function() {
                 
             } else if (response && response.code === 0) {
                 // 下载已完成但文件可能被删除
-                console.log(_('Download completed but firmware file not found'));
             } else {
                 // 没有活动的下载
-                console.log(_('No active download detected'));
             }
         }).catch(function(error) {
-            console.log(_('Progress check failed:'), error);
         });
     },
 
@@ -721,8 +708,6 @@ onCheck: function() {
             
         })
         .catch(function(error) {
-            console.error(_('Check failed:'), error);
-            
             btn.disabled = false;
             btn.textContent = _('Check update');
             result.textContent = _('Check failed');
@@ -775,8 +760,6 @@ onCheck: function() {
                 }
             })
             .catch(function(error) {
-                console.error(_('Download request failed:'), error);
-                
                 // 恢复按钮状态
                 btn.disabled = false;
                 btn.textContent = _('Download firmware');
@@ -993,16 +976,13 @@ onCheck: function() {
                                     self.progressTimer = null;
                                 }
                             } else {
-                                console.log(_('ERROR: No download in progress and no firmware file found'));
                             }
                         })
                         .catch(function() {
-                            console.log(_('ERROR: No firmware file found'));
                         });
                     break;
                     
                 default:
-                    console.log(_('Unknown progress code:'), code, _('message:'), message.substring(0, 100));
                     fs.stat('/tmp/firmware.img')
                         .then(function(stats) {
                             if (stats && stats.size > 10 * 1024 * 1024) {
@@ -1014,7 +994,6 @@ onCheck: function() {
                         });
             }
         }).catch(function(error) {
-            console.error(_('Progress check error:'), error);
         });
     },
 
@@ -1095,12 +1074,10 @@ onCheck: function() {
                                 '</div>';
                         }
                     }
-                    //console.log(_('SUCCESS: Firmware file verified -') + ' ' + sizeMB + ' MB');
                 }
             })
             .catch(function(error) {
                 // 文件不存在或无法访问
-                console.log(_('ERROR: Failed to access firmware file:') + ' ' + error.message);
             });
     },
 
@@ -1138,8 +1115,6 @@ onCheck: function() {
                 }
             })
             .catch(function(error) {
-                console.error(_('Cancel failed:'), error);
-                
                 btn.disabled = false;
                 btn.textContent = _('Cancel download');
             });
@@ -1380,7 +1355,6 @@ if (response.status === 'complete' || response.status === 'rebooting') {
                 }
             })
             .catch(function(error) {
-                console.error(_('Flash request failed:'), error);
                 self.showFlashError(_('Flash request failed:') + ' ' + error.message);
             });
     },
