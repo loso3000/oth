@@ -227,8 +227,6 @@ EOF
             exit 0
         fi
         
-        log "Processing method: $method"
-        
         case "$method" in
             check|download|cancel|progress)
                 output=$(/bin/ota "$method" 2>&1)
@@ -374,8 +372,6 @@ EOF
                     json_get_var expsize "expsize" >/dev/null 2>&1 || expsize="0"
                     json_get_var bopkg "bopkg" >/dev/null 2>&1 || bopkg="1"
                 fi
-                
-                log "Flash params: keep=$keep, expsize=$expsize, bopkg=$bopkg"
                 json_init
                 json_add_int code 0
                 json_add_string msg "Flash process started"

@@ -363,12 +363,5 @@ msgstr "正在尝试立即重新连接"
 msgid "Flash completed! Device is rebooting..."
 msgstr "刷写完成！设备正在重新启动."
 
-msgid "Firmware Status"
-msgstr "固件状态"
 
-msgid "Update Status"
-msgstr "更新状态"
-
-msgid "Go to Update"
-msgstr "去升级固件"
 
