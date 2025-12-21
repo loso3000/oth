@@ -8,7 +8,7 @@ config basic
 	option gossr 'passwall'
 	option dayword '0'
 	option background '0'
-	option bklock '1'
+	option bklock '0'
 	option mode 'auto'
 	option bkuse '1'
 	option primary_rgbs_ts '0'
