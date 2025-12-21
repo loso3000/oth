@@ -8,50 +8,58 @@ var callOTACheck = rpc.declare({
 });
 
 return baseclass.extend({
-    title: _('Firmware Status'),
+    title: _('Firmware Update'),
     
     load: function() {
-        return L.resolveDefault(callOTACheck(), {});
+        return Promise.resolve({ code: -1 });
     },
 
-    render: function(data) {
-        if (!data || data.code !== 0) {
-            return null;
+    render: function() {
+        setTimeout(() => {
+            this.checkOTAUpdate();
+        }, 2000); // ÑÓ³Ù2ÃëÖ´ÐÐ¼ì²é
+        
+        return null;
+    },
+    
+    checkOTAUpdate: function() {
+        if (window.otaCheckStarted) return;
+        window.otaCheckStarted = true;
+        callOTACheck().then(data => {
+            if (data && data.code === 0) {
+                this.addUpdateButton();
+            }
+        }).catch(() => {
+        });
+    },
+    
+    addUpdateButton: function() {
+        if (document.getElementById('ota-update-button')) {
+            return;
         }
-        var statusTable = E('table', { 'class': 'table' });
-        var row = E('tr', { 'class': 'tr' }, [
-            E('td', { 
-                'class': 'td left', 
-                'width': '33%',
-                'style': 'vertical-align: middle;'
-            }, [
-                E('strong', [
-                    E('i', { 
-                        'style': 'margin-right: 8px; color: #ff6b6b;' 
-                    }),
-                    _('Update Status')
-                ])
-            ]),
-            E('td', { 
-                'class': 'td left',
-                'style': 'text-align: right; vertical-align: middle;'
-            }, [
-                E('a', {
-                    'href': L.url('admin/system/ota'),
-                    'class': 'cbi-button cbi-button-action',
-                    'style': 'background: linear-gradient(135deg, #ff6b6b, #ee5a52); border: none; color: white; padding: 8px 20px;'
-                }, [
-                    E('i', { 
-                        'class': 'icon icon-forward', 
-                        'style': 'margin-right: 8px;' 
-                    }),
-                    _('Go to Update')
-                ])
-            ])
-        ]);
         
-        statusTable.appendChild(row);
-        
-        return statusTable;
+        var flashindicators = document.querySelector('#indicators');
+        if (!flashindicators) return;
+        var button = document.createElement('a');
+        button.id = 'ota-update-button';
+        button.href = L.url('admin/system/ota');
+        button.className = 'cbi-button cbi-button-action';
+        button.style.cssText = `
+            display: block;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            border: none;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 4px;
+            text-decoration: none;
+        `;
+        button.innerHTML = `
+            <i class="icon icon-upload" style="margin-right: 8px;"></i>
+            ${_('Update available!')}
+            <i class="icon icon-forward" style="margin-left: 8px;"></i>
+        `;
+        flashindicators.parentNode.insertBefore(button, flashindicators);
     }
 });
