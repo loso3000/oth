@@ -17,7 +17,7 @@ return baseclass.extend({
     render: function() {
         setTimeout(() => {
             this.checkOTAUpdate();
-        }, 2000); // —”≥Ÿ2√Î÷¥––ºÏ≤È
+        }, 1000);
         
         return null;
     },
@@ -34,32 +34,47 @@ return baseclass.extend({
     },
     
     addUpdateButton: function() {
-        if (document.getElementById('ota-update-button')) {
+        if (document.getElementById('ota-notice')) {
             return;
         }
         
         var flashindicators = document.querySelector('#indicators');
         if (!flashindicators) return;
-        var button = document.createElement('a');
-        button.id = 'ota-update-button';
-        button.href = L.url('admin/system/ota');
-        button.className = 'cbi-button cbi-button-action';
-        button.style.cssText = `
-            display: block;
-            padding: 12px;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            border: none;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 4px;
-            text-decoration: none;
-        `;
-        button.innerHTML = `
-            <i class="icon icon-upload" style="margin-right: 8px;"></i>
-            ${_('Update available!')}
-            <i class="icon icon-forward" style="margin-left: 8px;"></i>
-        `;
-        flashindicators.parentNode.insertBefore(button, flashindicators);
+        var notice = document.createElement('div');
+        notice.id = 'ota-notice';
+        
+        var htmlParts = [
+            '    <div style="color: white;">',
+            '        <a href="' + L.url('admin/system/ota') + '" ',
+            '           class="cbi-button cbi-button-action"',
+            '           style="color: white;',
+            '               background: linear-gradient(135deg, #ff6b6b, #ee5a52);"',
+            '           onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.15)\'"',
+            '           onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'none\'">',
+            '            <i class="icon icon-forward" ></i>',
+            '            ' + _('Update available!') + '',
+            '        </a>',
+            '    </div>'
+        ];
+        
+        notice.innerHTML = htmlParts.join('');
+        flashindicators.parentNode.insertBefore(notice, flashindicators);
+        this.addResponsiveStyle();
+    },
+    
+    addResponsiveStyle: function() {
+        if (document.getElementById('ota-responsive-style')) return;
+        
+        var style = document.createElement('style');
+        style.id = 'ota-responsive-style';
+        style.textContent = [
+            '@media (max-width: 480px) {',
+            '    header>.fill>.container>.flex1>.brand {',
+            '        display: none;',
+            '    }',
+            '}'
+        ].join('');
+        
+        document.head.appendChild(style);
     }
 });

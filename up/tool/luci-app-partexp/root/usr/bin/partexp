@@ -27,7 +27,7 @@ log(){
 }
 
 logn(){
-    echo -e "\n $*" | tee -a $LOG
+    echo -e " $*" | tee -a $LOG
 }
 
 load_uci_config() {
@@ -556,6 +556,7 @@ fdiskB() {
                 eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
                 echo $MOUNT $a> /etc/partexppath
                 log "扩容成功！可直接【在线升级】扩容升级了！"
+		show_partition_info /dev/$b
                 sleep 3
 
                 expquit 2
@@ -586,6 +587,7 @@ fdiskB() {
                 eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
                 echo $MOUNT $a> /etc/partexppath
                 log "扩容成功！可直接【在线升级】扩容升级了！"
+		show_partition_info /dev/$b
                 sleep 3
                 expquit 2
             fi
@@ -613,6 +615,7 @@ fdiskB() {
                 eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
                 echo $MOUNT $a> /etc/partexppath
                 log "扩容成功！可直接【在线升级】扩容升级了！"
+		show_partition_info /dev/$b
                 expquit 2
             else
                 log "/dev/$b分区扩容和挂载到$target_function失败！" 
@@ -644,6 +647,7 @@ fdiskB() {
                         log "/dev/$b分区扩容和挂载到$target_function成功！"
                         echo $MOUNT $a> /etc/partexppath
                         log "扩容成功！可直接【在线升级】扩容升级了！"
+			show_partition_info /dev/$b
                         expquit 2
                     else
                         log "目标盘 $SYSTEM_DISK $FSTYPE没有足够的剩余空间！"
@@ -679,6 +683,7 @@ fdiskB() {
                 eval $(block info /dev/$b | grep -o -e "MOUNT=\S*")
                 echo $MOUNT $a> /etc/partexppath
                 log "扩容成功！可直接【在线升级】扩容升级了！"
+		show_partition_info /dev/$b
                 expquit 2
             else
                 log "/dev/$b分区扩容和挂载到/mnt/$b失败！" 
