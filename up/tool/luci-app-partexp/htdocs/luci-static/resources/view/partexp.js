@@ -126,7 +126,7 @@ return view.extend({
             '                            <option value="/">' + _('Used to extend to the root directory of EXT4 firmware(Ext4 /)') + '</option>',
             '                            <option value="/overlay">' + _('Expand application space overlay (/overlay)') + '</option>',
             '                            <option value="/opt">' + _('Used as Docker data disk (/opt)') + '</option>',
-            '                            <option value="/dev">' + _('Normal mount and use by device name(/mnt/x1)') + '</option>',
+            '                            <option value="/mnt">' + _('Normal mount and use by device name(/mnt/x1)') + '</option>',
             '                        </select>',
             '                        <div class="cbi-value-description">' + _('Select the function to be performed') + '</div>',
             '                    </div>',

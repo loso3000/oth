@@ -20,6 +20,9 @@ msgstr ""
 msgid "One click partition expansion mounting tool"
 msgstr "一键分区扩容挂载工具"
 
+msgid "Partition Expansion"
+msgstr "分区扩容"
+
 msgid "Automatically format and mount the target device partition. If there are multiple partitions, it is recommended to manually delete all partitions before using this tool."
 msgstr "自动格式化并挂载目标设备分区。如果有多个分区，建议在使用此工具前手动删除所有分区。"
 
