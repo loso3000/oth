@@ -1218,6 +1218,7 @@ input,
     line-height: 1;
     background-image: none;
     background-color: var(--input-bgcolor);
+    background-color: transparent;
     color: var(--body-color);
     border: 1px solid var(--inputborder-color);
     border-radius: var(--radius2);
@@ -1664,6 +1665,7 @@ textarea {
     -webkit-transition: color 100ms ease, border-color 100ms ease, opacity 100ms ease;
     outline: none;
     background-color: var(--input-bgcolor);
+    background-color: transparent;
     color: var(--body-color);
     border: 1px solid var(--inputborder-color);
     word-wrap: break-word;
@@ -1711,6 +1713,7 @@ textarea {
     border-top: 1px solid var(--inputborder-color);
     border-bottom: 1px solid var(--inputborder-color);
     background-color: var(--input-bgcolor);
+    background-color: transparent;
     border-radius: var(--radius2) 0 0 var(--radius2);
     box-sizing: border-box;
     padding: 0.5rem 0.75rem
@@ -1739,6 +1742,7 @@ textarea {
     border-radius: 0 var(--radius2) var(--radius2) 0;
     outline: 0;
     background-color: var(--input-bgcolor);
+    background-color: transparent;
     box-sizing: border-box;
     margin: 0;
     padding: 5px !important
@@ -2981,6 +2985,8 @@ body.lang_pl.node-main-login .cbi-value-title {
     justify-content: center;
     text-indent: 0rem;
     background-color: var(--input-bgcolor);
+    background: transparent content-box;
+    box-sizing: border-box;
     width: 14rem;
     min-width: 100% !important;
     margin: 0
