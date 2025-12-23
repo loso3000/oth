@@ -1,0 +1,14 @@
+{
+	"luci-app-netwizard": {
+		"description": "Grant UCI access for luci-app-netwizard",
+		"read": {
+			"file": {
+				"/etc/init.d/netwizard reset": [ "exec" ]
+			},
+			"uci": [ "netwizard", "wireless" ]
+		},
+		"write": {
+			"uci": [ "netwizard" ]
+		}
+	}
+}
