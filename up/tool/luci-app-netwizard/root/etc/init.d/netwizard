@@ -225,6 +225,7 @@ configure_network() {
     config_get wan_dns "$cfg" wan_dns
     config_get wan_pppoe_user "$cfg" wan_pppoe_user
     config_get wan_pppoe_pass "$cfg" wan_pppoe_pass
+    config_get dhcp_proto "$cfg" dhcp_proto 'dhcp'
     
     if [ "x$showhide" = "x1" ]; then
         touch /etc/netwizard_hide
@@ -291,11 +292,28 @@ configure_network() {
   
     case "${wan_proto}" in
         dhcp)
-            $UCISET network.wan.proto='dhcp'
-            $UCISET network.wan.delegate='0'
-            [ "x$forwarding" = "x1" ] && setforwarding
-            [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
 	    
+	    case "${dhcp_proto}" in
+                static)
+                    $UCISET network.lan.proto='static'
+                    if [ -n "$wan_ipaddr" ]; then
+                       $UCISET network.wan.ipaddr="${wan_ipaddr}"
+                    fi
+                    if [ -n "$wan_netmask" ]; then
+                       $UCISET network.wan.netmask="${wan_netmask}"
+                    fi
+                    if [ -n "$wan_gateway" ]; then
+                       $UCISET network.wan.gateway="${wan_gateway}"
+                    fi
+                    ;;
+                    
+                dhcp)
+                    $UCISET network.wan.proto='dhcp'
+                    $UCISET network.wan.delegate='0'
+                    ;;
+            esac
+	    [ "x$forwarding" = "x1" ] && setforwarding
+            [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
             if [ -n "${wan_dns}" ]; then
                     $UCISET network.wan.peerdns='0'
                     uci -q add_list network.wan.dns="${wan_dns}"
@@ -468,7 +486,7 @@ commit network
 EOF
     (sleep 2
      /etc/init.d/system reload 2>/dev/null
-     /etc/init.d/rpcd restart 2>/dev/null
+     /etc/init.d/rpcd reload 2>/dev/null
      /etc/init.d/uhttpd reload 2>/dev/null
      /etc/init.d/network restart 2>/dev/null
      /etc/init.d/dnsmasq reload 2>/dev/null) &
