@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "Netwizard"
 msgstr "设置向导"
@@ -33,14 +33,11 @@ msgstr "四种不同的上网方式，请根据自身情况选择。</br>"
 msgid "DHCP client(Connect to the router)"
 msgstr "DHCP客户端(连接到路由器)"
 
-
 msgid "PPPoE dialing(Main route dial-up)"
 msgstr "PPPoE拨号(主路由拨号)"
 
-
 msgid "SideRouter(Same network as the main router)"
-msgstr "旁路由(与主路由同网段)"
-
+msgstr "旁路由（与主路由器同一网络）"
 
 msgid "Static address(Connect to the router)"
 msgstr "静态地址(连接到路由器)"
@@ -48,150 +45,143 @@ msgstr "静态地址(连接到路由器)"
 msgid "LAN IP address mode"
 msgstr "LAN口IP地址模式"
 
-
 msgid "Choose how to get IP address for LAN interface"
 msgstr "选择LAN口获取IP地址的方式"
-
 
 msgid "Static IP address(Specify non conflicting IP addresses)"
 msgstr "静态IP地址(指定不冲突的IP地址)"
 
-
 msgid "DHCP client(Main router assigns IP)"
 msgstr "DHCP客户端(主路由分配IP)"
-
 
 msgid "Lan IPv4 address"
 msgstr "LAN口IPv4地址"
 
-
 msgid "You must specify the IP address of this machine, which is the IP address of the web access route"
-msgstr "必须指定本机的IP地址，即WEB访问路由的IP地址"
-
+msgstr "您必须指定本机的IP地址，即Web访问路由的IP地址"
 
 msgid "Lan IPv4 netmask"
 msgstr "LAN口IPv4子网掩码"
 
-
 msgid "Lan IPv4 gateway"
 msgstr "LAN口IPv4网关"
-
 
 msgid "Please enter the main routing IP address. The bypass gateway is not the same as the login IP of this bypass WEB and is in the same network segment"
 msgstr "请输入主路由IP地址。旁路网关并非本旁路WEB登录IP，且处于同一网段"
 
-
 msgid "Use custom Siderouter DNS"
 msgstr "使用自定义旁路由DNS"
-
 
 msgid "Ali DNS:223.5.5.5"
 msgstr "阿里DNS:223.5.5.5"
 
-
 msgid "Baidu dns:180.76.76.76"
 msgstr "百度DNS:180.76.76.76"
-
 
 msgid "114 DNS:114.114.114.114"
 msgstr "114 DNS:114.114.114.114"
 
-
 msgid "Google DNS:8.8.8.8"
 msgstr "谷歌DNS:8.8.8.8"
-
 
 msgid "Cloudflare DNS:1.1.1.1"
 msgstr "Cloudflare DNS:1.1.1.1"
 
-
 msgid "Device"
 msgstr "设备"
-
 
 msgid "Allocate the physical interface of WAN port"
 msgstr "分配WAN口的物理接口"
 
-
 msgid "PAP/CHAP username"
 msgstr "PAP/CHAP用户名"
-
 
 msgid "PAP/CHAP password"
 msgstr "PAP/CHAP密码"
 
-
 msgid "Wan IPv4 address"
 msgstr "WAN口IPv4地址"
-
 
 msgid "Wan IPv4 netmask"
 msgstr "WAN口IPv4子网掩码"
 
-
 msgid "Wan IPv4 gateway"
 msgstr "WAN口IPv4网关"
-
 
 msgid "Use custom Wan DNS"
 msgstr "使用自定义WAN DNS"
 
-
 msgid "Enable IPv6"
 msgstr "启用IPv6"
-
 
 msgid "Disable DHCP Server"
 msgstr "禁用DHCP服务器"
 
-
 msgid "Selecting means that the DHCP server is not enabled. In a network, only one DHCP server is needed to allocate and manage client IPs. If it is a secondary route, it is recommended to turn off the primary routing DHCP server."
-msgstr "选中表示不启用DHCP服务器。一个网络中只需要一个DHCP服务器来分配和管理客户端IP。若是二级路由，建议关闭主路由DHCP服务器。"
-
+msgstr "选择意味着不启用DHCP服务器。在网络中，只需要一个DHCP服务器来分配和管理客户端IP。如果是旁路由，建议关闭主路由DHCP服务器。"
 
 msgid "Enable DNS notifications (ipv4/ipv6)"
 msgstr "启用DNS通知(ipv4/ipv6)"
 
-
 msgid "Forcefully specify the DNS server for this router"
 msgstr "强制指定本路由器的DNS服务器"
-
 
 msgid "DNS"
 msgstr "DNS服务器"
 
-
 msgid "Use local IP for DNS (default)"
-msgstr "使用本地IP作为DNS(默认)"
-
+msgstr "使用本地IP作为DNS（默认）"
 
 msgid "Forcefully forwarding"
 msgstr "强制转发"
 
-
 msgid "Forcefully add LAN to WAN forwarding"
 msgstr "强制添加LAN到WAN的转发"
-
 
 msgid "Redirect to HTTPS"
 msgstr "重定向到HTTPS"
 
-
 msgid "Enable automatic redirection of HTTP requests to HTTPS port."
 msgstr "启用HTTP请求自动重定向到HTTPS端口。"
-
 
 msgid "<abbr title=\"Extended Service Set Identifier\">ESSID</abbr>"
 msgstr "<abbr title=\"扩展服务集标识符\">ESSID</abbr>"
 
-
 msgid "Key"
-msgstr "无线密码"
-
+msgstr "密钥"
 
 msgid "Enable SYN-flood defense"
 msgstr "启用SYN洪水攻击防御"
 
-
 msgid "Enable Firewall SYN-flood defense [Suggest opening]"
 msgstr "启用防火墙SYN洪水攻击防御[建议开启]"
+
+msgid "Configuration Applied Successfully!"
+msgstr "配置应用成功！"
+
+msgid "The network configuration has been saved and applied.<br><br>New LAN IP Address: <strong style=\"color: #FFD700; font-size: 22px;\">%s</strong><br>The page will automatically redirect in <span id=\"netwizard-countdown\" style=\"color: #FFD700; font-size: 28px; font-weight: bold;\">10</span> seconds..."
+msgstr "网络配置已保存并应用。<br><br>新的局域网IP地址：<strong style=\"color: #FFD700; font-size: 22px;\">%s</strong><br>页面将在<span id=\"netwizard-countdown\" style=\"color: #FFD700; font-size: 28px; font-weight: bold;\">10</span>秒后自动重定向..."
+
+msgid "Redirect Now"
+msgstr "立即重定向"
+
+msgid "Stay Here"
+msgstr "停留在此"
+
+msgid "Redirecting to %s..."
+msgstr "正在重定向到 %s..."
+
+msgid "Failed to redirect to %s\nPlease manually access:\n%s"
+msgstr "重定向到 %s 失败\n请手动访问：\n%s"
+
+msgid "Applying network configuration..."
+msgstr "正在应用网络配置..."
+
+msgid "Configuration saved successfully!"
+msgstr "配置保存成功！"
+
+msgid "Saving configuration..."
+msgstr "正在保存配置..."
+
+msgid "Failed to save configuration"
+msgstr "保存配置失败"

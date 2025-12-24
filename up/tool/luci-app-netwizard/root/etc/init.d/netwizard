@@ -227,11 +227,11 @@ configure_network() {
     config_get wan_pppoe_pass "$cfg" wan_pppoe_pass
     
     if [ "x$showhide" = "x1" ]; then
-        touch /etc/config/netwizard_hide
+        touch /etc/netwizard_hide
         $UCISET advancedplus.@basic[0].wizard="1"
         exit 0
     else
-        rm -rf /etc/config/netwizard_hide 2>/dev/null
+        rm -rf /etc/netwizard_hide 2>/dev/null
         $UCISET advancedplus.@basic[0].wizard="0"
     fi 
     

@@ -14,7 +14,6 @@ return view.extend({
 
 	load: function() {
 		return Promise.all([
-			fs.exec('/etc/init.d/netwizard', ['reconfig']),
 			network.getDevices(),
 			uci.changes(),
 			L.resolveDefault(uci.load('wireless'), null),
@@ -24,7 +23,7 @@ return view.extend({
 	},
 
 	render: function(data) {
-		var devices = data[1] || []; // 使用 network.getDevices() 获取的网卡列表
+		var devices = data[0] || []; // 使用 network.getDevices() 获取的网卡列表
 		var has_wifi = false;
 		var m, o, s;
 
@@ -265,6 +264,449 @@ return view.extend({
 			_('Enable Firewall SYN-flood defense [Suggest opening]'));
 		o.default = '1';
 		o.rmempty = false;
+
+		// 保存原始的save方法
+		var originalSave = m.save;
+		var currentLanIP = lan_ip;
+		
+		// 获取新IP地址的函数
+		function getNewLanIP() {
+			// 尝试多种方式获取IP地址
+			var selectors = [
+				'input[name="widget.cbid.netwizard.default.lan_ipaddr"]',
+				'input[name="cbid.netwizard.default.lan_ipaddr"]',
+				'input[data-option="lan_ipaddr"]',
+				'input[placeholder*="IP"]',
+				'.cbi-input-text[type="text"]'
+			];
+			
+			for (var i = 0; i < selectors.length; i++) {
+				var inputs = document.querySelectorAll(selectors[i]);
+				for (var j = 0; j < inputs.length; j++) {
+					var input = inputs[j];
+					if (input && input.value) {
+						// 检查是否是IP地址格式
+						var ipMatch = input.value.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+						if (ipMatch) {
+							// 验证每个部分是否在0-255范围内
+							var valid = true;
+							for (var k = 1; k <= 4; k++) {
+								var part = parseInt(ipMatch[k]);
+								if (part < 0 || part > 255) {
+									valid = false;
+									break;
+								}
+							}
+							if (valid) {
+								return input.value;
+							}
+						}
+					}
+				}
+			}
+			
+			return null;
+		}
+
+		function showRedirectMessage(newIP) {
+			// 创建覆盖层
+			var overlay = document.createElement('div');
+			overlay.id = 'netwizard-redirect-overlay';
+			overlay.style.cssText = `
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.85);
+				z-index: 9999;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-family: Arial, sans-serif;
+			`;
+			
+			// 创建消息框
+			var messageBox = document.createElement('div');
+			messageBox.style.cssText = `
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				padding: 1rem;
+				border-radius: 15px;
+				text-align: center;
+				max-width: 600px;
+				box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+				color: white;
+			`;
+			
+			// 创建图标
+			var icon = document.createElement('div');
+			icon.innerHTML = '✓';
+			icon.style.cssText = `
+				font-size: 60px;
+				color: #4CAF50;
+				background: white;
+				width: 100px;
+				height: 100px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin: 0 auto 20px;
+				font-weight: bold;
+				box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+			`;
+			
+			// 创建标题
+			var title = document.createElement('h2');
+			title.textContent = _('Configuration Applied Successfully!');
+			title.style.cssText = `
+				margin: 0 0 20px 0;
+				color: white;
+			`;
+			
+			// 创建消息内容
+			var message = document.createElement('div');
+			message.innerHTML = _('The network configuration has been saved and applied.<br><br>') +
+							   '<div style="background: rgba(255,255,255,0.2); border-radius: 10px; ">' +
+							   _('New LAN IP Address: ') + 
+							   '<strong style="color: #FFD700; font-size: 22px;">' + newIP + '</strong></div><br>' +
+							   _('The page will automatically redirect in ') + 
+							   '<span id="netwizard-countdown" style="color: #FFD700; font-size: 28px; font-weight: bold;">10</span>' + 
+							   _(' seconds...');
+			message.style.cssText = `
+				color: rgba(255,255,255,0.9);
+				line-height: 1.8;
+				margin: 20px 0;
+				font-size: 16px;
+			`;
+			
+			// 创建按钮容器
+			var buttonContainer = document.createElement('div');
+			buttonContainer.style.cssText = `
+				display: flex;
+				justify-content: center;
+				gap: 15px;
+				margin-top: 25px;
+				flex-wrap: wrap;
+			`;
+			
+			// 创建立即重定向按钮
+			var redirectButton = document.createElement('button');
+			redirectButton.textContent = _('Redirect Now');
+			redirectButton.style.cssText = `
+				background: #4CAF50;
+				color: white;
+				border: none;
+				padding: 12px 30px;
+				border-radius: 50px;
+				font-size: 16px;
+				font-weight: bold;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+			`;
+			redirectButton.onmouseover = function() {
+				this.style.transform = 'translateY(-2px)';
+				this.style.boxShadow = '0 8px 20px rgba(76, 175, 80, 0.6)';
+			};
+			redirectButton.onmouseout = function() {
+				this.style.transform = 'translateY(0)';
+				this.style.boxShadow = '0 5px 15px rgba(76, 175, 80, 0.4)';
+			};
+			redirectButton.onclick = function() {
+				redirectToNewIP(newIP);
+			};
+			
+			// 创建取消按钮
+			var cancelButton = document.createElement('button');
+			cancelButton.textContent = _('Stay Here');
+			cancelButton.style.cssText = `
+				background: rgba(255,255,255,0.2);
+				color: white;
+				border: 2px solid white;
+				padding: 12px 30px;
+				border-radius: 50px;
+				font-size: 16px;
+				font-weight: bold;
+				cursor: pointer;
+				transition: all 0.3s ease;
+			`;
+			cancelButton.onmouseover = function() {
+				this.style.background = 'rgba(255,255,255,0.3)';
+				this.style.transform = 'translateY(-2px)';
+			};
+			cancelButton.onmouseout = function() {
+				this.style.background = 'rgba(255,255,255,0.2)';
+				this.style.transform = 'translateY(0)';
+			};
+			cancelButton.onclick = function() {
+				hideRedirectMessage();
+			};
+			
+			// 组装元素
+			messageBox.appendChild(icon);
+			messageBox.appendChild(title);
+			messageBox.appendChild(message);
+			buttonContainer.appendChild(redirectButton);
+			buttonContainer.appendChild(cancelButton);
+			messageBox.appendChild(buttonContainer);
+			overlay.appendChild(messageBox);
+			
+			// 添加到页面
+			document.body.appendChild(overlay);
+			
+			// 开始倒计时
+			var countdown = 10;
+			var countdownElement = document.getElementById('netwizard-countdown');
+			
+			var countdownInterval = setInterval(function() {
+				countdown--;
+				if (countdownElement) {
+					countdownElement.textContent = countdown;
+					
+					// 最后3秒闪烁效果
+					if (countdown <= 3) {
+						countdownElement.style.color = (countdown % 2 === 0) ? '#FF6B6B' : '#FFD700';
+					}
+				}
+				
+				if (countdown <= 0) {
+					clearInterval(countdownInterval);
+					redirectToNewIP(newIP);
+				}
+			}, 1000);
+			
+			// 保存interval以便清理
+			overlay._countdownInterval = countdownInterval;
+		}
+		
+		// 隐藏重定向消息的函数
+		function hideRedirectMessage() {
+			var overlay = document.getElementById('netwizard-redirect-overlay');
+			if (overlay) {
+				// 清除倒计时
+				if (overlay._countdownInterval) {
+					clearInterval(overlay._countdownInterval);
+				}
+				document.body.removeChild(overlay);
+			}
+		}
+		
+		// 重定向到新IP的函数
+		function redirectToNewIP(newIP) {
+			// 隐藏消息框
+			hideRedirectMessage();
+			
+			// 构建新URL
+			var currentProtocol = window.location.protocol;
+			var currentPort = window.location.port ? ':' + window.location.port : '';
+			var newURL = currentProtocol + '//' + newIP + currentPort + '/';
+			
+			// 显示短暂的跳转提示
+			var jumpMsg = document.createElement('div');
+			jumpMsg.id = 'netwizard-jump-msg';
+			jumpMsg.style.cssText = `
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: #4CAF50;
+				color: white;
+				padding: 15px 25px;
+				border-radius: 10px;
+				z-index: 10000;
+				font-weight: bold;
+				box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+				animation: slideIn 0.5s ease;
+			`;
+			
+			// 添加CSS动画
+			var style = document.createElement('style');
+			style.textContent = `
+				@keyframes slideIn {
+					from { transform: translateX(100%); opacity: 0; }
+					to { transform: translateX(0); opacity: 1; }
+				}
+			`;
+			document.head.appendChild(style);
+			
+			jumpMsg.textContent = _('Redirecting to ') + newIP + '...';
+			document.body.appendChild(jumpMsg);
+			
+			// 1秒后重定向
+			setTimeout(function() {
+				try {
+					window.location.href = newURL;
+				} catch (e) {
+					alert(_('Failed to redirect to ') + newIP + 
+						  _('\nPlease manually access:\n') + newURL);
+					
+					// 移除跳转提示
+					var jumpMsg = document.getElementById('netwizard-jump-msg');
+					if (jumpMsg) {
+						document.body.removeChild(jumpMsg);
+					}
+				}
+			}, 1000);
+		}
+
+		function executeNetwizardScript(newIP) {
+			return new Promise(function(resolve, reject) {
+				var applyingMsg = document.createElement('div');
+				applyingMsg.id = 'netwizard-applying-msg';
+				applyingMsg.style.cssText = `
+					position: fixed;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					background: rgba(0,0,0,0.9);
+					color: white;
+					padding: 20px 40px;
+					border-radius: 10px;
+					z-index: 9998;
+					font-size: 16px;
+				`;
+				applyingMsg.textContent = _('Applying network configuration...');
+				document.body.appendChild(applyingMsg);
+				
+				var callRPC = rpc.declare({
+					object: 'file',
+					method: 'exec',
+					params: ['command', 'params', 'env'],
+					expect: { '': {} }
+				});
+				
+				setTimeout(function() {
+					fs.stat('/etc/init.d/netwizard').then(function(stats) {
+						return callRPC('/etc/init.d/netwizard', ['start'], {});
+					}).then(function(response) {
+						if (applyingMsg && applyingMsg.parentNode) {
+							document.body.removeChild(applyingMsg);
+						}
+						showRedirectMessage(newIP);
+						setTimeout(function() {
+							redirectToNewIP(newIP);
+						}, 10000);
+						
+						resolve(response);
+					}).catch(function(err) {
+						if (applyingMsg && applyingMsg.parentNode) {
+							document.body.removeChild(applyingMsg);
+						}
+
+						showRedirectMessage(newIP);
+						
+						setTimeout(function() {
+							redirectToNewIP(newIP);
+						}, 10000);
+						
+						resolve({}); 
+					});
+				}, 1000); // 等待1秒确保配置已保存
+			});
+		}
+
+		// 重写save方法
+		m.save = function() {
+			var newLanIP = getNewLanIP();
+			var ipChanged = newLanIP && currentLanIP !== newLanIP;
+
+			var savingMsg = document.createElement('div');
+			savingMsg.id = 'netwizard-saving-msg';
+			savingMsg.style.cssText = `
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(0,0,0,0.9);
+				color: white;
+				padding: 20px 40px;
+				border-radius: 10px;
+				z-index: 9998;
+				font-size: 16px;
+			`;
+			savingMsg.textContent = _('Saving configuration...');
+			document.body.appendChild(savingMsg);
+			
+			// 调用原始的save方法
+			return originalSave.call(m).then(function(result) {
+
+				var msg = document.getElementById('netwizard-saving-msg');
+				if (msg && msg.parentNode) {
+					document.body.removeChild(msg);
+				}
+				if (!ipChanged || !newLanIP) {
+					var successMsg = document.createElement('div');
+					successMsg.id = 'netwizard-success-msg';
+					successMsg.style.cssText = `
+						position: fixed;
+						top: 20px;
+						right: 20px;
+						background: #4CAF50;
+						color: white;
+						padding: 15px 25px;
+						border-radius: 10px;
+						z-index: 9999;
+						font-weight: bold;
+						animation: slideIn 0.5s ease;
+					`;
+					successMsg.textContent = _('Configuration saved successfully!');
+					document.body.appendChild(successMsg);
+					
+					// 3秒后移除提示
+					setTimeout(function() {
+						var msg = document.getElementById('netwizard-success-msg');
+						if (msg && msg.parentNode) {
+							document.body.removeChild(msg);
+						}
+					}, 3000);
+					
+					return result;
+				}
+				
+
+				return executeNetwizardScript(newLanIP).then(function() {
+					return result;
+				}).catch(function(err) {
+					showRedirectMessage(newLanIP);
+					setTimeout(function() {
+						redirectToNewIP(newLanIP);
+					}, 10000);
+					
+					return result;
+				});
+			}).catch(function(err) {
+				var msg = document.getElementById('netwizard-saving-msg');
+				if (msg && msg.parentNode) {
+					document.body.removeChild(msg);
+				}
+				var errorMsg = document.createElement('div');
+				errorMsg.id = 'netwizard-error-msg';
+				errorMsg.style.cssText = `
+					position: fixed;
+					top: 20px;
+					right: 20px;
+					background: #f44336;
+					color: white;
+					padding: 15px 25px;
+					border-radius: 10px;
+					z-index: 9999;
+					font-weight: bold;
+					animation: slideIn 0.5s ease;
+				`;
+				errorMsg.textContent = _('Failed to save configuration');
+				document.body.appendChild(errorMsg);
+				
+				// 5秒后移除错误提示
+				setTimeout(function() {
+					var msg = document.getElementById('netwizard-error-msg');
+					if (msg && msg.parentNode) {
+						document.body.removeChild(msg);
+					}
+				}, 5000);
+				
+				throw err;
+			});
+		};
 
 		return m.render();
 	}
