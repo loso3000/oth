@@ -1826,15 +1826,15 @@ textarea {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    color: var(--inputtext-color);
+    color: var(--inputborder-color);
     text-align: center;
     margin-left: .1rem;
     outline: 0;
-    padding: 0 .4rem
+             padding: 0 .4rem
 }
 
 .cbi-dropdown>.open {
-    border-left: 0.1rem solid var(--inputtext-color)
+    border-left: 0.1rem solid var(--inputborder-color);
 }
 
 .cbi-page-actions>.cbi-dropdown.btn>.open,
@@ -1866,7 +1866,6 @@ textarea {
     white-space: nowrap;
     text-overflow: ellipsis;
     margin: 0 0.2rem;
-    padding: 0 0.5rem 0 0.6rem
 }
 
 .cbi-dropdown>ul>li[display]:not([display="0"]) {
@@ -2293,7 +2292,7 @@ td.cbi-value-field var,
     border-top: 0 !important;
     padding: 1.1em 1rem;
     font-size: var(--font-x);
-    color: var(--title-color) !important;
+    /* color: var(--title-color) !important; */
     border-top: 0 !important;
 }
 .cbi-section-table .tr .td:first-child, .cbi-section-table .tr .th:first-child, .table .tr .td:first-child, .table .tr .th:first-child, .table .tr:before {
@@ -2988,8 +2987,8 @@ body.lang_pl.node-main-login .cbi-value-title {
 .node-main-login>.main .cbi-value.cbi-value .cbi-value-field,
 .node-main-login>.main .cbi-value.cbi-value-last .cbi-value-field {
     position: relative;
-    color: #eee;
-    text-shadow: 0px 1px 3px #222;
+    color: var(--inputborder-color);
+    /* text-shadow: 0px 1px 3px #ddd;  */
     width: 14rem
 }
 
@@ -3004,8 +3003,8 @@ body.lang_pl.node-main-login .cbi-value-title {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\e91d";
-    color: #eee;
-    text-shadow: 0px 1px 3px #222;
+    color: var(--inputborder-color);
+
     font-size: 1.3rem;
     position: absolute;
     z-index: 100;
@@ -3024,8 +3023,8 @@ body.lang_pl.node-main-login .cbi-value-title {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\e93c";
-    color: #eee;
-    text-shadow: 0px 1px 3px #222;
+
+    color: var(--inputborder-color);
     font-size: 1.3rem;
     position: absolute;
     z-index: 100;
