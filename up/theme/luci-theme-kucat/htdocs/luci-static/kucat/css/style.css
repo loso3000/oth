@@ -310,7 +310,7 @@ body {
 .tr.placeholder {
     height: 1.9rem
 }
-#cbi-firewall .tr[data-title]::before, #cbi-firewall .tr.cbi-section-table-titles.named::before {
+.tr[data-title]::before, .tr.cbi-section-table-titles.named::before {
   font-weight: bold;
   display: table-cell;
   align-self: center;
@@ -322,10 +322,6 @@ body {
   white-space: normal;
   word-wrap: break-word;
   font-size: var(--font-z);
-}
-
- #cbi-firewall .tr.cbi-section-table-titles.named::before {
-    background-color: var(--menu-item-titlebg-color) !important;
 }
 
 .cbi-section-table-row {
@@ -611,7 +607,7 @@ footer a {
     z-index: 50;
     flex: 1;
     display: flex;
-    padding-top: 2rem;
+    padding-top: 2.5rem;
     flex-direction: column
 }
 
