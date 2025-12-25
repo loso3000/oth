@@ -67,8 +67,9 @@ HOST_LN="$(subst ${STAGING_DIR_HOST},$${STAGING_DIR_HOST},$(LN))"
 [ -n "$${IPKG_INSTROOT}" ] && {
 	$${HOST_SED} 's,^src/gz ezopwrt_,src/gz openwrt_,g' -e '/^src\/gz openwrt_\(core\|base\|kmods\|luci\|packages\|routing\|telephony\) /!d' "$${IPKG_INSTROOT}/etc/opkg/distfeeds.conf"
 
-	$${HOST_SED} 's/"192.168.1.1"/"192.168.100.1"/' "$${IPKG_INSTROOT}/bin/config_generate"
-	$${HOST_SED} "s/'192\\.168\\.1\\.1'/'192.168.10.1'/; s/'immortalwrt\\.lan'/window.location.host/"; s/'openwrt\\.lan'/window.location.host/" "$${IPKG_INSTROOT}/www/luci-static/resources/view/system/flash.js"
+	$${HOST_SED} 's/"192.168.1.1"/"192.168.10.1"/' \
+		"$${IPKG_INSTROOT}/bin/config_generate"
+	$${HOST_SED} "s/'192\\.168\\.1\\.1'/'192.168.10.1'/; s/'immortalwrt\\.lan'/window.location.host/" "$${IPKG_INSTROOT}/www/luci-static/resources/view/system/flash.js"
 	rm -f "$${IPKG_INSTROOT}/sbin/jffs2reset"
 	$${HOST_LN} /sbin/firstboot "$${IPKG_INSTROOT}/sbin/jffs2reset"
 }
