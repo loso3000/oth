@@ -66,6 +66,9 @@ msgstr "更改协议模式"
 msgid "Network protocol mode selection"
 msgstr "网络协议模式选择"
 
+msgid "Add LAN port configuration"
+msgstr "增加LAN口参数配置"
+
 msgid "Three different ways to access the Internet, please choose according to your own situation."
 msgstr "三种不同的上网方式，请根据自身情况选择。"
 
@@ -207,17 +210,17 @@ msgstr "启用防火墙 SYN 洪水防御 [建议开启]"
 msgid "Configuration Applied Successfully!"
 msgstr "配置应用成功！"
 
-msgid "The network configuration has been saved and applied."
-msgstr "网络配置已保存并应用。"
+msgid "The network configuration has been saved and applied.<br><br>"
+msgstr "网络配置已保存并应用。<br><br>"
 
 msgid "New LAN IP Address:"
 msgstr "新的 LAN IP 地址："
 
 msgid "The page will automatically redirect in"
-msgstr "页面将在"
+msgstr "新页面自动转向还有"
 
 msgid "seconds..."
-msgstr "秒后转向新地址..."
+msgstr "秒..."
 
 msgid "Redirect Now"
 msgstr "立即转向新地址"
@@ -239,6 +242,10 @@ msgstr "正在保存配置..."
 
 msgid "Configuration saved successfully!"
 msgstr "配置保存成功！"
+
+msgid "Access Protocol:"
+msgstr "访问协议："
+
 
 msgid "Failed to save configuration"
 msgstr "保存配置失败"

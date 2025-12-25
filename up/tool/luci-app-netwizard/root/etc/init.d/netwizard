@@ -208,7 +208,7 @@ configure_network() {
     config_get wan_proto "$cfg" wan_proto 'dhcp'
     config_get ipv6 "$cfg" ipv6 '0'
     config_get dnsset "$cfg" dnsset '0'
-    config_get wan_interface "$cfg" wan_interface 'eth1'
+    config_get wan_interface "$cfg" wan_interface
     config_get lan_dhcp "$cfg" lan_dhcp '0'
     config_get synflood "$cfg" synflood '0'
     config_get lan_ipaddr "$cfg" lan_ipaddr 
