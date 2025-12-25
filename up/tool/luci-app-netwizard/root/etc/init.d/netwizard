@@ -317,26 +317,11 @@ configure_network() {
             if [ -n "${wan_dns}" ]; then
                     $UCISET network.wan.peerdns='0'
                     uci -q add_list network.wan.dns="${wan_dns}"
+	    else
+                    $UCISET network.wan.peerdns='1'
             fi
             ;;
-            
-        static)
-            [ "x$forwarding" = "x1" ] && setforwarding
-            [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
-            
-            if [ -n "${wan_ipaddr}" ] && [ -n "${wan_netmask}" ]; then
-                $UCISET network.wan.proto='static'
-                $UCISET network.wan.ipaddr="${wan_ipaddr}"
-                $UCISET network.wan.netmask="${wan_netmask}"
-                $UCISET network.wan.gateway="${wan_gateway}"
-                
-            fi
-	    
-            if [ -n "${wan_dns}" ]; then
-                    $UCISET network.wan.peerdns='0'
-                    uci -q add_list  network.wan.dns="${wan_dns}"
-            fi
-            ;;
+
             
         pppoe)
             [ "x$forwarding" = "x1" ] && setforwarding
@@ -349,6 +334,8 @@ configure_network() {
                 if [ -n "${wan_dns}" ]; then
                     $UCISET network.wan.peerdns='0'
                     uci -q add_list  network.wan.dns="${wan_dns}"
+	    else
+                    $UCISET network.wan.peerdns='1'
                 fi
             fi
             ;;
@@ -380,7 +367,7 @@ configure_network() {
                     ;;
             esac
             if [ -n "$lan_dns" ] ;then
-		   $UCISET network.lan.peerdns='0'
+		   # $UCISET network.lan.peerdns='0'
 		   uci -q add_list network.lan.dns=$lan_dns
             fi
             if [ $netsum -gt 1 ]; then
