@@ -1214,7 +1214,6 @@ input,
     line-height: 1;
     background-image: none;
     background-color: var(--input-bgcolor);
-    background-color: transparent;
     color: var(--body-color);
     border: 1px solid var(--inputborder-color);
     border-radius: var(--radius2);
@@ -1830,7 +1829,6 @@ textarea {
     text-align: center;
     margin-left: .1rem;
     outline: 0;
-             padding: 0 .4rem
 }
 
 .cbi-dropdown>.open {
@@ -1862,12 +1860,19 @@ textarea {
     align-self: center;
     flex-grow: 1;
     flex-shrink: 1;
-    min-height: 1.6rem;
+    min-height: 1.8rem;
     white-space: nowrap;
     text-overflow: ellipsis;
     margin: 0 0.2rem;
 }
 
+.cbi-dropdown.btn>span, .cbi-dropdown.btn>ul>li {
+  padding: 0 .4rem;
+}
+.cbi-dropdown.btn>ul>li {
+  min-height: 1.5rem;
+  height: 1.6rem
+}
 .cbi-dropdown>ul>li[display]:not([display="0"]) {
     border-left: thin solid var(--input-boxhovercolor)
 }
@@ -1900,7 +1905,7 @@ textarea {
 }
 
 .cbi-dropdown>ul>li input[type="text"] {
-    height: 1.6rem;
+    height: 2rem;
     border: 1px solid var(--inputborder-color);
     color: var(--inputtext-color)
 }
@@ -1908,7 +1913,7 @@ textarea {
 .cbi-dropdown[open]>ul.dropdown>li {
     color: var(--inputtext-color);
     margin: 0.1rem auto;
-    padding: 0.2rem 0.75rem
+    padding: 0.5rem 0.75rem
 }
 
 .cbi-dropdown[open]>ul.dropdown>li:hover {
@@ -2292,7 +2297,6 @@ td.cbi-value-field var,
     border-top: 0 !important;
     padding: 1.1em 1rem;
     font-size: var(--font-x);
-    /* color: var(--title-color) !important; */
     border-top: 0 !important;
 }
 .cbi-section-table .tr .td:first-child, .cbi-section-table .tr .th:first-child, .table .tr .td:first-child, .table .tr .th:first-child, .table .tr:before {
@@ -2750,6 +2754,7 @@ label[data-index][data-depends] {
 #command-rc-output>pre,
 [data-page^="admin-services-wol"] .notice code {
     font-size: var(--font-x);
+    font-size-adjust: .9;
     line-height: normal;
     display: block;
     overflow-y: hidden;
@@ -2969,7 +2974,6 @@ body.lang_pl.node-main-login .cbi-value-title {
 .node-main-login>.main .cbi-value.cbi-value-last .cbi-input-password,
 .node-main-login>.main .cbi-value.cbi-value-last .cbi-input-text[type="password"] {
     box-shadow: none;
-    border-radius: var(--radius1);
     text-align: center;
     -webkit-box-align: center;
     -ms-flex-align: center;
@@ -2981,30 +2985,22 @@ body.lang_pl.node-main-login .cbi-value-title {
     background: transparent;
     width: 14rem;
     min-width: 100% !important;
+    border-radius: 0;
+    padding: 0 20px 0 20px;
+    border: none;
+    border-bottom: 1px solid var(--inputborder-color);
     margin: 0
-}
-
-.node-main-login>.main .cbi-value.cbi-value .cbi-value-field,
-.node-main-login>.main .cbi-value.cbi-value-last .cbi-value-field {
-    position: relative;
-    color: var(--inputborder-color);
-    /* text-shadow: 0px 1px 3px #ddd;  */
-    width: 14rem
 }
 
 .node-main-login>.main .cbi-value.cbi-value .cbi-value-field:before {
     font-family: kucat !important;
     speak: none;
-    font-style: normal;
-    font-weight: 400;
     font-variant: normal;
     text-transform: none;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\e91d";
-    color: var(--inputborder-color);
-
     font-size: 1.3rem;
     position: absolute;
     z-index: 100;
@@ -3012,19 +3008,16 @@ body.lang_pl.node-main-login .cbi-value-title {
     top: 10px
 }
 
+
 .node-main-login>.main .cbi-value.cbi-value-last .cbi-value-field:before {
     font-family: kucat !important;
     speak: none;
-    font-style: normal;
-    font-weight: 400;
     font-variant: normal;
     text-transform: none;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\e93c";
-
-    color: var(--inputborder-color);
     font-size: 1.3rem;
     position: absolute;
     z-index: 100;
@@ -3032,19 +3025,24 @@ body.lang_pl.node-main-login .cbi-value-title {
     top: 10px
 }
 
+.node-main-login>.main .cbi-value.cbi-value .cbi-value-field,
+.node-main-login>.main .cbi-value.cbi-value-last .cbi-value-field {
+    position: relative;
+    color: var(--inputborder-color);
+    width: 14rem
+}
 .node-main-login>.main .cbi-value.cbi-value-last,
 .node-main-login>.main .cbi-value {
     display: block;
     position: relative;
     background-image: none !important;
     border-bottom: 0px solid #222 !important;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: rgba(255, 255, 255, 0) !important;
     padding: 0rem
 }
 
 .node-main-login>.main .cbi-value.cbi-value-last {
-    margin-top: 2rem;
-    background-color: rgba(255, 255, 255, 0) !important
+    margin-top: 1rem;
 }
 
 .node-main-login .main .main-right #maincontent .alert-message p {
