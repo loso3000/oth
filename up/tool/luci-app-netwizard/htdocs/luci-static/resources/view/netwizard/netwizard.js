@@ -75,7 +75,7 @@ return view.extend({
         if (!lan_gateway && lan_ip) {
             var parts = lan_ip.split('.');
             if (parts.length === 4) {
-                lan_gateway = parts[0] + '.' + parts[1] + '.' + parts[2] + '.1';
+                lan_gateway = parts[0] + '.' + parts[1] + '.' + parts[2] + '.';
             }
         }
         
@@ -402,6 +402,9 @@ return view.extend({
     },
 
     selectMode: function(mode) {
+        uci.set('netwizard', 'default', 'wan_proto', mode);
+        uci.save();
+        
         var currentUrl = window.location.pathname;
         var newUrl = currentUrl + '?selectedMode=' + mode + '&tab=wansetup';
         window.location.href = newUrl;
@@ -439,8 +442,10 @@ return view.extend({
                     '<h3 >' + modeTitle + '</h3>' +
                     '<p >' + modeDescription + '</p>' +
                     '<div class="quick-nav-buttons">' +
-                    '<a href="' + window.location.pathname + '" class="quick-nav-btn btn cbi-button cbi-button-apply " style="color: #fff;background: ' + modeColor + ';">' +
-                    '⚙️ ' + _('Change Mode') + '</a>' +
+		     '<button onclick="switchToTab(\'wansetup\')" class="quick-nav-btn" style="background: ' + modeColor + ';">' +
+                    '⚙️ ' + _('Go to WAN Settings') + '</button>' +
+                    '<a href="' + window.location.pathname + '" class="quick-nav-btn cbi-button cbi-button-reset">' +
+                    '↻ ' + _('Change Mode') + '</a>' +
                     '</div>' +
                     '</div>';
 
@@ -452,8 +457,8 @@ return view.extend({
                                  '<h4 style="margin: 0 0 5px 0; color: #fff;">' + modeTitle + '</h4>' +
                                  '<p style="margin: 0; font-size: 14px; color: #fff;">' + modeDescription + '</p>' +
                                  '<div style="margin: 10px;">' +
-                    '<a href="' + window.location.pathname + '" class="quick-nav-btn btn cbi-button cbi-button-apply " style="color: #fff">' +
-                    '⚙️ ' + _('Change Mode') + '</a>' +
+                    '<a href="' + window.location.pathname + '" class="quick-nav-btn cbi-button cbi-button-reset">' +
+                    '↻ ' + _('Change Mode') + '</a>' +
 
                                  '</div>' +
                                  '</div>' +
@@ -466,7 +471,8 @@ return view.extend({
         o.value('pppoe', _('PPPoE dialing (Main route dial-up)'));
         o.value('siderouter', _('SideRouter (Same network as the main router)'));
         o.rmempty = false;
-        
+	o.readonly = true;
+    
         // LAN Settings for SideRouter mode
         o = s.taboption('wansetup', form.ListValue, 'lan_proto', _('LAN IP Address Mode'), 
             _('Choose how to get IP address for LAN interface'));
@@ -480,10 +486,11 @@ return view.extend({
         o = s.taboption('wansetup', form.ListValue, 'dhcp_proto', _('WAN interface IP address mode'), 
             _('Choose how to get IP address for WAN interface'));
         o.default = 'dhcp';
-        o.value('static', _('Static address(Connect to the router)'));
-        o.value('dhcp', _('DHCP client(Connect to the router)'));
+        o.value('static', _('Static IP address (Specify non conflicting IP addresses)'));
+        o.value('dhcp', _('DHCP client (Main router assigns IP)'));
         o.depends('wan_proto', 'dhcp');
         o.rmempty = false;
+	
         o = s.taboption('wansetup', form.Value, 'lan_ipaddr', _('LAN IPv4 Address'), 
             _('You must specify the IP address of this machine, which is the IP address of the web access route'));
         o.default = this.lan_ip;
@@ -865,7 +872,7 @@ return view.extend({
             `;
             document.head.appendChild(style);
             
-            jumpMsg.textContent = _('Redirecting to ') + newIP + '...';
+            jumpMsg.textContent = _('Redirecting to') + newIP + '...';
             document.body.appendChild(jumpMsg);
             
             setTimeout(function() {
@@ -1046,10 +1053,11 @@ return view.extend({
                 for (var i = 0; i < tabs.length; i++) {
                     var tab = tabs[i];
                     var tabText = tab.textContent || tab.innerText;
-                    if ((tabName === 'wansetup' && (tabText.trim() === 'WAN Settings' || tabText.includes('WAN') || tabText.includes('Wan'))) ||
-                        (tabName === 'modesetup' && (tabText.trim() === 'Network Mode' || tabText.includes('Mode') || tabText.includes('模式'))) ||
-                        (tabName === 'wifisetup' && (tabText.trim() === 'Wireless Settings' || tabText.includes('Wireless') || tabText.includes('WiFi'))) ||
-                        (tabName === 'othersetup' && (tabText.trim() === 'Other Settings' || tabText.includes('Other') || tabText.includes('其他')))) {
+                    console.log('Checking tab:', tabText, 'looking for:', tabName);
+                    if ((tabName === 'wansetup' && (tabText.trim() === 'WAN Settings' || tabText.includes('WAN') || tabText.includes('网络设置'))) ||
+                        (tabName === 'modesetup' && (tabText.trim() === 'Network Mode' || tabText.includes('Mode') || tabText.includes('网络模式'))) ||
+                        (tabName === 'wifisetup' && (tabText.trim() === 'Wireless Settings' || tabText.includes('Wireless') || tabText.includes('无线设置'))) ||
+                        (tabName === 'othersetup' && (tabText.trim() === 'Other Settings' || tabText.includes('Other') || tabText.includes('其他设置')))) {
                         tab.click();
                         var tabItems = document.querySelectorAll('.cbi-tabmenu li');
                         tabItems.forEach(function(item) {
@@ -1062,10 +1070,7 @@ return view.extend({
             }
             
             if (window.location.search.includes('selectedMode')) {
-                setTimeout(function() {
-                    switchToTab('wansetup');
-                }, 50);
-                
+
                 setTimeout(function() {
                     switchToTab('wansetup');
                 }, 200);

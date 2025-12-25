@@ -57,6 +57,9 @@ msgstr "网络连接协议模式"
 msgid "Current Network Mode"
 msgstr "当前网络协议模式"
 
+msgid "Go to WAN Settings"
+msgstr "去设置网络参数"
+
 msgid "Change Mode"
 msgstr "更改协议模式"
 
@@ -219,8 +222,8 @@ msgstr "秒后转向新地址..."
 msgid "Redirect Now"
 msgstr "立即转向新地址"
 
-msgid "Stay Here"
-msgstr "留在此处"
+msgid "Redirecting to"
+msgstr "转向新地址"
 
 msgid "Failed to redirect to"
 msgstr "无效重定向"
