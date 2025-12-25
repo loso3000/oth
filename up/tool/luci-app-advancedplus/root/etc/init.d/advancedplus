@@ -50,13 +50,13 @@ sethttps() {
 
 setnetwizard(){
     if [ "x$(uci -q get advancedplus.@basic[0].wizard)" == "x1" ] ; then
-	     touch /etc/config/netwizard_hide
+	     touch /etc/netwizard_hide
 	     uci -q set netwizard.default.showhide="1"
 	     uci commit netwizard
     else
 	     uci -q set netwizard.default.showhide="0"
 	     uci commit netwizard
-	     rm -rf /etc/config/netwizard_hide
+	     rm -rf /etcnetwizard_hide
     fi
 }
 
