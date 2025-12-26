@@ -113,8 +113,8 @@ advancedset(){
 }
 
 start_service() {
-    [ -f $LOCK ] && exit
     [ "x$(uci -q get advancedplus.@basic[0].uhttpd)" = "x1" ] && uhttpd_service
+    [ -f $LOCK ] && exit
     [ "x$XBOOT" = "x1" ] && exit 0
     touch $LOCK
     advancedset
@@ -122,8 +122,16 @@ start_service() {
     rm -f $LOCK 2>/dev/null
 }
 
+validate_service_file() {
+    if [ ! -x "/usr/sbin/uhttpd" ]; then
+        echo "错误：/usr/sbin/uhttpd 不存在或不可执行" >&2
+        return 1
+    fi
+    return 0
+}
 boot() {
-	XBOOT=1 start
+	XBOOT=1
+	start
 }
 
 uhttpd_service() {
@@ -148,14 +156,13 @@ uhttpd_service() {
     # procd_append_param env MAX_FAILURES=3
     
     procd_close_instance
-    echo "uhttpd 进程监控服务已启动"
 }
 
 stop_service() {
-    pkill -f "sleep 30.*pgrep.*uhttpd" 2>/dev/null
+
+    rm -f $LOCK 2>/dev/null
     $PROG stop 2>/dev/null
     rm -f "/var/run/${NAME}.pid"
-    echo "uhttpd 进程监控服务已停止"
 }
 
 restart() {
