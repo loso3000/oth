@@ -1829,6 +1829,7 @@ textarea {
     text-align: center;
     margin-left: .1rem;
     outline: 0;
+    padding: 0 .4rem
 }
 
 .cbi-dropdown>.open {
