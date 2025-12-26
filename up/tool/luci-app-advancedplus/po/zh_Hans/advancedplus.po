@@ -26,6 +26,23 @@ msgid "Hide Wizard"
 msgstr "隐藏设置向导"
 
 
+
+msgid "</br>For specific usage, see:"
+msgstr "</br>使用说明："
+
+
+msgid "Accessing using HTTPS"
+msgstr "使用https访问"
+
+msgid "Open the address in the background and use HTTPS for secure access"
+msgstr "打开后台地址用https安全访问"
+
+msgid "OPENWRT backend and SSH login do not display shortcut menus"
+msgstr "OPENWRT后台和SSH登录不显示快捷菜单"
+
+msgid "No backend menu required"
+msgstr "不用后台菜单"
+
 msgid "Qos automatic optimization"
 msgstr "Qos自动优化"
 
@@ -34,6 +51,7 @@ msgstr "开启QOS自动优化策略（测试功能）"
 
 msgid "Prevent uhttpd from exiting web services"
 msgstr "防uhttpd退出WEB服务"
+
 
 msgid "The starting number symbol (#) or each line of the semicolon (;) is considered a comment; Remove (;) and enable the specified option."
 msgstr "开头的数字符号（＃）或分号的每一行（;）被视为注释；删除（;）启用指定选项。"
