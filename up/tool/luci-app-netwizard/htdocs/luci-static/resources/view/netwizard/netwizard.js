@@ -61,7 +61,7 @@ return view.extend({
         var lan_mask = uci.get('netwizard', 'default', 'lan_netmask');
         var wan_face = uci.get('netwizard', 'default', 'wan_interface');
         var wanproto = uci.get('netwizard', 'default', 'wan_proto');
-        
+        var LanHTTPS = uci.get('netwizard', 'default', 'https') || '0';
         if (physicalIfaces <= 1) {
             wanproto = 'siderouter';
             uci.set('netwizard', 'default', 'wan_proto', 'siderouter');
@@ -77,11 +77,11 @@ return view.extend({
         }
 
         if (!lan_mask) {
-            wan_face = uci.get('network', 'lan', 'netmask') ;
+            lan_mask = uci.get('network', 'lan', 'netmask') || '255.255.255.0' ;
         }
-        
+
         if (!wan_face) {
-            wan_face = uci.get('network', 'wan', 'device') || uci.get('network', 'wan', 'ifname') || '';
+            wan_face = uci.get('network', 'wan', 'device') || uci.get('network', 'wan', 'ifname') ;
         }
         
         if (!wanproto) {
@@ -94,6 +94,7 @@ return view.extend({
         this.physicalInterfaces = physicalInterfaces;
         this.lan_mask = lan_mask;
         this.lan_ip = lan_ip;
+	this.LanHTTPS = LanHTTPS;
         this.wan_face = wan_face;
         this.wanproto = wanproto;
         
@@ -343,27 +344,24 @@ return view.extend({
         return '<img src="' + svgUrl + '" alt="' + mode + ' icon" class="mode-icon"  >';
     },
 
-    // 获取模式标题
     getModeTitle: function(mode) {
         switch(mode) {
             case 'pppoe': return _('PPPoE Dial-up');
             case 'dhcp': return _('DHCP Client');
             case 'siderouter': return _('Side Router');
-            default: return _('Network Mode');
+            default: return _('WAN Settings');
         }
     },
 
-    // 获取模式描述
     getModeDescription: function(mode) {
         switch(mode) {
-            case 'pppoe': return _('For ADSL or fiber broadband with username/password');
-            case 'dhcp': return _('Connect to router and automatically obtain IP via DHCP');
+            case 'pppoe': return _('Fiber broadband that requires username/password');
+            case 'dhcp': return _('Connect to router as a subordinate router to internet');
             case 'siderouter': return _('Configure as side router in same network as main router');
             default: return _('Network connection mode');
         }
     },
 
-    // 获取模式颜色
     getModeColor: function(mode) {
         switch(mode) {
             case 'pppoe': return '#ff6b6b';
@@ -375,7 +373,7 @@ return view.extend({
 
     renderModeSelection: function() {
         var container = E('div', { 'class': 'mode-selection-container' }, [
-            E('h3', { 'style': 'margin-top: 4%; margin-bottom: 15px; text-align: center;' },
+            E('h2', { 'style': 'margin-top: 4%; margin-bottom: 15px; text-align: center;padding: 1rem 2rem;' },
                 _('Select Network Connection Mode')),
             E('p', { 'style': 'margin-bottom: %1; text-align: center;' },
                 _('Choose the connection mode that matches your network environment:'))
@@ -403,7 +401,6 @@ return view.extend({
             }, [
                 iconDiv,
                 E('div', { 'class': 'mode-title' }, self.getModeTitle(mode.id)),
-                // E('div', { 'class': 'mode-description' }, self.getModeDescription(mode.id))
             ]);
             
             card.addEventListener('click', function() {
@@ -479,12 +476,12 @@ return view.extend({
                                  '</div>' +
                                  '</div>';
 
-        o = s.taboption('modesetup', form.ListValue, 'wan_proto', _('Network protocol mode selection'), 
+        o = s.taboption('modesetup', form.ListValue, 'wan_proto', _('Protocol'), 
             _('Three different ways to access the Internet, please choose according to your own situation.'));
         o.default = wanproto;
-        o.value('dhcp', _('DHCP client (Connect to the router)'));
-        o.value('pppoe', _('PPPoE dialing (Main route dial-up)'));
-        o.value('siderouter', _('SideRouter (Same network as the main router)'));
+        o.value('dhcp', _('DHCP Client'));
+        o.value('pppoe', _('PPPoE Dial-up'));
+        o.value('siderouter', _('Side Router'));
         o.rmempty = false;
 	o.readonly = true;
     
@@ -509,7 +506,7 @@ return view.extend({
             _('Choose how to get IP address for WAN interface'));
         o.default = 'dhcp';
         o.value('static', _('Static IP address (Specify non conflicting IP addresses)'));
-        o.value('dhcp', _('DHCP client (Main router assigns IP)'));
+        o.value('dhcp', _('DHCP client (existing router assigns IP)'));
         o.depends('wan_proto', 'dhcp');
         o.rmempty = false;
 	
@@ -527,7 +524,7 @@ return view.extend({
         o.value('255.255.255.0');
         o.value('255.255.0.0');
         o.value('255.0.0.0');
-        o.default = '255.255.255.0';
+        o.default = this.lan_mask;
         o.depends({'wan_proto': 'siderouter', 'lan_proto': 'static'});
         o.depends({'wan_proto': 'pppoe','setlan': '1'});
         o.depends({'wan_proto': 'dhcp','setlan': '1'});
@@ -589,7 +586,7 @@ return view.extend({
         o.datatype = 'ip4addr';
         o.rmempty = false;
 
-        o = s.taboption('wansetup', form.DynamicList, 'wan_dns', _('Use Custom WAN DNS'));
+        o = s.taboption('wansetup', form.DynamicList, 'wan_dns', _('Use custom DNS servers'));
         o.value('', _('none'));
         o.value('223.5.5.5', _('Ali DNS: 223.5.5.5'));
         o.value('180.76.76.76', _('Baidu DNS: 180.76.76.76'));
@@ -605,7 +602,7 @@ return view.extend({
         o.rmempty = false;
 
         o = s.taboption('wansetup', form.Flag, 'lan_dhcp', _('Disable DHCP Server'), 
-            _('Selecting means that the DHCP server is not enabled. In a network, only one DHCP server is needed to allocate and manage client IPs. If it is a secondary route, it is recommended to turn off the primary routing DHCP server.'));
+            _('Selecting means that the DHCP server is not enabled. In a network, only one DHCP server is needed to allocate and manage client IPs. If it is a siderouter route, it is recommended to turn off the primary routing DHCP server.'));
         o.default = '0';
         o.rmempty = false;
 
@@ -615,7 +612,7 @@ return view.extend({
         o.default = '0';
         o.rmempty = false;
 
-        o = s.taboption('wansetup', form.ListValue, 'dns_tables', _('DNS'));
+        o = s.taboption('wansetup', form.ListValue, 'dns_tables', _('Use custom DNS servers'));
         o.value('1', _('Use local IP for DNS (default)'));
         o.value('223.5.5.5', _('Ali DNS: 223.5.5.5'));
         o.value('180.76.76.76', _('Baidu DNS: 180.76.76.76'));
@@ -655,12 +652,13 @@ return view.extend({
         // 保存原始的save方法
         var originalSave = m.save;
         var currentLanIP = this.lan_ip;
-        
+        var currentHTTPS = this.LanHTTPS;
+
         // 获取新IP地址的函数
         function getNewLanIP() {
             var selectors = [
+                'input[id="widget.cbid.netwizard.default.lan_ipaddr"]',
                 'input[name="widget.cbid.netwizard.default.lan_ipaddr"]',
-                'input[name="cbid.netwizard.default.lan_ipaddr"]',
                 'input[data-option="lan_ipaddr"]',
                 'input[placeholder*="IP"]',
                 '.cbi-input-text[type="text"]'
@@ -668,8 +666,10 @@ return view.extend({
             
             for (var i = 0; i < selectors.length; i++) {
                 var inputs = document.querySelectorAll(selectors[i]);
+		//console.log('LanIP selector:', selectors[i], 'found:', inputs.length);
                 for (var j = 0; j < inputs.length; j++) {
                     var input = inputs[j];
+                    //console.log('LanIP Input element:', input);
                     if (input && input.value) {
                         var ipMatch = input.value.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
                         if (ipMatch) {
@@ -721,7 +721,7 @@ function getNewhttps() {
     }  
 
 }  
-        
+
         function showRedirectMessage(newIP, useHTTPS) {
             var overlay = document.createElement('div');
             overlay.id = 'netwizard-redirect-overlay';
@@ -745,7 +745,7 @@ function getNewhttps() {
                 padding: 1rem;
                 border-radius: 15px;
                 text-align: center;
-                max-width: 600px;
+                min-width: 350px;
                 box-shadow: 0 20px 40px rgba(0,0,0,0.3);
                 color: white;
             `;
@@ -766,21 +766,21 @@ function getNewhttps() {
                 font-weight: bold;
                 box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             `;
-            
+
             var title = document.createElement('h2');
             title.textContent = _('Configuration Applied Successfully!');
             title.style.cssText = `
                 margin: 0 0 20px 0;
                 color: white;
             `;
-            
+
             var protocolText = useHTTPS === '1' ? 'HTTPS' : 'HTTP';
-            
+
             var message = document.createElement('div');
             message.innerHTML = _('The network configuration has been saved and applied.<br><br>') +
-                               '<div style="background: rgba(255,255,255,0.2); border-radius: 10px; padding: 10px; margin: 10px 0;">' +
-                               _('New LAN IP Address:') + ' ' +
-                               '<strong style="color: #FFD700; font-size: 22px;">' + newIP + '</strong><br>' +
+                               '<div style="background: rgba(255,255,255,0.2);border-radius: 10px;padding: 0 10px;margin: 0 10px;">' +
+                               _('Redirecting to') + ' ' +
+                               '<strong style="color: #FFD700; font-size: 22px;">'+  newIP + '</strong><br>' +
                                _('Access Protocol:') + ' ' +
                                '<strong style="color: #FFD700; font-size: 18px;">' +' ' + protocolText + '</strong>' +
                                '</div><br>' +
@@ -793,16 +793,16 @@ function getNewhttps() {
                 margin: 20px 0;
                 font-size: 16px;
             `;
-            
+
             var buttonContainer = document.createElement('div');
             buttonContainer.style.cssText = `
                 display: flex;
                 justify-content: center;
                 gap: 15px;
-                margin-top: 25px;
+                margin-bottom: 2rem;
                 flex-wrap: wrap;
             `;
-            
+
             var redirectButton = document.createElement('button');
             redirectButton.textContent = _('Redirect Now');
             redirectButton.style.cssText = `
@@ -828,30 +828,29 @@ function getNewhttps() {
             redirectButton.onclick = function() {
                 redirectToNewIP(newIP, useHTTPS);
             };
-            
-            
+
             messageBox.appendChild(icon);
             messageBox.appendChild(title);
             messageBox.appendChild(message);
             buttonContainer.appendChild(redirectButton);
             messageBox.appendChild(buttonContainer);
             overlay.appendChild(messageBox);
-            
+
             document.body.appendChild(overlay);
-            
+
             var countdown = 10;
             var countdownElement = document.getElementById('netwizard-countdown');
-            
+
             var countdownInterval = setInterval(function() {
                 countdown--;
                 if (countdownElement) {
                     countdownElement.textContent = countdown;
-                    
+
                     if (countdown <= 3) {
                         countdownElement.style.color = (countdown % 2 === 0) ? '#FF6B6B' : '#FFD700';
                     }
                 }
-                
+
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
                     redirectToNewIP(newIP, useHTTPS);
@@ -860,7 +859,7 @@ function getNewhttps() {
             
             overlay._countdownInterval = countdownInterval;
         }
-        
+
         function hideRedirectMessage() {
             var overlay = document.getElementById('netwizard-redirect-overlay');
             if (overlay) {
@@ -870,15 +869,14 @@ function getNewhttps() {
                 document.body.removeChild(overlay);
             }
         }
-        
+
         function redirectToNewIP(newIP, useHTTPS) {
             hideRedirectMessage();
             
-            // 根据HTTPS设置决定协议
             var protocol = useHTTPS === '1' ? 'https:' : 'http:';
             var currentPort = window.location.port ? ':' + window.location.port : '';
             var newURL = protocol + '//' + newIP + currentPort + '/';
-            
+
             var jumpMsg = document.createElement('div');
             jumpMsg.id = 'netwizard-jump-msg';
             jumpMsg.style.cssText = `
@@ -894,7 +892,7 @@ function getNewhttps() {
                 box-shadow: 0 5px 15px rgba(0,0,0,0.3);
                 animation: slideIn 0.5s ease;
             `;
-            
+
             var style = document.createElement('style');
             style.textContent = `
                 @keyframes slideIn {
@@ -903,10 +901,10 @@ function getNewhttps() {
                 }
             `;
             document.head.appendChild(style);
-            
-            jumpMsg.textContent = _('Redirecting to ') + (useHTTPS === '1' ? 'HTTPS://' : 'HTTP://') + newIP + '...';
+
+            jumpMsg.textContent = _('Redirecting to') + ' ' + (useHTTPS === '1' ? 'HTTPS://' : 'HTTP://') + newIP + '...';
             document.body.appendChild(jumpMsg);
-            
+
             setTimeout(function() {
                 try {
                     window.location.href = newURL;
@@ -940,14 +938,14 @@ function getNewhttps() {
                 `;
                 applyingMsg.textContent = _('Applying network configuration...');
                 document.body.appendChild(applyingMsg);
-                
+
                 var callRPC = rpc.declare({
                     object: 'file',
                     method: 'exec',
                     params: ['command', 'params', 'env'],
                     expect: { '': {} }
                 });
-                
+
                 setTimeout(function() {
                     fs.stat('/etc/init.d/netwizard').then(function(stats) {
                         return callRPC('/etc/init.d/netwizard', ['start'], {});
@@ -959,7 +957,7 @@ function getNewhttps() {
                         setTimeout(function() {
                             redirectToNewIP(newIP, useHTTPS);
                         }, 10000);
-                        
+
                         resolve(response);
                     }).catch(function(err) {
                         if (applyingMsg && applyingMsg.parentNode) {
@@ -967,37 +965,39 @@ function getNewhttps() {
                         }
 
                         showRedirectMessage(newIP, useHTTPS);
-                        
+
                         setTimeout(function() {
                             redirectToNewIP(newIP, useHTTPS);
                         }, 10000);
-                        
+
                         resolve({}); 
                     });
                 }, 1000);
             });
         }
+m.save = function() {
+    var newLanIP = getNewLanIP();
+    var ipChanged = newLanIP && currentLanIP !== newLanIP;
+    var useHTTPS = getNewhttps();
+    var HTTPSChanged = currentHTTPS !== useHTTPS;
 
-        m.save = function() {
-            var newLanIP = getNewLanIP();
-            var ipChanged = newLanIP && currentLanIP !== newLanIP;
-            var useHTTPS = getNewhttps();
+    var isHTTP = useHTTPS === '0';
+    var noRedirect= isHTTP && !ipChanged && !HTTPSChanged;
 
-            //console.log('useHTTPS:', useHTTPS);
-            var savingMsg = document.createElement('div');
-            savingMsg.id = 'netwizard-saving-msg';
-            savingMsg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0,0,0,0.9);
-                color: white;
-                padding: 20px 40px;
-                border-radius: 10px;
-                z-index: 9998;
-                font-size: 16px;
-            `;
+    var savingMsg = document.createElement('div');
+    savingMsg.id = 'netwizard-saving-msg';
+    savingMsg.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.9);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 10px;
+        z-index: 9998;
+        font-size: 16px;
+    `;
             savingMsg.textContent = _('Saving configuration...');
             document.body.appendChild(savingMsg);
             
@@ -1007,7 +1007,7 @@ function getNewhttps() {
                     document.body.removeChild(msg);
                 }
                 
-                if (!ipChanged || !newLanIP) {
+                if (noRedirect) {
                     var successMsg = document.createElement('div');
                     successMsg.id = 'netwizard-success-msg';
                     successMsg.style.cssText = `
@@ -1026,26 +1026,26 @@ function getNewhttps() {
                     document.body.appendChild(successMsg);
                     
                     setTimeout(function() {
-                        var msg = document.getElementById('netwizard-success-msg');
-                        if (msg && msg.parentNode) {
-                            document.body.removeChild(msg);
-                        }
-                    }, 3000);
-                    
-                    return result;
+                var msg = document.getElementById('netwizard-success-msg');
+                if (msg && msg.parentNode) {
+                    document.body.removeChild(msg);
                 }
+            }, 3000);
 
-                return executeNetwizardScript(newLanIP, useHTTPS).then(function() {
-                    return result;
-                }).catch(function(err) {
-                    showRedirectMessage(newLanIP, useHTTPS);
-                    setTimeout(function() {
-                        redirectToNewIP(newLanIP, useHTTPS);
-                    }, 10000);
-                    
-                    return result;
-                });
-            }).catch(function(err) {
+            return result;
+        }
+        
+        return executeNetwizardScript(newLanIP, useHTTPS).then(function() {
+            return result;
+        }).catch(function(err) {
+            showRedirectMessage(newLanIP, useHTTPS);
+            setTimeout(function() {
+                redirectToNewIP(newLanIP, useHTTPS);
+            }, 10000);
+            
+            return result;
+        });
+    }).catch(function(err) {
                 var msg = document.getElementById('netwizard-saving-msg');
                 if (msg && msg.parentNode) {
                     document.body.removeChild(msg);
@@ -1076,9 +1076,8 @@ function getNewhttps() {
                 }, 5000);
                 
                 throw err;
-            });
-        };
-
+    });
+};
 
 
         var script = document.createElement('script');

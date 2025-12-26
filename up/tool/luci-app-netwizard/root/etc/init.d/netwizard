@@ -276,7 +276,7 @@ configure_network() {
         
         $UCISET network.wan.metric='1'
         $UCISET network.wan.$ifname="${wan_interface}"
-        $UCISET network.wan6.$ifname="@wan"
+        [ "$wan_proto" == "pppoe" ] && $UCISET network.wan6.$ifname="@wan" || $UCISET network.wan6.$ifname="${wan_interface}"
 	 # firewall
          $UCIDEL firewall.@zone[1].network
         $UCISET firewall.@zone[1].masq='1'
@@ -481,7 +481,6 @@ EOF
 
 boot() {
     XBOOT=1
-    start
     
     SSID=$(uci get wireless.@wifi-iface[0].ssid 2>/dev/null || echo "")
     KEY=$(uci get wireless.@wifi-iface[0].key 2>/dev/null || echo "")
@@ -513,6 +512,7 @@ boot() {
         
         uci commit netwizard
     fi
+    start
 }
 
 start() { 
