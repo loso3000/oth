@@ -1,17 +1,21 @@
+
 {
      "luci-app-netwizard": {
 		"description": "Grant UCI access for luci-app-netwizard",
-        "read": {
+	"read": {
             "ubus": {
-                "file": ["exec"]
-            },
-	    "uci": [ "netwizard", "wireless" ]
-        },
-        "write": {
+
+                        "file": ["exec", "list", "stat", "read"],
+                        "uci": [ "*" ],
+                        "netwizard": ["*"]
+            }
+	},
+	"write": {
             "ubus": {
-                "file": ["exec"]
-            },
-	    "uci": [ "netwizard" ]
-        }
+                "netwizard": ["*"],
+                "file": ["write"],
+                "uci": ["*"]
+      }
     }
+  }
 }
