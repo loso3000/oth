@@ -1055,7 +1055,7 @@ onCheck: function() {
                                 '<table>' +
                                 '<tr><td>' + _('File:') + '</td><td>/tmp/firmware.img</td></tr>' +
                                 '<tr><td>' + _('Size:') + '</td><td>' + sizeMB + ' MB (' + _('Expected:') + ' ' + self.firmwareInfo.size + ' MB)</td></tr>' +
-                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + '</td></tr>' +
+                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + ' MB)</td></tr>' +
                                 '<tr><td>' + _('Version:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.version) + '</td></tr>' +
                                 '<tr><td>' + _('Release Date:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.date) + '</td></tr>' +
                                 '<tr><td>' + _('MD5:') + '</td><td><code>' + self.escapeHtml(self.firmwareInfo.md5) + '</code></td></tr>' +

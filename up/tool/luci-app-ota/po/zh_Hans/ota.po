@@ -151,10 +151,10 @@ msgid "Firmware Ready"
 msgstr "固件就绪"
 
 msgid "File:"
-msgstr "文件:"
+msgstr "文件名称:"
 
 msgid "Size:"
-msgstr "大小:"
+msgstr "固件大小:"
 
 msgid "Part Size:"
 msgstr "分区大小:"
@@ -163,7 +163,7 @@ msgid "Expected:"
 msgstr "预期大小:"
 
 msgid "Version:"
-msgstr "版本:"
+msgstr "固件版本:"
 
 msgid "Release Date:"
 msgstr "发布日期:"
@@ -172,7 +172,7 @@ msgid "MD5:"
 msgstr "MD5值:"
 
 msgid "Default IP:"
-msgstr "默认 IP:"
+msgstr "默认IP:"
 
 msgid "Starting download..."
 msgstr "开始下载..."
