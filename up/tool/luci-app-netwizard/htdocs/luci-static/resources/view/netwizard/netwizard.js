@@ -69,7 +69,7 @@ return view.extend({
         }
 
         if (!lan_ip) {
-            lan_ip = uci.get('network', 'lan', 'ipaddr') ;
+            lan_ip = uci.get('network', 'lan', 'ipaddr') || '192.168.10.1/24' ;
 	    var parts = lan_ip.split('/');
 	    if (parts.length === 2) {
 	    lan_ip = parts[0];
@@ -81,7 +81,7 @@ return view.extend({
         }
 
         if (!wan_face) {
-            wan_face = uci.get('network', 'wan', 'device') || uci.get('network', 'wan', 'ifname') ;
+            wan_face = uci.get('network', 'wan', 'device') || 'eth1') ;
         }
         
         if (!wanproto) {
@@ -507,7 +507,7 @@ getModeIcon: function(mode) {
 	
         // LAN Settings for SideRouter mode
         o = s.taboption('wansetup', form.ListValue, 'lan_proto', _('LAN IP Address Mode'), 
-            _('Choose how to get IP address for LAN interface'));
+            _('Warning: Setting up automatic IP address retrieval requires checking the IP address on the higher-level router'));
         o.default = 'static';
         o.value('static', _('Static IP address (Specify non conflicting IP addresses)'));
         o.value('dhcp', _('DHCP client (Main router assigns IP)'));

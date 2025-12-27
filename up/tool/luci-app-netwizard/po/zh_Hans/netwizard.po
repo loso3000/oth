@@ -75,8 +75,8 @@ msgstr "三种不同的上网方式，请根据自身情况选择。"
 msgid "LAN IP Address Mode"
 msgstr "LAN IP 地址模式"
 
-msgid "Choose how to get IP address for LAN interface"
-msgstr "选择LAN接口获取IP地址的方式"
+msgid "Warning: Setting up automatic IP address retrieval requires checking the IP address on the higher-level router"
+msgstr "警告：设置自动获取IP地址须到上级路由上查看IP"
 
 msgid "Static IP address (Specify non conflicting IP addresses)"
 msgstr "静态 IP 地址（指定非冲突的 IP 地址）"
