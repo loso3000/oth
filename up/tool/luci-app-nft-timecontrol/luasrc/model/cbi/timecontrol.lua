@@ -25,7 +25,7 @@ e.default = "blacklist"
 
 e = t:option(ListValue, "chain",translate("Control intensity"), translate("Pay attention to strong control: machines under control will not be able to connect to the software router backend!"))
 e.rmempty = false
--- e:value("forward", translate("Ordinary forwarding control"))
+e:value("forward", translate("Ordinary forwarding control"))
 e:value("input", translate("Strong inbound control"))
 e.default = "input"
 
@@ -44,7 +44,6 @@ e.size = 4
 ip = t:option(Value, "mac", translate("IP/MAC"))
 ip.size = 8
 
--- 替换原有的 get_devices() 函数
 local function get_devices()
     local devices = {}
     local seen_ips = {}
