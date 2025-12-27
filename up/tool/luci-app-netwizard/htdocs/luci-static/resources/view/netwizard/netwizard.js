@@ -514,14 +514,6 @@ getModeIcon: function(mode) {
         o.depends('wan_proto', 'siderouter');
         o.rmempty = false;
 
-        // WAN interface Settings for set mode
-        o = s.taboption('wansetup', form.ListValue, 'dhcp_proto', _('WAN interface IP address mode'), 
-            _('Choose how to get IP address for WAN interface'));
-        o.default = 'dhcp';
-        o.value('static', _('Static IP address (Specify non conflicting IP addresses)'));
-        o.value('dhcp', _('DHCP client (existing router assigns IP)'));
-        o.depends('wan_proto', 'dhcp');
-        o.rmempty = false;
 	
         o = s.taboption('wansetup', form.Value, 'lan_ipaddr', _('LAN IPv4 Address'), 
             _('You must specify the IP address of this machine, which is the IP address of the web access route'));
@@ -549,6 +541,15 @@ getModeIcon: function(mode) {
         o.datatype = 'ip4addr';
         o.rmempty = false;
 
+        // WAN interface Settings for set mode
+        o = s.taboption('wansetup', form.ListValue, 'dhcp_proto', _('WAN interface IP address mode'), 
+            _('Choose how to get IP address for WAN interface'));
+        o.default = 'dhcp';
+        o.value('static', _('Static IP address (Specify non conflicting IP addresses)'));
+        o.value('dhcp', _('DHCP client (existing router assigns IP)'));
+        o.depends('wan_proto', 'dhcp');
+        o.rmempty = false;
+	
         o = s.taboption('wansetup', form.DynamicList, 'lan_dns', _('Use Custom SideRouter DNS'));
         o.value('223.5.5.5', _('Ali DNS: 223.5.5.5'));
         o.value('180.76.76.76', _('Baidu DNS: 180.76.76.76'));
@@ -559,7 +560,7 @@ getModeIcon: function(mode) {
         o.datatype = 'ip4addr';
         o.default = '223.5.5.5';
         o.rmempty = false;
-
+	
         // WAN Interface for other modes
         o = s.taboption('wansetup', widgets.DeviceSelect, 'wan_interface', 
             _('Device'), 
