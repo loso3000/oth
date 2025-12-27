@@ -147,18 +147,19 @@ return view.extend({
             
             .mode-card {
                 border-radius: 8px;
-                padding: 5rem 1rem;
+                padding: 4rem 1rem;
                 cursor: pointer;
                 transition: all 0.3s;
                 text-align: center;
                 flex: 1;
-                min-width: 200px;
-                max-width: 200px;
+                min-width: 180px;
+                max-width: 180px;
                 box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 border: 2px solid transparent;
+		
             }
             
             .mode-card:hover {
@@ -208,9 +209,10 @@ return view.extend({
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 50%;
+                background: rgba(255, 255, 255, 1);
+                border-radius: 10%;
                 padding: 10px;
+		box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor);
             }
             
             .mode-icon-bg {
@@ -328,21 +330,32 @@ return view.extend({
         document.head.appendChild(style);
     },
 
-    getModeIconBase64: function(mode) {
-        switch(mode) {
-            case 'pppoe':
-                return 'data:image/svg+xml;base64,' + btoa('<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40"><path fill="white" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c2.76 0 5 2.24 5 5v2h2c1.66 0 3 1.34 3 3s-1.34 3-3 3z"/></svg>');
-            case 'dhcp':
-               return 'data:image/svg+xml;base64,' + btoa('<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40"><path fill="white" d="M12 3C7.79 3 4.14 5.34 2.29 8.5c-.37.66.11 1.5.9 1.5h17.63c.79 0 1.27-.84.9-1.5C19.86 5.34 16.21 3 12 3zm0 5c-1.38 0-2.5 1.12-2.5 2.5S10.62 13 12 13s2.5-1.12 2.5-2.5S13.38 8 12 8zm0 6c-2.33 0-7 1.17-7 3.5V19h14v-1.5c0-2.33-4.67-3.5-7-3.5z"/></svg>');
-            case 'siderouter':
-               return 'data:image/svg+xml;base64,' + btoa('<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40"><path fill="white" d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>');
-        }
-    },
+getModeIcon: function(mode) {
+    var svgCode;
+    //var color = "#fff";
+    var color = this.getModeColor(mode); // 获取模式对应的颜色
+    
+    switch(mode) {
+        case 'pppoe':
+            svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="48" height="48"><path fill="${color}" d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/></svg>`;
+            break;
+        case 'dhcp':
+            svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768" width="48" height="48">
+<path fill="${color}" d="M506.666 629.335v-82.417h-82.418v82.417h82.418zM362.916 629.335v-82.417h-80.501v82.417h80.501zM221.083 629.335v-82.417h-82.417v82.417h82.417zM669.584 424.25q32.584 0 57.5 24.916t24.916 57.5v162.916q0 32.584-24.916 57.5t-57.5 24.917h-571.169q-32.584 0-57.5-24.917t-24.916-57.5v-162.916q0-32.584 24.916-57.5t57.5-24.916h408.252v-162.917h82.418v162.917h80.5zM683 167.416l-32.584 32.584q-40.25-40.25-103.501-40.25-61.334 0-101.584 40.25l-32.584-32.584q57.5-57.5 134.168-57.5 78.584 0 136.084 57.5zM719.417 134.833q-78.584-69-172.501-69-92 0-170.585 69l-32.584-32.584q86.25-86.25 203.167-86.25 118.834 0 205.085 86.25z"></path>
+</svg>`;
+            break;
+        case 'siderouter':
+            svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768" width="48" height="48">
+<path fill="${color}" d="M496.5 463.5v84l-112.5 141-370.5-465 9-7.5q9-6 18.75-12.75t26.25-17.25 35.25-19.5 42.75-20.25 51-19.5 56.25-15.75 63-11.25 68.25-3.75 68.25 3.75 63 11.25 56.25 15.75 51 19.5 42.75 20.25 35.25 19.5 26.25 17.25 18.75 12.75l9 7.5-66 84q-9-3-33-3-67.5 0-113.25 45.75t-45.75 113.25zM703.5 511.5v-48q0-19.5-14.25-33.75t-33.75-14.25-33.75 14.25-14.25 33.75v48h96zM736.5 511.5q12 0 21.75 10.5t9.75 22.5v127.5q0 12-9.75 21.75t-21.75 9.75h-160.5q-12 0-21.75-9.75t-9.75-21.75v-127.5q0-12 9.75-22.5t21.75-10.5v-48q0-34.5 22.5-57t57-22.5 57.75 23.25 23.25 56.25v48z"></path>
+</svg>`;
+            break;
+    }
+    
+    var svgUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgCode)));
+    return '<img src="' + svgUrl + '" alt="' + mode + ' icon" class="mode-icon">';
+},
 
-    getModeIcon: function(mode) {
-        var svgUrl = this.getModeIconBase64(mode);
-        return '<img src="' + svgUrl + '" alt="' + mode + ' icon" class="mode-icon"  >';
-    },
+
 
     getModeTitle: function(mode) {
         switch(mode) {
@@ -450,7 +463,7 @@ return view.extend({
         var o = s.taboption('modesetup', form.DummyValue, 'current_mode', _('Current Network Mode'));
         o.rawhtml = true;
         o.default = '<div style="display: flex;align-items: center;flex-direction: column;">' +
-                    '<div class="mode-icon-bg" style="margin-bottom: 20px;background: ' + modeColor + ';">' + modeIcon + '</div>' +
+                    '<div class="mode-icon-container">' + modeIcon + '</div>' +
                     '<h3 >' + modeTitle + '</h3>' +
                     '<p >' + modeDescription + '</p>' +
                     '<div class="quick-nav-buttons">' +
