@@ -2477,6 +2477,11 @@ div>.table>.tr:nth-of-type(2n+1):hover {
     max-width: 3rem
 }
 
+#cbi-network .cbi-value>.cbi-value-field, #cbi-network  .cbi-value>.cbi-value-title{
+    line-height: 1.2;
+}
+
+
 .cbi-input-invalid {
     color: red;
     border-bottom-color: red
