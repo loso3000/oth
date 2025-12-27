@@ -154,7 +154,7 @@ return view.extend({
                 flex: 1;
                 min-width: 180px;
                 max-width: 180px;
-                box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor);
+                box-shadow: 0 0.3rem 0.5rem var(--input-boxcolor);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -169,8 +169,8 @@ return view.extend({
             
             /* PPPoE模式 - 红色主题 */
             .mode-card[data-mode="pppoe"] {
-                background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
-                border-color: #ff4757;
+		background: rgba(255, 107 ,107, 0.7);
+                border-color: rgba(255, 107 ,107, 0.7);
                 color: white;
             }
             
@@ -181,24 +181,24 @@ return view.extend({
             
             /* DHCP模式 - 绿色主题 */
             .mode-card[data-mode="dhcp"] {
-                background: linear-gradient(135deg, #339af0 0%, #228be6 100%);
-                border-color: #228be6;
+		background: rgba(51, 154, 240, 0.7);
+                border-color: rgba(51, 154, 240, 0.7);
                 color: white;
             }
             
             .mode-card[data-mode="dhcp"]:hover {
-                border-color: #1c7ed6;
+                border-color: #01b7ff;
                 box-shadow: 0 4px 12px rgba(34, 139, 230, 0.3);
             }
             
             .mode-card[data-mode="siderouter"] {
-                background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
-                border-color: #40c057;
+		background: rgba(81, 207, 102, 0.7);
+                border-color: rgba(81, 207, 102, 0.7);
                 color: white;
             }
             
             .mode-card[data-mode="siderouter"]:hover {
-                border-color: #37b24d;
+                border-color: #27f94d;
                 box-shadow: 0 4px 12px rgba(64, 192, 87, 0.3);
             }
             
@@ -212,7 +212,7 @@ return view.extend({
                 background: rgba(255, 255, 255, 1);
                 border-radius: 10%;
                 padding: 10px;
-		box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor);
+		box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
             }
             
             .mode-icon-bg {
@@ -285,15 +285,15 @@ return view.extend({
             }
             
             .mode-info-header[data-mode="pppoe"] {
-                background: #ff6b6b;
+                background: rgba(255, 107 ,107, 0.7);
             }
             
             .mode-info-header[data-mode="dhcp"] {
-                background: #339af0;
+                background: rgba(51, 154, 240, 0.7);
             }
             
             .mode-info-header[data-mode="siderouter"] {
-                background: #51cf66;
+                background: rgba(81, 207, 102, 0.7);
             }
             
             @media (max-width: 768px) {
