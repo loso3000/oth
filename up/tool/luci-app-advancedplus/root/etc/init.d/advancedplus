@@ -158,6 +158,10 @@ uhttpd_service() {
     procd_close_instance
 }
 
+service_triggers() {
+ 	 procd_add_reload_trigger 'advancedplus'
+}
+
 stop_service() {
 
     rm -f $LOCK 2>/dev/null
