@@ -14,7 +14,7 @@ PKG_LICENSE:=Apache-2.0
 
 LUCI_TITLE:=LuCI support for timecontrol for nftables
 LUCI_DESCRIPTION:=LuCI support for Easy timecontrol for nftables(Internet time control).
-LUCI_DEPENDS:=+bc +nftables +bash +conntrack-tools
+LUCI_DEPENDS:=+bc +nftables +bash +conntrack
 LUCI_PKGARCH:=all
 
 PKG_VERSION:=3.1.6

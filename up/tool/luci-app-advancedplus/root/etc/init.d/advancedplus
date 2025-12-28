@@ -137,6 +137,7 @@ boot() {
 uhttpd_service() {
     validate_service_file || return 1
     
+    echo "uhttpd 服务启用检测！"
     if ! /etc/init.d/uhttpd enabled; then
         echo "uhttpd 服务未启用，监控服务不启动" >&2
         return 0
