@@ -10,7 +10,7 @@ LUCI_PKGARCH:=all
 
 LUCI_DEPENDS:=+jq +curl +gdisk +parted +sgdisk
 PKG_VERSION:=2.0.9
-PKG_RELEASE:=20251221
+PKG_RELEASE:=20251228
 PKG_MAINTAINER:=sirpdboy <herboy2008@gmail.com>
 
 include $(TOPDIR)/feeds/luci/luci.mk

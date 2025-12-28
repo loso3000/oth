@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2019-2025 The Sirpdboy <herboy2008@gmail.com> 
- *
+ *  Copyright (C) 2019-2025 author sirpdboy herboy2008@gmail.com github@sirpdboy 
+ *  
  *  Licensed to the public under the Apache License 2.0
  */
 
@@ -550,7 +550,7 @@ fetchFirmwareInfoFromRPC: function() {
                                                 '<table>' +
                                                 '<tr><td>' + _('File:') + '</td><td>/tmp/firmware.img</td></tr>' +
                                                 '<tr><td>' + _('Size:') + '</td><td>' + sizeMB + ' MB</td></tr>' +
-                                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + '</td></tr>' +
+                                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + ' MB</td></tr>' +
                                                 '<tr><td>' + _('Version:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.version) + '</td></tr>' +
                                                 '<tr><td>' + _('Release Date:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.date) + '</td></tr>' +
                                                 '<tr><td>' + _('MD5:') + '</td><td><code>' + self.escapeHtml(self.firmwareInfo.md5) + '</code></td></tr>' +
@@ -1055,7 +1055,7 @@ onCheck: function() {
                                 '<table>' +
                                 '<tr><td>' + _('File:') + '</td><td>/tmp/firmware.img</td></tr>' +
                                 '<tr><td>' + _('Size:') + '</td><td>' + sizeMB + ' MB (' + _('Expected:') + ' ' + self.firmwareInfo.size + ' MB)</td></tr>' +
-                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + ' MB)</td></tr>' +
+                                '<tr><td>' + _('Part Size:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.partsize) + ' MB</td></tr>' +
                                 '<tr><td>' + _('Version:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.version) + '</td></tr>' +
                                 '<tr><td>' + _('Release Date:') + '</td><td>' + self.escapeHtml(self.firmwareInfo.date) + '</td></tr>' +
                                 '<tr><td>' + _('MD5:') + '</td><td><code>' + self.escapeHtml(self.firmwareInfo.md5) + '</code></td></tr>' +

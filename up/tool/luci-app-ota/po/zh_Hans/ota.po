@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"OpenWrt 24.10 JavaScript版本 author sirpdboy herboy2008@gmail.com github@sirpdboy "
 
 msgid "OTA"
 msgstr "在线升级"
@@ -70,7 +71,7 @@ msgid "Keep settings configuration"
 msgstr "保留设置配置"
 
 msgid "Keep installed plugins (test)"
-msgstr "保留已安装插件 (测试)"
+msgstr "保留已安装插件 (开发中)"
 
 msgid "Flash Mode Information"
 msgstr "刷机模式信息"

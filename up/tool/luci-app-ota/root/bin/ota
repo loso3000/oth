@@ -1,6 +1,6 @@
 #!/bin/sh
+# OpenWrt 24.10 JavaScript版本 author sirpdboy herboy2008@gmail.com github@sirpdboy 
 
-# OTA在线升级脚本 - OpenWrt 24.10 JavaScript版本
 
 . /etc/os-release
 . /lib/functions/uci-defaults.sh
