@@ -81,7 +81,7 @@ return view.extend({
         }
 
         if (!wan_face) {
-            wan_face = uci.get('network', 'wan', 'device') || 'eth1') ;
+            wan_face = uci.get('network', 'wan', 'device') || 'eth1';
         }
         
         if (!wanproto) {
@@ -169,8 +169,8 @@ return view.extend({
             
             /* PPPoE模式 - 红色主题 */
             .mode-card[data-mode="pppoe"] {
-		background: rgba(255, 107 ,107, 0.7);
-                border-color: rgba(255, 107 ,107, 0.7);
+		background: rgba(255,107,107,0.7);
+                border-color: rgba(255,107,107,0.7);
                 color: white;
             }
             
@@ -181,8 +181,8 @@ return view.extend({
             
             /* DHCP模式 - 绿色主题 */
             .mode-card[data-mode="dhcp"] {
-		background: rgba(51, 154, 240, 0.7);
-                border-color: rgba(51, 154, 240, 0.7);
+		background: rgba(51,154,240,0.7);
+                border-color: rgba(51,154,240,0.7);
                 color: white;
             }
             
@@ -192,8 +192,8 @@ return view.extend({
             }
             
             .mode-card[data-mode="siderouter"] {
-		background: rgba(81, 207, 102, 0.7);
-                border-color: rgba(81, 207, 102, 0.7);
+		background: rgba(81,207,102,0.7);
+                border-color: rgba(81,207,102,0.7);
                 color: white;
             }
             
@@ -209,10 +209,10 @@ return view.extend({
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: rgba(255, 255, 255, 1);
+                background: rgba(255, 255, 255,1);
                 border-radius: 10%;
                 padding: 10px;
-		box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
+		box-shadow: 0 0.3rem 0.5rem rgba(0,0,0,0.22);
             }
             
             .mode-icon-bg {
@@ -285,15 +285,15 @@ return view.extend({
             }
             
             .mode-info-header[data-mode="pppoe"] {
-                background: rgba(255, 107 ,107, 0.7);
+                background: rgba(255,107,107,0.7);
             }
             
             .mode-info-header[data-mode="dhcp"] {
-                background: rgba(51, 154, 240, 0.7);
+                background: rgba(51,154,240,0.7);
             }
             
             .mode-info-header[data-mode="siderouter"] {
-                background: rgba(81, 207, 102, 0.7);
+                background: rgba(81,207,102,0.7);
             }
             
             @media (max-width: 768px) {
@@ -386,9 +386,9 @@ getModeIcon: function(mode) {
 
     renderModeSelection: function() {
         var container = E('div', { 'class': 'mode-selection-container' }, [
-            E('h2', { 'style': 'margin-top: 4%; margin-bottom: 15px; text-align: center;padding: 1rem 2rem;' },
+            E('h2', { 'style': 'margin-top: 4%;margin-bottom: 15px;text-align: center;padding: 1rem;font-size: 1.8rem;font-weight: 600;' },
                 _('Select Network Connection Mode')),
-            E('p', { 'style': 'margin-bottom: %1; text-align: center;' },
+            E('p', { 'style': 'margin-bottom: 1rem;text-align: center;font-size: 1.1rem;' },
                 _('Choose the connection mode that matches your network environment:'))
         ]);
         
