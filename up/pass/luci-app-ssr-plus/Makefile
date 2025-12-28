@@ -9,8 +9,6 @@ PKG_RELEASE:=3
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_Iptables_Transparent_Proxy \
 	CONFIG_PACKAGE_$(PKG_NAME)_Nftables_Transparent_Proxy \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_NONE_V2RAY \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_V2ray \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Xray \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS_NG \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_DNS2SOCKS \
@@ -33,8 +31,6 @@ LUCI_DEPENDS:= \
 	+coreutils +coreutils-base64 +dns2tcp +dnsmasq-full \
 	+jq +ip-full +lua +lua-neturl +libuci-lua +microsocks \
 	+tcping +resolveip +curl +nping \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_V2ray:curl \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_V2ray:v2ray-core \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Xray:curl \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Xray:xray-core \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS_NG:chinadns-ng \
