@@ -225,46 +225,82 @@ flush_connections() {
 send_tcp_reset() {
     local target="$1"
     
-    if [ -x "$bin_iptables" ]; then
-        local parsed_result=$(parse_target "${target}")
-        if [ $? -eq 0 ]; then
-            IFS=':' read -r type subtype value <<< "${parsed_result}"
-            
-            if [ "${type}" = "ipv4" ]; then
-                # 根据不同类型添加规则
-                case "$subtype" in
-                    "single")
-                        # 单个IP
-                        $bin_iptables -I FORWARD -s "${value}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-                        if [ "$StrongCHAIN" = "1" ]; then
-                            $bin_iptables -I INPUT -s "${value}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-                        fi
-                        dbg "添加TCP RST规则(单个IP): ${value}"
-                        ;;
-                    "range")
-                        # IP范围
-                        local start_ip=${value%-*}
-                        local end_ip=${value#*-}
-                        $bin_iptables -I FORWARD -m iprange --src-range "${start_ip}-${end_ip}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-                        if [ "$StrongCHAIN" = "1" ]; then
-                            $bin_iptables -I INPUT -m iprange --src-range "${start_ip}-${end_ip}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-                        fi
-                        dbg "添加TCP RST规则(IP范围): ${value}"
-                        ;;
-                    "cidr")
-                        # CIDR
-                        $bin_iptables -I FORWARD -s "${value}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-                        if [ "$StrongCHAIN" = "1" ]; then
-                            $bin_iptables -I INPUT -s "${value}" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-                        fi
-                        dbg "添加TCP RST规则(CIDR): ${value}"
-                        ;;
-                esac
-                info "发送TCP RST包: ${target}"
-            else
-                dbg "TCP RST仅支持IPv4: ${target}"
-            fi
-        fi
+    [ "$TCP_RST" != "1" ] && return
+    
+    local parsed_result=$(parse_target "${target}")
+    [ $? -ne 0 ] && return
+    
+    IFS=':' read -r type subtype value <<< "${parsed_result}"
+    [ "$type" != "ipv4" ] && return
+    
+    info "发送TCP RST包: ${target}"
+    
+    # ============ iptables ============
+    if [ -n "$iptables_ver" ]; then
+        case "$subtype" in
+            "single"|"cidr")
+                iptables -I FORWARD -s "$value" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                [ "$StrongCHAIN" = "1" ] && iptables -I INPUT -s "$value" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                ;;
+            "range")
+                local start_ip=${value%-*}
+                local end_ip=${value#*-}
+                iptables -I FORWARD -m iprange --src-range "$start_ip-$end_ip" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                [ "$StrongCHAIN" = "1" ] && iptables -I INPUT -m iprange --src-range "$start_ip-$end_ip" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                ;;
+        esac
+    fi
+    
+    # ============ nftables ============
+    if [ -n "$nftables_ver" ]; then
+        case "$subtype" in
+            "single"|"cidr")
+                nft add rule inet timecontrol forward ip saddr "$value" tcp flags rst counter reject with tcp reset 2>/dev/null || true
+                [ "$StrongCHAIN" = "1" ] && nft add rule inet timecontrol input ip saddr "$value" tcp flags rst counter reject with tcp reset 2>/dev/null || true
+                ;;
+            "range")
+                local start_ip=${value%-*}
+                local end_ip=${value#*-}
+                nft add rule inet timecontrol forward ip saddr >= "$start_ip" ip saddr <= "$end_ip" tcp flags rst counter reject with tcp reset 2>/dev/null || true
+                [ "$StrongCHAIN" = "1" ] && nft add rule inet timecontrol input ip saddr >= "$start_ip" ip saddr <= "$end_ip" tcp flags rst counter reject with tcp reset 2>/dev/null || true
+                ;;
+        esac
+    fi
+    
+    # 10秒后自动删除
+    (sleep 10; remove_tcp_reset "$target") &
+}
+
+remove_tcp_reset() {
+    local target="$1"
+    local parsed_result=$(parse_target "$target")
+    [ $? -ne 0 ] && return
+    
+    IFS=':' read -r type subtype value <<< "$parsed_result"
+    [ "$type" != "ipv4" ] && return
+    
+    # iptables删除
+    if [ -n "$iptables_ver" ]; then
+        case "$subtype" in
+            "single"|"cidr")
+                iptables -D FORWARD -s "$value" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                [ "$StrongCHAIN" = "1" ] && iptables -D INPUT -s "$value" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                ;;
+            "range")
+                local start_ip=${value%-*}
+                local end_ip=${value#*-}
+                iptables -D FORWARD -m iprange --src-range "$start_ip-$end_ip" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                [ "$StrongCHAIN" = "1" ] && iptables -D INPUT -m iprange --src-range "$start_ip-$end_ip" -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
+                ;;
+        esac
+    fi
+    
+    # nftables删除（简化：重新加载表）
+    if [ -n "$nftables_ver" ]; then
+        # 简单的做法是重新创建表
+        nft delete table inet timecontrol 2>/dev/null || true
+        # 重新初始化
+        init_timecontrol
     fi
 }
 
@@ -356,7 +392,7 @@ nft_rule_exists() {
 }
 
 stop_timecontrol() {
-    
+    remove_tcp_reset
     if [ -n "$nftables_ver" ]; then
         for chain in "ip" "bridge" "ip6"; do
             if nft_table_exists "$chain filter"; then
@@ -376,10 +412,7 @@ stop_timecontrol() {
         dbg "All nftables rules have been cleared."
     elif [ -n "$iptables_ver" ]; then
     
-            iptables -D FORWARD -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-            if [ "$StrongCHAIN" -eq 1 ]; then
-                iptables -D INPUT -p tcp -j REJECT --reject-with tcp-reset 2>/dev/null || true
-            fi
+           
         if [ "$StrongCHAIN" -eq 1 ]; then
             iptables -D INPUT -m set --match-set timecontrol_blacklist src -j DROP 2>/dev/null
             ip6tables -D INPUT -m set --match-set timecontrol_blacklistv6 src -j DROP 2>/dev/null
