@@ -2992,7 +2992,7 @@ body.lang_pl.node-main-login .cbi-value-title {
     -ms-flex-pack: center;
     justify-content: center;
     text-indent: 0rem;
-    background: transparent;
+    background: transparent!important;
     width: 14rem;
     min-width: 100% !important;
     border-radius: 0;
