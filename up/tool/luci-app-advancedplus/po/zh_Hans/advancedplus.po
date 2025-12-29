@@ -53,6 +53,9 @@ msgid "Prevent uhttpd from exiting web services"
 msgstr "防uhttpd退出WEB服务"
 
 
+msgid "Waiting,(executing)..."
+msgstr "稍等 ，努力加载中"
+
 msgid "The starting number symbol (#) or each line of the semicolon (;) is considered a comment; Remove (;) and enable the specified option."
 msgstr "开头的数字符号（＃）或分号的每一行（;）被视为注释；删除（;）启用指定选项。"
 
