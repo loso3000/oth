@@ -204,8 +204,8 @@ configure_network() {
     local dns_tables forwarding https synflood
     local ifname lannet netname netsum i
 
-    config_get showhide "$cfg" showhide '0'
-    config_get wan_proto "$cfg" wan_proto 'dhcp'
+    config_get showhide "$cfg" showhide
+    config_get wan_proto "$cfg" wan_proto
     config_get ipv6 "$cfg" ipv6 '0'
     config_get dnsset "$cfg" dnsset '0'
     config_get wan_interface "$cfg" wan_interface
@@ -289,8 +289,22 @@ configure_network() {
         test -n "${lan_ipaddr}"  &&  $UCISET network.lan.ipaddr="${lan_ipaddr}"  
         test -n "${lan_netmask}" &&  $UCISET network.lan.netmask="${lan_netmask}"
     fi
-  
     case "${wan_proto}" in
+
+        pppoe)
+            $UCISET network.wan.proto='pppoe'
+            [ -n "${wan_pppoe_user}" ] && $UCISET network.wan.username="${wan_pppoe_user}"
+            [ -n "${wan_pppoe_pass}" ] && $UCISET network.wan.password="${wan_pppoe_pass}"
+            [ "x$forwarding" = "x1" ] && setforwarding
+            [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
+            if [ -n "${wan_dns}" ]; then
+                    $UCISET network.wan.peerdns='0'
+                    uci -q add_list  network.wan.dns="${wan_dns}"
+	        else
+                    $UCISET network.wan.peerdns='1'
+            fi
+            ;;
+
         dhcp)
 	    
 	    case "${dhcp_proto}" in
@@ -322,24 +336,6 @@ configure_network() {
             fi
             ;;
 
-            
-        pppoe)
-            [ "x$forwarding" = "x1" ] && setforwarding
-            [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
-            if [ "${wan_pppoe_user} != $(uci -q get network.wan.username)" ] || [ "${wan_pppoe_pass} != $(uci -q get network.wan.password)" ] ;then
-                $UCISET network.wan.proto='pppoe'
-                $UCISET network.wan.username="${wan_pppoe_user}"
-                $UCISET network.wan.password="${wan_pppoe_pass}"
-                
-                if [ -n "${wan_dns}" ]; then
-                    $UCISET network.wan.peerdns='0'
-                    uci -q add_list  network.wan.dns="${wan_dns}"
-	    else
-                    $UCISET network.wan.peerdns='1'
-                fi
-            fi
-            ;;
-            
         siderouter)
             $UCIDEL firewall.@zone[0].network
             $UCIADD firewall.@zone[0].network='lan'
@@ -480,39 +476,7 @@ EOF
 }
 
 boot() {
-    XBOOT=1
-    
-    SSID=$(uci get wireless.@wifi-iface[0].ssid 2>/dev/null || echo "")
-    KEY=$(uci get wireless.@wifi-iface[0].key 2>/dev/null || echo "")
-    IPADDR=$(uci get network.lan.ipaddr 2>/dev/null || echo "192.168.10.1")
-    NETMASK=$(uci get network.lan.netmask 2>/dev/null || echo "255.255.255.0")
-    WAN_PROTO=$(uci get netwizard.default.wan_proto 2>/dev/null || echo "siderouter")
-    LAN_PROTO=$(uci get netwizard.default.lan_proto 2>/dev/null || echo "static")
-    fakemesh=$(uci get fakemesh.default.enabled 2>/dev/null || echo 0)
-    
-    if [ "$(uci get netwizard.default.wifi_ssid 2>/dev/null)" != "$SSID" ] || \
-       [ "$(uci get netwizard.default.lan_ipaddr 2>/dev/null)" != "$IPADDR" ]; then
-        
-        uci set netwizard.default=netwizard >/dev/null 2>&1 || uci add netwizard netwizard
-        uci set netwizard.default.wan_proto="$WAN_PROTO"
-        uci set netwizard.default.lan_proto="$LAN_PROTO"
-        
-        if [ "x$fakemesh" != "x1" ]; then
-            uci set netwizard.default.wifi_ssid="$SSID"
-            uci set netwizard.default.wifi_key="$KEY"
-        fi
-        
-        if [ "$WAN_PROTO" = "siderouter" ] && [ "$LAN_PROTO" = "static" ]; then
-            uci set netwizard.default.lan_ipaddr="$IPADDR"
-            uci set netwizard.default.lan_netmask="$NETMASK"
-        else
-            uci set netwizard.default.lan_ipaddr="$IPADDR"
-            uci set netwizard.default.lan_netmask="$NETMASK"
-        fi
-        
-        uci commit netwizard
-    fi
-    start
+    XBOOT=1    start
 }
 
 start() { 
