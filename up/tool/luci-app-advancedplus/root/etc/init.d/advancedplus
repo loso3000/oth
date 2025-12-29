@@ -7,7 +7,6 @@ STOP=10
 USE_PROCD=1
 PROG="/usr/bin/uhttpd-watchdog"
 NAME="uhttpd-watchdog"
-LOGFILE="/var/log/uhttpd-watchdog.log"
 LOCK=/var/lock/advancedplus-boot.lock
 
 
@@ -30,27 +29,7 @@ else
 fi
 }
 
-sethttps() {
-    uhttp=`uci -q get uhttpd.main.listen_https | awk -F ' ' '{printf $1}'`
-    if [ "x$(uci -q get advancedplus.@basic[0].uhttps)" = "x1" ] ; then
-	     [  $uhttp ] || {
-	         sed -i "/listen_https/d" /etc/config/uhttpd
-	         /etc/init.d/uhttpd stop
-	         uci -q add_list uhttpd.main.listen_https='0.0.0.0:443'
-	         uci -q add_list uhttpd.main.listen_https='[::]:443'
-	         uci commit uhttpd
-	         /etc/init.d/uhttpd restart
-	    }
-    else
-        [  $uhttp ] &&
-	{
-	     /etc/init.d/uhttpd stop
-	    sed -i "/listen_https/d" /etc/config/uhttpd
-	    uci commit uhttpd
-	    /etc/init.d/uhttpd restart
-	}
-    fi
-}
+
 
 setnetwizard(){
     if [ "x$(uci -q get advancedplus.@basic[0].wizard)" == "x1" ] ; then
@@ -60,7 +39,7 @@ setnetwizard(){
     else
 	     uci -q set netwizard.default.showhide="0"
 	     uci commit netwizard
-	     rm -rf /etcnetwizard_hide
+	     rm -rf /etc/netwizard_hide
     fi
 }
 
@@ -113,9 +92,8 @@ advancedset(){
 }
 
 start_service() {
-    [ "x$(uci -q get advancedplus.@basic[0].uhttpd)" = "x1" ] && uhttpd_service
     [ -f $LOCK ] && exit
-    [ "x$XBOOT" = "x1" ] && exit 0
+    [ "x$(uci -q get advancedplus.@basic[0].uhttpd)" = "x1" ] && uhttpd_service
     touch $LOCK
     advancedset
     rm -rf /tmp/luci-*
@@ -128,10 +106,6 @@ validate_service_file() {
         return 1
     fi
     return 0
-}
-boot() {
-	XBOOT=1
-	start
 }
 
 uhttpd_service() {
@@ -151,8 +125,8 @@ uhttpd_service() {
     procd_set_param respawn_timeout 10
     procd_set_param stderr 1
     procd_set_param stdout 1
-    procd_set_param file "$PROG"
-    procd_set_param pidfile "/var/run/${NAME}.pid"
+    # procd_set_param file "$PROG"
+    # procd_set_param pidfile "/var/run/${NAME}.pid"
     # procd_append_param env CHECK_INTERVAL=30
     # procd_append_param env MAX_FAILURES=3
     
