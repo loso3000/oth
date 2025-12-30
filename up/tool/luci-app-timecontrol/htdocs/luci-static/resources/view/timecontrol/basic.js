@@ -205,7 +205,6 @@ return view.extend({
 	
         o = s.option(form.Value, 'mac', _('IP/MAC Address'));
         o.rmempty = false;
-        o.datatype = 'or(ipaddr,macaddr)';
         o.placeholder = '192.168.10.100 or 00:11:22:33:44:55';
         
         getHostList().then(function(hosts) {
