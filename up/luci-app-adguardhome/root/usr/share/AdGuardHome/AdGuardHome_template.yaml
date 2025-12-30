@@ -87,11 +87,19 @@ filters:
 - enabled: true
   url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
   name: AdGuard DNS filter
-  id: 1628750870
+  id: 1128750870
 - enabled: true
   url: https://anti-ad.net/easylist.txt
   name: 'CHN: anti-AD'
-  id: 1628750871
+  id: 1128750871
+- enabled: true
+  url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
+  name: AdGuard DNS filter
+  id: 1128751871
+- enabled: false
+  url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
+  name: AdAway Default Blocklist
+  id: 1128752871
 whitelist_filters: []
 user_rules:
 - '@@||taobao.com^$important'

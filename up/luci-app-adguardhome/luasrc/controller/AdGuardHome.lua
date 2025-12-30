@@ -62,8 +62,6 @@ function act_status()
 end
 function do_update()
 	fs.writefile("/var/run/lucilogpos","0")
-	http.prepare_content("application/json")
-	http.write('')
 	local arg
 	if luci.http.formvalue("force") == "1" then
 		arg="force"
@@ -77,6 +75,8 @@ function do_update()
 	else
 		luci.sys.exec("sh /usr/share/AdGuardHome/update_core.sh "..arg.." >/tmp/AdGuardHome_update.log 2>&1 &")
 	end
+	http.prepare_content("application/json")
+	http.write("{}")
 end
 function get_log()
 	local logfile=uci:get("AdGuardHome","AdGuardHome","logfile")

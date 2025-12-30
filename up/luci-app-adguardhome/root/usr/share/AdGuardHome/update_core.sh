@@ -7,7 +7,7 @@ if [ -z "$binpath" ]; then
 	uci set AdGuardHome.AdGuardHome.binpath="/tmp/AdGuardHome/AdGuardHome"
 	binpath="/tmp/AdGuardHome/AdGuardHome"
 fi
-[[ ! -d ${binpath%/*} ]] && mkdir -p ${binpath%/*}
+mkdir -p ${binpath%/*}
 upxflag=$(uci get AdGuardHome.AdGuardHome.upxflag 2>/dev/null)
 
 [[ -z ${upxflag} ]] && upxflag=off
@@ -98,8 +98,31 @@ UPX_Compress(){
 Update_Core(){
 	rm -r /tmp/AdGuardHome_Update > /dev/null 2>&1
 	mkdir -p "/tmp/AdGuardHome_Update"
-	
-	Arch=$(GET_Arch )
+
+	um="$(uname -m)"
+	OPENWRT_ARCH="$(awk -F'=' '/^OPENWRT_ARCH=/{gsub(/"/,"",$2); split($2,a,"_"); print a[1]}' /etc/os-release)"
+	case "$um" in
+		i386|i686)     Arch="386" ;;
+		x86_64)        Arch="amd64" ;;
+		aarch64)       Arch="arm64" ;;
+		armv5*)        Arch="armv5" ;;
+		armv6*)        Arch="armv6" ;;
+		armv7*|armv8l) Arch="armv7" ;;
+		mips*)
+			case "$OPENWRT_ARCH" in
+				mips64el) Arch="mips64le_softfloat" ;;   # 64bit little‑endian
+				mips64)   Arch="mips64_softfloat"   ;;   # 64bit big‑endian
+				mipsel)   Arch="mipsle_softfloat"   ;;   # 32bit little‑endian
+				mips)     Arch="mips_softfloat"     ;;   # 32bit big‑endian
+				*) echo "Error: unknown OpenWrt MIPS flavour '$OPENWRT_ARCH'"; exit 1 ;;
+			esac
+			;;
+		ppc*)          Arch="ppc64le" ;;
+		riscv|riscv64) Arch="riscv64" ;;
+		*) echo "Error: $um is not supported"; exit 1 ;;
+	esac
+
+
 	eval link=$(uci get AdGuardHome.AdGuardHome.update_url 2>/dev/null)
 	echo -e "下载链接:${link}"
 	echo -e "文件名称:${link##*/}"
@@ -153,54 +176,25 @@ Update_Core(){
 }
 
 GET_Arch() {
-	Archt="$(opkg info kernel | grep Architecture | awk -F "[ _]" '{print($2)}')"
-	case "${Archt}" in
-	"i386")
-		Arch="386"
-		;;
-	"i686")
-		Arch="386"
-		;;
-	"x86")
-		Arch="amd64"
-		;;
-	"mipsel")
-		Arch="mipsle"
-	;;
-	"mips64el")
-		Arch="mips64le"
-		Arch="mipsle"
-		echo -e "mips64el use $Arch may have bug"
-	;;
-	"mips")
-		Arch="mips"
-	;;
-	"mips64")
-		Arch="mips64"
-		Arch="mips"
-		echo -e "mips64 use $Arch may have bug"
-	;;
-	"arm")
-		Arch="arm"
-		;;
-	"aarch64")
-		Arch="arm64"
-		;;
-	"powerpc")
-		Arch="ppc"
-		echo -e "error not support $Archt"
-		EXIT 1
-		;;
-	"powerpc64")
-		Arch="ppc64"
-		echo -e "error not support $Archt"
-		EXIT 1
-		;;
-
-	*)
-		echo -e "error not support $Archt if you can use offical release please issue a bug"
-		EXIT 1
-		;;
+	um="$(uname -m)"
+	OPENWRT_ARCH="$(awk -F'=' '/^OPENWRT_ARCH=/{gsub(/"/,"",$2); split($2,a,"_"); print a[1]}' /etc/os-release)"
+	case "$um" in
+		i386)    Arch="i386" ;;
+		i686)    Arch="i386"; echo "i686 use $Arch may have bug" ;;
+		x86_64)  Arch="amd64" ;;
+		aarch64) Arch="arm64" ;;
+		arm*)    Arch="arm" ;;
+		mips*)
+			case "$OPENWRT_ARCH" in
+				mips64el) Arch="mipsel"; echo "mips64el use $Arch may have bug" ;;   # 64‑bit little‑endian
+				mips64)   Arch="mips"; echo "mips64 use $Arch may have bug"   ;;   # 64‑bit big‑endian
+				mipsel)   Arch="mipsel"   ;;   # 32‑bit little‑endian
+				mips)     Arch="mips"     ;;   # 32‑bit big‑endian
+				*) echo "Error: unknown OpenWrt MIPS flavour '$OPENWRT_ARCH'"; exit 1 ;;
+			esac
+			;;
+		ppc*) Arch="powerpc64le" ;;
+		*) echo "Error: $um is not supported"; exit 1 ;;
 	esac
         echo  "$Arch"
 }

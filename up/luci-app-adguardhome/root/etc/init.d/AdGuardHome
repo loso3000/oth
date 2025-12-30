@@ -174,30 +174,6 @@ force_reload(){
 	_isrunning && procd_send_signal "$CONFIGURATION" || start
 }
 
-get_tz()
-{
-	SET_TZ=""
-
-	if [ -e "/etc/localtime" ]; then
-		return
-	fi
-
-	for tzfile in /etc/TZ /var/etc/TZ
-	do
-		if [ ! -e "$tzfile" ]; then
-			continue
-		fi
-
-		tz="`cat $tzfile 2>/dev/null`"
-	done
-
-	if [ -z "$tz" ]; then
-		return
-	fi
-
-	SET_TZ=$tz
-}
-
 rm_port53()
 {
 	local AdGuardHome_PORT=$(config_editor "dns.port" "" "$configpath" "1")
@@ -509,7 +485,7 @@ start_service() {
 	fi
 
 	procd_open_instance
-	get_tz
+	SET_TZ="`uci get system.@system[0].timezone 2>/dev/null`"
 	if [ -n "$SET_TZ" ]; then
 		procd_set_param env TZ="$SET_TZ"
 	fi
