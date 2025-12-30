@@ -659,7 +659,7 @@ header .fill {
 }
 
 .bfill .bcontainer .flex1 .brand {
-    color: var(--menu-fontcolor);
+    color: var(--primary-title-color);
     font-family: var(--font-sans);
     font-weight: 600;
     font-size: 1.3rem;
@@ -822,14 +822,14 @@ span[data-indicator="uci-changes"],
 .showWord:after {
     font-size: 1.1rem;
     line-height: 1.2;
-    color: var(--menu-fontcolor);
+      color: var(--primary-title-color);
     text-decoration: none;
     padding-right: 0.5rem
 }
 
 .showWord {
     font-family: var(--font-sans);
-    color: var(--menu-fontcolor);
+      color: var(--primary-title-color);
     font-size: 1.1rem !important;
     text-shadow: 1px 1px 2px var(--input-boxcolor);
     line-height: 1.2;
@@ -1570,7 +1570,7 @@ textarea,
 }
 
 .tabs>li:hover {
-    background: var(--menu-item-titlebg-color);
+  background: rgba(var(--primary-rgbm), 0.7);
   border-left: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
   border-right: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
     box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor)
@@ -1587,8 +1587,6 @@ textarea,
     border: none;
     border-right: 0.18751rem solid rgba(255, 255, 255, 0);
     letter-spacing: 1px;
-    /*white-space: nowrap;
-    color: var(--menu-hover-color); */
     margin-bottom: 0.5rem;
     overflow-x: auto;
 }
@@ -1624,7 +1622,7 @@ ul.tabs, .tabmenu .tabs, #tabmenu .tabs, ul.cbi-tabmenu {
 
 .cbi-tabmenu>li:hover {
     color: var(--menu-hover-color);
-    background: var(--menu-item-titlebg-color);
+    background: rgba(var(--primary-rgbm), 0.7);
     box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor);
   border-left: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
   border-right: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
@@ -1633,7 +1631,7 @@ ul.tabs, .tabmenu .tabs, #tabmenu .tabs, ul.cbi-tabmenu {
 
 .tabs li[class~="active"],
 .cbi-tabmenu>li[class~="cbi-tab"] {
-    background-color: var(--menu-item-active-bgcolor);
+    background: rgba(var(--primary-rgbm), 0.7);
     border-left: 0.18751rem solid var(--primary-solid) !important;
     border-right: 0.18751rem solid var(--primary-solid) !important;
     box-shadow: 0 0.05rem 0.2rem var(--input-boxhovercolor)
@@ -3493,7 +3491,7 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 .bandix-container button {
-  color: var(--menu-fontcolor);
+  color: var(--primary-title-color);
   background-color: rgba(255, 255, 255, 0);
   box-shadow: none;
   border: 1px solid rgba(255, 255, 255, 0);
@@ -3503,7 +3501,7 @@ body.lang_pl.node-main-login .cbi-value-title {
 .bandix-container button.active,
 .bandix-container button:active{
   color: var(--menu-color);
-  background-color: var(--menu-item-active-bgcolor);
+  background-color: rgba(var(--primary-rgbm), 0.7);
   border: 1px solid var(--inputborder-color);
 }
 
