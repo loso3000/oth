@@ -21,23 +21,17 @@ check_binary() {
 }
 
 check_process() {
-    if pgrep -x "$UHTTPD_SERVICE" > /dev/null 2>&1; then
-        local pid=$(pgrep -x "$UHTTPD_SERVICE")
-        if [ -n "$pid" ] && [ -d "/proc/$pid" ]; then
-            if [ -f "/proc/$pid/cmdline" ]; then
+    if pgrep -f "/usr/sbin/uhttpd" >/dev/null 2>&1 || \
+       pgrep -x uhttpd >/dev/null 2>&1; then
                 return 0
-            fi
-        fi
     fi
     return 1
 }
 
 restart_service() {
     log "尝试重启 $UHTTPD_SERVICE 服务..."
-    
     if /etc/init.d/$UHTTPD_SERVICE restart >/dev/null 2>&1; then
         sleep 3  # 等待服务启动
-        
         if check_process; then
             log "$UHTTPD_SERVICE 重启成功"
             return 0
@@ -73,7 +67,6 @@ monitor_loop() {
                 if restart_service; then
                     failures=0
                 else
-                    # 重启失败，等待更长时间再检查
                     sleep 60
                 fi
             fi
@@ -90,13 +83,10 @@ monitor_loop() {
 }
 
 start() {
-    # 检查是否已经在运行
     if pgrep -f "$PROG" | grep -v $$ >/dev/null 2>&1; then
         log "警告：$PROG 已经在运行"
         exit 1
     fi
-    
-    # 进入监控循环
     monitor_loop
 }
 
