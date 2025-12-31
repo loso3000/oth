@@ -777,7 +777,7 @@ span[data-indicator="uci-changes"]:hover,
 #indicators span[data-indicator="poll-status"]:hover,
 .pdboy-qlogout:hover,
 .showSide:hover {
-    background-color: rgba(var(--primary-rgbm),0.1) !important;
+    background-color: rgba(var(--primary-rgbm),0.3) !important;
     color: var(--menu-hover-color);
     border-radius: var(--radius1);
     text-decoration: none
@@ -1357,7 +1357,7 @@ textarea:focus,
 select:not([multiple="multiple"]):focus,
 input:not(.cbi-button):focus,
 .cbi-dropdown:focus {
-    border: 1px solid rgba(var(--primary-rgbm), 0.7);
+    border: 1px solid rgba(var(--primary-rgbm), 0.9);
     color: var(--inputtext-color);
     box-shadow: 0 1px 6px var(--input-boxhovercolor)
 }
@@ -1570,7 +1570,7 @@ textarea,
 }
 
 .tabs>li:hover {
-  background: rgba(var(--primary-rgbm), 0.7);
+  background: rgba(var(--primary-rgbm), 0.6);
   border-left: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
   border-right: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
     box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor)
@@ -1622,7 +1622,7 @@ ul.tabs, .tabmenu .tabs, #tabmenu .tabs, ul.cbi-tabmenu {
 
 .cbi-tabmenu>li:hover {
     color: var(--menu-hover-color);
-    background: rgba(var(--primary-rgbm), 0.7);
+    background: rgba(var(--primary-rgbm), 0.6);
     box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor);
   border-left: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
   border-right: 0.18751rem solid var(--menu-item-hover-bgcolor) !important; 
@@ -1631,7 +1631,7 @@ ul.tabs, .tabmenu .tabs, #tabmenu .tabs, ul.cbi-tabmenu {
 
 .tabs li[class~="active"],
 .cbi-tabmenu>li[class~="cbi-tab"] {
-    background: rgba(var(--primary-rgbm), 0.7);
+    background: rgba(var(--primary-rgbm), 0.9);
     border-left: 0.18751rem solid var(--primary-solid) !important;
     border-right: 0.18751rem solid var(--primary-solid) !important;
     box-shadow: 0 0.05rem 0.2rem var(--input-boxhovercolor)
@@ -1944,7 +1944,7 @@ textarea {
 }
 
 .cbi-dropdown[open]>ul.dropdown>li:hover {
-    background: rgba(var(--primary-rgbm), 0.5);
+    background: rgba(var(--primary-rgbm), 0.6);
     color: var(--menu-hover-color);
     cursor: pointer;
     outline: none
