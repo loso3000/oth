@@ -33,13 +33,20 @@ fi
 
 setnetwizard(){
     if [ "x$(uci -q get advancedplus.@basic[0].wizard)" == "x1" ] ; then
-	     touch /etc/netwizard_hide
+	     [ `grep -e '-netwizard' /usr/share/luci/menu.d/luci-app-netwizard.json | wc -l` == 1 ] &&  {
+	     sed -i 's|-netwizard|-znetwizard|' /usr/share/luci/menu.d/luci-app-netwizard.json
+	     /etc/init.d/rpcd restart
+	     }
 	     uci -q set netwizard.default.showhide="1"
 	     uci commit netwizard
     else
 	     uci -q set netwizard.default.showhide="0"
 	     uci commit netwizard
-	     rm -rf /etc/netwizard_hide
+	     [ `grep -e '-znetwizard' /usr/share/luci/menu.d/luci-app-netwizard.json | wc -l`  == 1 ] &&  {
+	     sed -i 's|-znetwizard|-netwizard|' /usr/share/luci/menu.d/luci-app-netwizard.json
+	     /etc/init.d/rpcd restart
+	     }
+	     
     fi
 }
 
