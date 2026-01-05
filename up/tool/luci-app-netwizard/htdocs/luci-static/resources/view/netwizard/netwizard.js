@@ -62,11 +62,11 @@ return view.extend({
         var wan_face = uci.get('netwizard', 'default', 'wan_interface');
         var wanproto = uci.get('netwizard', 'default', 'wan_proto');
         var LanHTTPS = uci.get('netwizard', 'default', 'https') || '0';
-        if (physicalIfaces <= 1) {
-            wanproto = 'siderouter';
-            uci.set('netwizard', 'default', 'wan_proto', 'siderouter');
-            uci.save();
-        }
+        //if (physicalIfaces <= 1) {
+        //    wanproto = 'siderouter';
+        //    uci.set('netwizard', 'default', 'wan_proto', 'siderouter');
+        //    uci.save();
+        //}
 
         if (!lan_ip) {
             lan_ip = uci.get('network', 'lan', 'ipaddr') || '192.168.10.1/24' ;
@@ -98,6 +98,7 @@ return view.extend({
         this.wan_face = wan_face;
         this.wanproto = wanproto;
         
+	// console.log('devices :', devices, 'physicalIfaces:', physicalIfaces, 'physicalInterfaces:', physicalInterfaces, 'lan_ip:', lan_ip, 'wanproto:', wanproto);
         this.addStyles();
 
         var params = new URLSearchParams(window.location.search);
@@ -167,7 +168,6 @@ return view.extend({
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
             
-            /* PPPoE模式 - 红色主题 */
             .mode-card[data-mode="pppoe"] {
 		background: rgba(255,107,107,0.7);
                 border-color: rgba(255,107,107,0.7);
@@ -258,7 +258,6 @@ return view.extend({
             }
             
             .quick-nav-btn {
-                padding: 8px 16px;
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -332,7 +331,6 @@ return view.extend({
 
 getModeIcon: function(mode) {
     var svgCode;
-    //var color = "#fff";
     var color = this.getModeColor(mode); // 获取模式对应的颜色
     
     switch(mode) {
@@ -442,7 +440,7 @@ getModeIcon: function(mode) {
         var m = new form.Map('netwizard', _('Quick Network Setup Wizard'),
             _('Quick network setup wizard. If you need more settings, please enter network - interface to set.'));
         
-        var s = m.section(form.NamedSection, 'default', 'netwizard');
+        var s = m.section(form.NamedSection, 'default');
         s.addremove = false;
         s.anonymous = true;
 
@@ -467,7 +465,7 @@ getModeIcon: function(mode) {
                     '<h3 >' + modeTitle + '</h3>' +
                     '<p >' + modeDescription + '</p>' +
                     '<div class="quick-nav-buttons">' +
-		     '<button onclick="switchToTab(\'wansetup\')" class="quick-nav-btn" style="background: ' + modeColor + ';">' +
+		     '<button onclick="switchToTab(\'wansetup\')" class="quick-nav-btn cbi-button cbi-button-apply" style="background: ' + modeColor + ';">' +
                     '⚙️ ' + _('Go to WAN Settings') + '</button>' +
                     '<a href="' + window.location.pathname + '" class="quick-nav-btn cbi-button cbi-button-reset">' +
                     '↻ ' + _('Change Mode') + '</a>' +
