@@ -2957,11 +2957,12 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 .node-main-login>.main>.main-right #maincontent>.container>form .alert-message {
-    background-color: #b98413 !important
+    background-color: #b98413 !important;
+    margin-top: 1rem;
 }
 
 .node-main-login>.main .cbi-map {
-    padding: 1rem !important;
+    padding-top: 1rem !important;
     overflow: hidden;
 }
 
@@ -3044,24 +3045,12 @@ body.lang_pl.node-main-login .cbi-value-title {
     position: absolute;
     z-index: 100;
     left: 10px;
-    top: 8px
+    top: 7px
 }
 
-
 .node-main-login>.main .cbi-value.cbi-value-last .cbi-value-field:before {
-    font-family: kucat !important;
-    speak: none;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+
     content: "\e93c";
-    font-size: 1.3rem;
-    position: absolute;
-    z-index: 100;
-    left: 10px;
-    top: 8px
 }
 
 .node-main-login>.main .cbi-value.cbi-value .cbi-value-field,
