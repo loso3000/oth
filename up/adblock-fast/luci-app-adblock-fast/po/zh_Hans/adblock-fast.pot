@@ -1,0 +1,559 @@
+```gettext
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+
+# 状态与操作
+msgid "%s is currently disabled"
+msgstr "%s 当前已禁用"
+
+msgid "%s is not installed or not found"
+msgstr "%s 未安装或未找到"
+
+msgid "-"
+msgstr "-"
+
+msgid "Action"
+msgstr "操作"
+
+msgid "Active"
+msgstr "活跃"
+
+msgid "Ad-blocking on all instances"
+msgstr "在所有实例上启用广告屏蔽"
+
+msgid "Ad-blocking on select instances"
+msgstr "在选定实例上启用广告屏蔽"
+
+# 组件名称与标题
+msgid "AdBlock Fast"
+msgstr "广告屏蔽"
+
+msgid "AdBlock-Fast"
+msgstr "广告屏蔽"
+
+msgid "AdBlock-Fast - Allowed and Blocked Domains"
+msgstr "广告屏蔽 - 允许与阻止的域名"
+
+msgid "AdBlock-Fast - Allowed and Blocked Lists URLs"
+msgstr "广告屏蔽 - 允许与阻止列表的URL"
+
+msgid "AdBlock-Fast - Configuration"
+msgstr "广告屏蔽 - 配置"
+
+msgid "AdBlock-Fast - Status"
+msgstr "广告屏蔽 - 状态"
+
+# IPv6 配置
+msgid "Add IPv6 entries"
+msgstr "添加IPv6条目"
+
+msgid "Add IPv6 entries to block-list."
+msgstr "向阻止列表添加IPv6条目。"
+
+msgid "Do not add IPv6 entries"
+msgstr "不添加IPv6条目"
+
+msgid "IPv6 Support"
+msgstr "IPv6支持"
+
+# 高级配置
+msgid "Advanced Configuration"
+msgstr "高级配置"
+
+msgid "Allow"
+msgstr "允许"
+
+msgid "Allowed Domains"
+msgstr "允许的域名"
+
+msgid "Block"
+msgstr "阻止"
+
+msgid "Blocked Domains"
+msgstr "阻止的域名"
+
+# 缓存配置
+msgid "Attempt to create a compressed cache of block-list in the persistent memory."
+msgstr "尝试在持久内存中创建阻止列表的压缩缓存。"
+
+msgid "Cache"
+msgstr "缓存"
+
+msgid "Cache file"
+msgstr "缓存文件"
+
+msgid "Cache file found."
+msgstr "找到缓存文件。"
+
+msgid "Compressed cache"
+msgstr "压缩缓存"
+
+msgid "Compressed cache file created."
+msgstr "压缩缓存文件已创建。"
+
+msgid "Compressed cache file found."
+msgstr "找到压缩缓存文件。"
+
+msgid "Directory for compressed cache file"
+msgstr "压缩缓存文件的目录"
+
+msgid "Directory for compressed cache file of block-list in the persistent memory."
+msgstr "持久内存中阻止列表压缩缓存文件的目录。"
+
+msgid "Do not store compressed cache"
+msgstr "不存储压缩缓存"
+
+msgid "Store compressed cache"
+msgstr "存储压缩缓存"
+
+msgid "Store compressed cache file on router"
+msgstr "在路由器上存储压缩缓存文件"
+
+# 配置更新
+msgid "Automatic Config Update"
+msgstr "自动配置更新"
+
+msgid "Config (%s) validation failure!"
+msgstr "配置(%s)验证失败！"
+
+msgid "Perform config update before downloading the block/allow-lists."
+msgstr "在下载阻止/允许列表前执行配置更新。"
+
+# 基本配置
+msgid "Basic Configuration"
+msgstr "基本配置"
+
+msgid "Blocking %s domains (with %s)."
+msgstr "正在阻止 %s 个域名 (使用 %s)。"
+
+# 错误与检测
+msgid "Can't detect free RAM"
+msgstr "无法检测可用RAM"
+
+msgid "Errors encountered, please check the %sREADME%s"
+msgstr "遇到错误，请查阅 %sREADME%s"
+
+msgid "Failed to access shared memory"
+msgstr "访问共享内存失败"
+
+msgid "Failed to create '%s' file"
+msgstr "创建文件 '%s' 失败"
+
+msgid "Failed to create block-list or restart DNS resolver"
+msgstr "创建阻止列表或重启DNS解析器失败"
+
+msgid "Failed to create compressed cache"
+msgstr "创建压缩缓存失败"
+
+msgid "Failed to create directory for %s file"
+msgstr "为文件 %s 创建目录失败"
+
+msgid "Failed to create output/cache/gzip file directory"
+msgstr "创建输出/缓存/gzip文件目录失败"
+
+msgid "Failed to detect format %s"
+msgstr "检测格式 %s 失败"
+
+msgid "Failed to download %s"
+msgstr "下载 %s 失败"
+
+msgid "Failed to download Config Update file"
+msgstr "下载配置更新文件失败"
+
+msgid "Failed to format data file"
+msgstr "格式化数据文件失败"
+
+msgid "Failed to move '%s' to '%s'"
+msgstr "移动 '%s' 到 '%s' 失败"
+
+msgid "Failed to move temporary data file to '%s'"
+msgstr "将临时数据文件移动到 '%s' 失败"
+
+msgid "Failed to optimize data file"
+msgstr "优化数据文件失败"
+
+msgid "Failed to parse %s"
+msgstr "解析 %s 失败"
+
+msgid "Failed to parse Config Update file"
+msgstr "解析配置更新文件失败"
+
+msgid "Failed to process allow-list"
+msgstr "处理允许列表失败"
+
+msgid "Failed to reload/restart DNS resolver"
+msgstr "重载/重启DNS解析器失败"
+
+msgid "Failed to remove temporary files"
+msgstr "删除临时文件失败"
+
+msgid "Failed to restart/reload DNS resolver"
+msgstr "重启/重载DNS解析器失败"
+
+msgid "Failed to sort data file"
+msgstr "排序数据文件失败"
+
+msgid "Failed to start"
+msgstr "启动失败"
+
+msgid "Failed to stop %s"
+msgstr "停止 %s 失败"
+
+msgid "Failed to unpack compressed cache"
+msgstr "解压缓存失败"
+
+msgid "Free ram (%s) is not enough to process all enabled block-lists"
+msgstr "可用内存(%s)不足以处理所有启用的阻止列表"
+
+# DNS与网络设置
+msgid "Force DNS Ports"
+msgstr "强制DNS端口"
+
+msgid "Force DNS ports:"
+msgstr "强制DNS端口："
+
+msgid "Force Router DNS"
+msgstr "强制路由器DNS"
+
+msgid "Force Router DNS server to all local devices"
+msgstr "强制所有本地设备使用路由器DNS服务器"
+
+msgid "Forces Router DNS use on local devices, also known as DNS Hijacking."
+msgstr "强制本地设备使用路由器DNS，也称为DNS劫持。"
+
+msgid "Let local devices use their own DNS servers if set"
+msgstr "如果已设置，允许本地设备使用其自身的DNS服务器"
+
+# 服务控制
+msgid "Force Reloading"
+msgstr "强制重载"
+
+msgid "Force redownloading %s block lists"
+msgstr "强制重新下载 %s 阻止列表"
+
+msgid "Disable"
+msgstr "禁用"
+
+msgid "Disabling %s service"
+msgstr "正在禁用 %s 服务"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Enabling %s service"
+msgstr "正在启用 %s 服务"
+
+msgid "Pause"
+msgstr "暂停"
+
+msgid "Pausing %s"
+msgstr "正在暂停 %s"
+
+msgid "Restarting"
+msgstr "正在重启"
+
+msgid "Start"
+msgstr "启动"
+
+msgid "Starting"
+msgstr "正在启动"
+
+msgid "Starting %s service"
+msgstr "正在启动 %s 服务"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Stopping %s service"
+msgstr "正在停止 %s 服务"
+
+# 调试与输出
+msgid "Disable Debugging"
+msgstr "禁用调试"
+
+msgid "Enable Debugging"
+msgstr "启用调试"
+
+msgid "Enables debug output to /tmp/adblock-fast.log."
+msgstr "启用调试输出到 /tmp/adblock-fast.log。"
+
+msgid "Controls system log and console output verbosity."
+msgstr "控制系统日志和控制台输出的详细程度。"
+
+msgid "Output Verbosity Setting"
+msgstr "输出详细程度设置"
+
+msgid "Some output"
+msgstr "部分输出"
+
+msgid "Suppress output"
+msgstr "抑制输出"
+
+msgid "Verbose output"
+msgstr "详细输出"
+
+# 下载设置
+msgid "Curl download retry"
+msgstr "Curl下载重试次数"
+
+msgid "Curl maximum file size (in bytes)"
+msgstr "Curl最大文件大小(字节)"
+
+msgid "Download time-out (in seconds)"
+msgstr "下载超时时间(秒)"
+
+msgid "Downloading lists"
+msgstr "正在下载列表"
+
+msgid "If curl is installed and detected, it would not download files bigger than this."
+msgstr "如果检测到已安装curl，则不会下载大于此值的文件。"
+
+msgid "If curl is installed and detected, it would retry download this many times on timeout/fail."
+msgstr "如果检测到已安装curl，在超时/失败时将重试下载这么多次。"
+
+msgid "Stop the download if it is stalled for set number of seconds."
+msgstr "如果下载停滞超过设定的秒数，则停止下载。"
+
+# DNS服务相关
+msgid "DNS Service"
+msgstr "DNS服务"
+
+msgid "DNS resolution option, see the %sREADME%s for details."
+msgstr "DNS解析选项，详情请参阅 %sREADME%s。"
+
+msgid "Dnsmasq Config File URL"
+msgstr "Dnsmasq配置文件URL"
+
+msgid "URL to the external dnsmasq config file, see the %sREADME%s for details."
+msgstr "外部dnsmasq配置文件的URL，详情请参阅 %sREADME%s。"
+
+# 列表处理
+msgid "Individual domains to be allowed."
+msgstr "将被允许的独立域名。"
+
+msgid "Individual domains to be blocked."
+msgstr "将被阻止的独立域名。"
+
+msgid "Processing lists"
+msgstr "正在处理列表"
+
+msgid "Simultaneous processing"
+msgstr "同时处理"
+
+msgid "Do not use simultaneous processing"
+msgstr "不使用同时处理"
+
+msgid "Launch all lists downloads and processing simultaneously, reducing service start time."
+msgstr "同时启动所有列表的下载和处理，以减少服务启动时间。"
+
+msgid "Use simultaneous processing"
+msgstr "使用同时处理"
+
+# 包与依赖
+msgid "Grant UCI and file access for luci-app-adblock-fast"
+msgstr "授予luci-app-adblock-fast UCI和文件访问权限"
+
+msgid "Missing recommended package: '%s'"
+msgstr "缺少推荐的软件包：'%s'"
+
+# 实例选择
+msgid "No Ad-blocking on SmartDNS"
+msgstr "不在SmartDNS上启用广告屏蔽"
+
+msgid "No Ad-blocking on dnsmasq"
+msgstr "不在dnsmasq上启用广告屏蔽"
+
+msgid "Pick the SmartDNS instance(s) for ad-blocking"
+msgstr "选择用于广告屏蔽的SmartDNS实例"
+
+msgid "Pick the dnsmasq instance(s) for ad-blocking"
+msgstr "选择用于广告屏蔽的dnsmasq实例"
+
+msgid "Use ad-blocking on the SmartDNS instance(s)"
+msgstr "在SmartDNS实例上使用广告屏蔽"
+
+msgid "Use ad-blocking on the dnsmasq instance(s)"
+msgstr "在dnsmasq实例上使用广告屏蔽"
+
+msgid "You can limit the ad-blocking to the specific SmartDNS instance(s) (%smore information%s)."
+msgstr "您可以将广告屏蔽限制在特定的SmartDNS实例上 (%s更多信息%s)。"
+
+msgid "You can limit the ad-blocking to the specific dnsmasq instance(s) (%smore information%s)."
+msgstr "您可以将广告屏蔽限制在特定的dnsmasq实例上 (%s更多信息%s)。"
+
+# LED指示
+msgid "LED to indicate status"
+msgstr "用于指示状态的LED"
+
+msgid "Pick the LED not already used in %sSystem LED Configuration%s."
+msgstr "选择在%s系统LED配置%s中未使用的LED。"
+
+# 其他UI元素
+msgid "Name"
+msgstr "名称"
+
+msgid "Name/URL"
+msgstr "名称/URL"
+
+msgid "Not installed or not found"
+msgstr "未安装或未找到"
+
+msgid "Redownload"
+msgstr "重新下载"
+
+msgid "Service Control"
+msgstr "服务控制"
+
+msgid "Service Errors"
+msgstr "服务错误"
+
+msgid "Service Status"
+msgstr "服务状态"
+
+msgid "Service Warnings"
+msgstr "服务警告"
+
+msgid "Size"
+msgstr "大小"
+
+msgid "Size: %s"
+msgstr "大小：%s"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Stopped"
+msgstr "已停止"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "URLs to file(s) containing lists to be allowed or blocked."
+msgstr "包含允许或阻止列表的文件的URL。"
+
+msgid "Version"
+msgstr "版本"
+
+msgid "Version %s"
+msgstr "版本 %s"
+
+# 状态与等待消息
+msgid "Disabled"
+msgstr "已禁用"
+
+msgid "Waiting for trigger (on_boot)"
+msgstr "等待触发器(on_boot)"
+
+msgid "Waiting for trigger (on_start)"
+msgstr "等待触发器(on_start)"
+
+# 警告与检查
+msgid "Heartbeat domain is not accessible after resolver restart"
+msgstr "解析器重启后心跳域名无法访问"
+
+msgid "Internal version mismatch (package: %s, luci app: %s, luci rpcd: %s), you may need to update packages or reboot the device, please check the %sREADME%s."
+msgstr "内部版本不匹配(软件包：%s, luci应用：%s, luci rpcd：%s)，您可能需要更新软件包或重启设备，请查阅%sREADME%s。"
+
+msgid "Invalid compressed cache directory '%s'"
+msgstr "无效的压缩缓存目录 '%s'"
+
+msgid "No HTTPS/SSL support on device"
+msgstr "设备不支持HTTPS/SSL"
+
+msgid "No blocked list URLs nor blocked-domains enabled"
+msgstr "未启用阻止列表URL也未启用阻止域名"
+
+msgid "Please %sdonate%s to support development of this project."
+msgstr "请%s捐助%s以支持此项目的开发。"
+
+msgid "Please note that %s is not supported on this system."
+msgstr "请注意，该系统不支持 %s。"
+
+msgid "Sanity check discovered TLDs in %s"
+msgstr "完整性检查在 %s 中发现了顶级域名(TLD)"
+
+msgid "Sanity check discovered leading dots in %s"
+msgstr "完整性检查在 %s 中发现了前导点"
+
+msgid "The %s failed to discover WAN gateway"
+msgstr "%s 发现WAN网关失败"
+
+msgid "The WebUI application (luci-app-adblock-fast) is outdated, please update it"
+msgstr "WebUI应用程序(luci-app-adblock-fast)已过时，请更新"
+
+msgid "The dnsmasq ipset support is enabled, but dnsmasq is either not installed or installed dnsmasq does not support ipset"
+msgstr "dnsmasq ipset支持已启用，但dnsmasq未安装或已安装的dnsmasq不支持ipset"
+
+msgid "The dnsmasq ipset support is enabled, but ipset is either not installed or installed ipset does not support '%s' type"
+msgstr "dnsmasq ipset支持已启用，但ipset未安装或已安装的ipset不支持'%s'类型"
+
+msgid "The dnsmasq nft set support is enabled, but dnsmasq is either not installed or installed dnsmasq does not support nft set"
+msgstr "dnsmasq nft set支持已启用，但dnsmasq未安装或已安装的dnsmasq不支持nft set"
+
+msgid "The dnsmasq nft sets support is enabled, but nft is not installed"
+msgstr "dnsmasq nft sets支持已启用，但nft未安装"
+
+msgid "The principal package (adblock-fast) is outdated, please update it"
+msgstr "主软件包(adblock-fast)已过时，请更新"
+
+msgid "Use of external dnsmasq config file detected, please set '%s' option to '%s'"
+msgstr "检测到使用外部dnsmasq配置文件，请将'%s'选项设置为'%s'"
+
+# 未知/通用
+msgid "Unknown"
+msgstr "未知"
+
+msgid "Unknown error"
+msgstr "未知错误"
+
+msgid "Unknown message"
+msgstr "未知消息"
+
+msgid "Unknown warning"
+msgstr "未知警告"
+
+# 技术组件名称 (通常保持英文)
+msgid "dnsmasq additional hosts"
+msgstr "dnsmasq附加主机"
+
+msgid "dnsmasq config"
+msgstr "dnsmasq配置"
+
+msgid "dnsmasq ipset"
+msgstr "dnsmasq ipset"
+
+msgid "dnsmasq nft set"
+msgstr "dnsmasq nft集合"
+
+msgid "dnsmasq servers file"
+msgstr "dnsmasq服务器文件"
+
+msgid "smartdns domain set"
+msgstr "smartdns域名集合"
+
+msgid "smartdns ipset"
+msgstr "smartdns ipset"
+
+msgid "smartdns nft set"
+msgstr "smartdns nft集合"
+
+msgid "unbound adblock list"
+msgstr "unbound广告屏蔽列表"
+
+# 文件操作错误
+msgid "failed to create backup file %s"
+msgstr "创建备份文件 %s 失败"
+
+msgid "failed to create final block-list %s"
+msgstr "创建最终阻止列表 %s 失败"
+
+msgid "failed to delete data file %s"
+msgstr "删除数据文件 %s 失败"
+
+msgid "failed to restore backup file %s"
+msgstr "恢复备份文件 %s 失败"
+
+msgid "none"
+msgstr "无"
+```
