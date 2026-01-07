@@ -1,4 +1,3 @@
-```gettext
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 "Language: zh_CN\n"
@@ -9,9 +8,6 @@ msgstr "%s 当前已禁用"
 
 msgid "%s is not installed or not found"
 msgstr "%s 未安装或未找到"
-
-msgid "-"
-msgstr "-"
 
 msgid "Action"
 msgstr "操作"
@@ -25,7 +21,7 @@ msgstr "在所有实例上启用广告屏蔽"
 msgid "Ad-blocking on select instances"
 msgstr "在选定实例上启用广告屏蔽"
 
-# 组件名称与标题
+
 msgid "AdBlock Fast"
 msgstr "广告屏蔽"
 
@@ -556,4 +552,4 @@ msgstr "恢复备份文件 %s 失败"
 
 msgid "none"
 msgstr "无"
-```
+
