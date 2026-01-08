@@ -2,6 +2,7 @@
 'require baseclass';
 'require fs';
 'require rpc';
+'require uci';
 
 var callLuciDescription = rpc.declare({
 	object: 'luci',
