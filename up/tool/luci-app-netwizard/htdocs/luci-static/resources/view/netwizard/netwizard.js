@@ -70,10 +70,11 @@ return view.extend({
 
         if (!lan_ip) {
             lan_ip = uci.get('network', 'lan', 'ipaddr') || '192.168.10.1/24' ;
-	    var parts = lan_ip.split('/');
-	    if (parts.length === 2) {
-	    lan_ip = parts[0];
+            lan_ip = (lan_ip + '');
+            if (lan_ip.indexOf('/') > -1) {
+                lan_ip = lan_ip.split('/')[0];
             }
+
         }
 
         if (!lan_mask) {
