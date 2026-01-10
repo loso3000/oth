@@ -285,10 +285,7 @@ configure_network() {
                  $UCIADD firewall.@zone[1].network='wan' 
           } || $UCISET firewall.@zone[1].network='wan wan6'
     fi
-    if [ "$wan_proto" != "siderouter" ]; then
-        test -n "${lan_ipaddr}"  &&  $UCISET network.lan.ipaddr="${lan_ipaddr}"  
-        test -n "${lan_netmask}" &&  $UCISET network.lan.netmask="${lan_netmask}"
-    fi
+
     case "${wan_proto}" in
 
         pppoe)
@@ -366,6 +363,7 @@ configure_network() {
 		   # $UCISET network.lan.peerdns='0'
 		   uci -q add_list network.lan.dns=$lan_dns
             fi
+	    
             if [ $netsum -gt 1 ]; then
                     [ "x$ifname" = "xdevice" ] && $UCISET network.@$ifname[0].ports="${lannet} ${wan_interface}" || $UCISET network.lan.$ifname="${lannet} ${wan_interface}"
             fi
@@ -388,7 +386,10 @@ configure_network() {
             $UCIDEL firewall.@zone[1].network
             ;;
     esac
-
+    if [ "$wan_proto" != "siderouter" ]; then
+      [ -n "${lan_ipaddr}" ] && $UCISET network.lan.ipaddr="${lan_ipaddr}"  
+      [ -n "${lan_netmask}" ] && $UCISET network.lan.netmask="${lan_netmask}"
+    fi
   
     setsynflood
     

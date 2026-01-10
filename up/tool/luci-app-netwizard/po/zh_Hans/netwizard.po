@@ -225,6 +225,12 @@ msgstr "正在应用网络配置..."
 msgid "Saving configuration..."
 msgstr "正在保存配置..."
 
+msgid "Applying configuration..."
+msgstr "正在应用配置..."
+
+msgid "Preparing network settings..."
+msgstr "正在更新网络设置..."
+
 msgid "Configuration saved successfully!"
 msgstr "配置保存成功！"
 
@@ -233,3 +239,42 @@ msgstr "访问协议："
 
 msgid "Failed to save configuration"
 msgstr "保存配置失败"
+
+msgid "Network configuration has been successfully applied!"
+msgstr "网络配置已成功应用！"
+
+msgid "The router is now configured to obtain IP address via DHCP."
+msgstr "路由器现已配置为通过DHCP获取IP地址。"
+
+msgid "Please check your main router DHCP client list or try to access the router using its original IP address."
+msgstr "请检查您主路由器的DHCP客户端列表，或尝试使用其原始IP地址访问路由器。"
+
+msgid "Set LAN to DHCP mode"
+msgstr "LAN设置为DHCP模式"
+
+msgid "Important Note:"
+msgstr "重要提示："
+
+msgid "The current router IP address will be assigned by the DHCP server of the superior router"
+msgstr "当前路由器IP地址将由上级路由器的DHCP服务器分配"
+
+msgid "Please login to the superior router to view the DHCP client list"
+msgstr "请登录上级路由器查看DHCP客户端列表"
+
+msgid "Or access using the original IP address on the current router"
+msgstr "或在当前路由器使用原始IP地址访问"
+
+msgid "Unable to automatically redirect to the new IP address"
+msgstr "无法自动重定向到新IP地址"
+
+msgid "Configuration has been saved successfully. You can manually access the router management interface."
+msgstr "配置已保存成功，可以手动访问路由器管理界面。"
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
