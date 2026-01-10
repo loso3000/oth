@@ -1250,7 +1250,7 @@ button,
     line-height: 2.2rem!important;
     border-radius: var(--radius2);
     padding: 0 0.75rem;
-    transition: box-shadow 0.3s ease;
+    transition: all 0.3s ease ;
 }
 
 .main .btn,
@@ -1388,22 +1388,27 @@ select[multiple="multiple"] {
 
 button:focus,
 .btn:focus,
-.cbi-button:focus {
-
-    color: var(--menu-hover-color)!important;
-    box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor);
-    -webkit-box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor);
-    -moz-box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor)
-}
-
+.cbi-button:focus,
 button:hover,
 .btn:hover,
 .cbi-button:hover
  {
-    color: var(--menu-hover-color)!important; 
-    box-shadow: 0 0.2rem 0.4rem var(--input-boxhovercolor);
-    -webkit-box-shadow: 0 0.2rem 0.4rem var(--input-boxhovercolor);
-    -moz-box-shadow: 0 0.2rem 0.4rem var(--input-boxhovercolor)
+    color: var(--menu-hover-color); 
+    transform: translateY(-2px) ;
+    box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor);
+    -webkit-box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor);
+    -moz-box-shadow: 0 0.3rem 0.5rem var(--input-boxhovercolor)
+
+}
+
+button:not(:hover) ,
+.btn:not(:hover) ,
+.cbi-button:not(:hover) 
+ {
+    transform: translateY(0);
+    box-shadow: 0 0.1rem 0.3rem var(--input-boxhovercolor);
+    -webkit-box-shadow: 0 0.1rem 0.3rem var(--input-boxhovercolor);
+    -moz-box-shadow: 0 0.1rem 0.3rem var(--input-boxhovercolor)
 }
 
 .btn:active,
