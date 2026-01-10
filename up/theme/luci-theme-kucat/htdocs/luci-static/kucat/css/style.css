@@ -2996,7 +2996,6 @@ body.lang_pl.node-main-login .cbi-value-title {
 .node-main-login>.main .container .cbi-value-field input:focus {
     color: var(--body-color);
     outline: 0;
-    background-color: rgba(248, 248, 248, 0.2) !important;
     box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(94, 114, 228, .1)
 }
 
@@ -3034,8 +3033,6 @@ body.lang_pl.node-main-login .cbi-value-title {
     min-width: 100% !important;
     border-radius: 0;
     padding: 0 20px 0 20px;
-    border: none;
-    border-bottom: 1px solid var(--inputborder-color);
     margin: 0
 }
 
@@ -3051,6 +3048,7 @@ body.lang_pl.node-main-login .cbi-value-title {
     font-size: 1.3rem;
     position: absolute;
     z-index: 100;
+    text-shadow: none;
     left: 10px;
     top: 7px
 }

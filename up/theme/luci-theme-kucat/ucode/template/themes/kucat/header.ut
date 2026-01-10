@@ -171,11 +171,10 @@ if (font3d == '0') {
         textfont = 'none';
 } else {
      if (automode == 'dark') {
-        textfont = '0 0.5px 0.5px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.4), 0 1.5px 1.5px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0.5px 0 rgba(255, 255, 255, 0.1)';
-	//  1px 1px 1px rgba(0, 0, 0, 0.5),-1px -1px 1px rgba(255, 255, 255, 0.2)';
+        // textfont = '0 0.5px 0.5px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.4), 0 1.5px 1.5px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0.5px 0 rgba(255, 255, 255, 0.1)';
+	textfont = '0 0.25px 0.25px rgba(0, 0, 0, 0.8),0 0.5px 0.5px rgba(0, 0, 0, 0.5),0 0 0.25px rgba(255, 255, 255, 0.05)';
      }else {
 	textfont = '0 0.25px 0.25px rgba(255, 255, 255, 0.8),0 0.5px 0.5px rgba(255, 255, 255, 0.5),0 0 0.25px rgba(0, 0, 0, 0.05)';
-        // textfont = '1px 1px 1px rgba(255, 255, 255, 0.5),-1px -1px 1px rgba(0, 0, 0, 0.3)';
      }
 }
 
