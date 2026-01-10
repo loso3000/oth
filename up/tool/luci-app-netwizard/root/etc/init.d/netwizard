@@ -298,7 +298,8 @@ configure_network() {
                     $UCISET network.wan.peerdns='0'
                     uci -q add_list  network.wan.dns="${wan_dns}"
 	        else
-                    $UCISET network.wan.peerdns='1'
+                       $UCIDEL network.wan.peerdns
+		       $UCIDEL network.wan.dns
             fi
             ;;
 
@@ -306,7 +307,7 @@ configure_network() {
 	    
 	    case "${dhcp_proto}" in
                 static)
-                    $UCISET network.lan.proto='static'
+                    $UCISET network.wan.proto='static'
                     if [ -n "$wan_ipaddr" ]; then
                        $UCISET network.wan.ipaddr="${wan_ipaddr}"
                     fi
@@ -316,21 +317,29 @@ configure_network() {
                     if [ -n "$wan_gateway" ]; then
                        $UCISET network.wan.gateway="${wan_gateway}"
                     fi
+                    if [ -n "${wan_dns}" ]; then
+                      $UCISET network.wan.defaultroute='1'
+                      uci -q add_list  network.wan.dns="${wan_dns}"
+		    else
+		       $UCIDEL network.wan.dns
+                    fi
                     ;;
                     
                 dhcp)
                     $UCISET network.wan.proto='dhcp'
                     $UCISET network.wan.delegate='0'
+                    if [ -n "${wan_dns}" ]; then
+                      $UCISET network.wan.peerdns='0'
+                      uci -q add_list network.wan.dns="${wan_dns}"
+	            else
+                       $UCIDEL network.wan.peerdns
+		       $UCIDEL network.wan.dns
+                    fi
                     ;;
             esac
 	    [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
-            if [ -n "${wan_dns}" ]; then
-                    $UCISET network.wan.peerdns='0'
-                    uci -q add_list network.wan.dns="${wan_dns}"
-	    else
-                    $UCISET network.wan.peerdns='1'
-            fi
+
             ;;
 
         siderouter)
@@ -350,19 +359,27 @@ configure_network() {
                         $UCISET network.lan.gateway="${lan_gateway}"
                         $UCISET firewall.@zone[0].masq='1'
                     fi
+                    if [ -n "$lan_dns" ] ;then
+		       uci -q add_list network.lan.dns=$lan_dns
+		    else
+		       $UCIDEL network.lan.dns
+                    fi
                     ;;
                     
                 dhcp)
                     $UCISET network.lan.proto='dhcp'
                     $UCIDEL network.lan.ipaddr
                     $UCIDEL network.lan.netmask
-
+                    if [ -n "$lan_dns" ] ;then
+                      $UCISET network.lan.peerdns='0'
+                      uci -q add_list network.lan.dns=$lan_dns
+                    else
+                       $UCIDEL network.lan.peerdns
+		       $UCIDEL network.lan.dns
+                    fi
                     ;;
             esac
-            if [ -n "$lan_dns" ] ;then
-		   # $UCISET network.lan.peerdns='0'
-		   uci -q add_list network.lan.dns=$lan_dns
-            fi
+
 	    
             if [ $netsum -gt 1 ]; then
                     [ "x$ifname" = "xdevice" ] && $UCISET network.@$ifname[0].ports="${lannet} ${wan_interface}" || $UCISET network.lan.$ifname="${lannet} ${wan_interface}"

@@ -633,7 +633,11 @@ return view.extend({
             _('Enable Firewall SYN-flood defense [Suggest opening]'));
         o.default = '1';
         o.rmempty = false;
-
+	
+        //o = s.taboption('othersetup', form.Flag, 'updatacheck', _('Update detection prompt'));
+        //o.default = '0';
+        //o.rmempty = false;
+	
         var originalSave = m.save;
         var currentLanIP = this.lan_ip;
         var currentHTTPS = this.LanHTTPS;
