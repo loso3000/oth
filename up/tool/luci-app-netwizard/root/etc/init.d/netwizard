@@ -6,6 +6,7 @@ UCISET='uci -q set'
 UCIDEL='uci -q delete'
 UCIADD='uci -q add_list'
 LOCK=/var/lock/netwizard-boot.lock
+. /lib/functions/uci-defaults.sh
 
 setipv6() {
     local mode=$1
@@ -226,7 +227,7 @@ configure_network() {
     config_get wan_pppoe_user "$cfg" wan_pppoe_user
     config_get wan_pppoe_pass "$cfg" wan_pppoe_pass
     config_get dhcp_proto "$cfg" dhcp_proto 'dhcp'
-    
+
     if [ "x$showhide" = "x1" ]; then
         touch /etc/netwizard_hide
         $UCISET advancedplus.@basic[0].wizard="1"
@@ -252,20 +253,35 @@ configure_network() {
     [ `uci -q get network.wan6 2>/dev/null` ] && $UCIDEL network.wan6
     [ `uci -q get network.lan6 2>/dev/null` ] && $UCIDEL network.lan6
     
-    netname=$(ls /sys/class/net/ 2>/dev/null | grep -E '^(eth[0-9]+|en[op][0-9]+|usb[0-9]+|wlan[0-9]+|wl[0-9]+)')
-    netsum=$(echo "$netname" | wc -l 2>/dev/null || echo 0)
-    [ $netsum -gt 1 ] && {
-    lannet=''
-    for i in $(echo "$netname"); do
-        if [ "$i" != "$wan_interface" ]; then
-            lannet="${lannet} $i"
+netname=$(ls /sys/class/net/ 2>/dev/null | grep -E '^(eth[0-9]+|en[op][0-9]+s[0-9]+|usb[0-9]+|wlan[0-9]+|wl[0-9]+)' | sort)
+netsum=$(echo "$netname" | wc -l 2>/dev/null || echo 0)
+if [ "$netsum" -eq 1 ]; then
+    lannet=$(echo "$netname")
+    wan_interface=$(echo "$netname")
+    ucidef_set_interface_lan "$lannet"
+elif [ "$netsum" -ge 2 ]; then
+    wan_interface=$(echo "$netname" | grep '^eth' | tail -n 1)
+    if [ -z "$wan_interface" ]; then
+        wan_interface=$(echo "$netname" | grep -E '^en[opx][0-9]+' | tail -n 1)
+    fi
+    if [ -z "$wan_interface" ]; then
+        wan_interface=$(echo "$netname" | grep -v '^wl' | grep -v '^wlan' | head -n 1)
+    fi
+    lannet=""
+    for eth_interface in $netname; do
+        if [ "$eth_interface" != "$wan_interface" ]; then
+            lannet=$lannet" "${eth_interface##*/}
         fi
     done
     lannet=$(echo "$lannet" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-        [ "x$ifname" = "xdevice" ] && $UCISET network.@$ifname[0].ports="${lannet}" || $UCISET network.lan.$ifname="${lannet}"
-    }
+    [ -n "$wan_interface" ] && ucidef_set_interface_wan "$wan_interface"
+    [ -n "$lannet" ] && ucidef_set_interface_lan "$lannet"
+fi
+
+if [ -n "$(uci changes network 2>/dev/null)" ]; then
     uci commit network
-    
+fi
+
     if  [ -n "$wan_interface" ]; then
         $UCISET network.wan=interface
         $UCISET network.wan6=interface
@@ -473,7 +489,7 @@ configure_network() {
 
         $UCISET netwizard.default.old_wifi_ssid="${wifi_ssid}"
         $UCISET netwizard.default.old_wifi_key="${wifi_key}"
-        uci commit wireless
+        [ -n "$(uci changes wireless 2>/dev/null)" ] && uci commit wireless
     fi
 
 uci -q batch <<-EOF >/dev/null
