@@ -1886,6 +1886,7 @@ textarea:focus
 .diag-action>.cbi-dropdown.btn>.open,
 .cbi-page-actions>.cbi-dropdown.btn>.open {
     color: var(--menu-hover-color);
+    padding: 0 0.3rem;
 }
 
 .cbi-dropdown.btn>div {
@@ -1908,9 +1909,6 @@ textarea:focus
     margin: 0 0.2rem 0 0.4rem;
 }
 
-.cbi-dropdown.btn>ul>li {
-    padding: 0 0 0 0.4rem;
-}
 .cbi-dropdown.btn>ul>li {
   min-height: 1.5rem;
   height: 1.6rem
