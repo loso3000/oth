@@ -51,7 +51,7 @@ return view.extend({
 		o.default = '0';
 
 		// box-shadow
-		o = s.option( form.Flag, 'boxshadow', _('Shadow light strip effect'));
+		o = s.option( form.Flag, 'boxshadow', _('Shadow layering effect'));
 		o.rmempty = false;
 		o.default = '0';
 

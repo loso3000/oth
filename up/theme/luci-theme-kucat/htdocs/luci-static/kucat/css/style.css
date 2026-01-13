@@ -3294,7 +3294,7 @@ body.lang_pl.node-main-login .cbi-value-title {
 .main .block {
     color: var(--body-color);
     background-color: rgba(var(--primary-rgbbody), 0.7) !important;
-    box-shadow: var(--boxshadow);
+    box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor)
 }
 
 [data-page^="admin-services-shadowsocksr"]>.block:active,
