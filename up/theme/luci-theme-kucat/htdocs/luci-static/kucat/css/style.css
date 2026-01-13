@@ -556,7 +556,7 @@ footer a {
     border-radius: 0.25rem;
     background-color: rgba(var(--primary-rgbbody), 1);
     color: var(--title-color);
-    box-shadow: 0 0.1rem 0.4rem var(--input-boxcolor);
+    box-shadow: var(--boxshadow);
     padding: 1rem 3rem !important
 }
 
@@ -584,7 +584,8 @@ footer a {
     z-index: 100;
     background-color: var(--menu-bgcolor);
     background-image: var(--bgqs-image);
-    box-shadow: 0 .1rem .5rem .2rem var(--input-boxcolor);
+    box-shadow: var(--boxshadow);
+    border-right: 1px solid var(--inputborder-color);
     overflow-x: auto;
     word-break: break-word;
     flex-shrink: 0;
@@ -1135,7 +1136,7 @@ li {
     overflow: unset;
     border-radius: var(--radius1);
     background-color: rgba(var(--primary-rgbbody), 0.9);
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 2px 0 var(--input-boxcolor);
+    box-shadow: var(--boxshadow);
     padding: 0.7rem 1rem;
 }
 
@@ -1408,9 +1409,9 @@ button:not(:hover) ,
 .cbi-button:not(:hover) 
  {
     transform: translateY(0);
-    box-shadow: 0 0.1rem 0.3rem var(--input-boxhovercolor);
-    -webkit-box-shadow: 0 0.1rem 0.3rem var(--input-boxhovercolor);
-    -moz-box-shadow: 0 0.1rem 0.3rem var(--input-boxhovercolor)
+    box-shadow: var(--boxshadow);
+    -webkit-box-shadow: var(--boxshadow);
+    -moz-box-shadow: var(--boxshadow);
 }
 
 .btn:active,
@@ -1465,7 +1466,7 @@ textarea,
     min-width: 100%;
     max-width: none;
     max-height: 200px !important;
-    box-shadow: 0 0 4px var(--inputborder-color);
+    box-shadow: var(--boxshadow);
     border-radius: var(--radius2);
     background-color: rgba(var(--primary-rgbbody), 1);
     color: var(--inputtext-color);
@@ -2069,7 +2070,7 @@ textarea:focus
     border-radius: var(--radius2) !important;
     background-color: rgba(var(--primary-rgbbody), 1) !important;
     color: var(--primary-title-color) !important;
-    box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor);
+    box-shadow: var(--boxshadow);
     margin: 5em auto;
     padding: 1rem
 }
@@ -2942,7 +2943,7 @@ body.lang_pl.node-main-login .cbi-value-title {
 .node-main-login>.main>.main-right #maincontent>.container>form {
     -webkit-backdrop-filter: blur(6px) !important;
     backdrop-filter: blur(6px) !important;
-    box-shadow: 0 .1rem .4rem .2rem var(--input-boxcolor);
+    box-shadow: var(--boxshadow);
     background-color: rgba(var(--primary-rgbbody), 0.5) !important;
     border-radius: var(--radius1);
     border: none;
@@ -3295,7 +3296,7 @@ body.lang_pl.node-main-login .cbi-value-title {
 .main .block {
     color: var(--body-color);
     background-color: rgba(var(--primary-rgbbody), 0.7) !important;
-    box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor)
+    box-shadow: var(--boxshadow);
 }
 
 [data-page^="admin-services-shadowsocksr"]>.block:active,
@@ -3915,8 +3916,6 @@ input,
 
     .main-left {
         visibility: hidden;
-        box-shadow: rgba(0, 0, 0, 0.75) 0 0 20px -5px;
-        -webkit-box-shadow: rgba(0, 0, 0, 0.75) 0 0 20px -5px;
         position: fixed;
         background-image: var(--bgqs-image);
         width: calc(0% + 15rem);

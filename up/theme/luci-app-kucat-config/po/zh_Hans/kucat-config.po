@@ -56,8 +56,11 @@ msgstr "中号字体"
 msgid "Large font"
 msgstr "大号字体"
 
-msgid "Font dimensionality"
-msgstr "字体立体感"
+msgid "3D font"
+msgstr "立体感字体"
+
+msgid "Shadow light strip effect"
+msgstr "阴影灯带效果"
 
 msgid "Wallpaper synchronization"
 msgstr "壁纸同步"

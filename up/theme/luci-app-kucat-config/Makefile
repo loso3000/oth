@@ -7,8 +7,8 @@
 include $(TOPDIR)/rules.mk
 NAME:=kucat-config
 PKG_NAME:=luci-app-$(NAME)
-PKG_VERSION:=2.1.3
-PKG_RELEASE:=20260110
+PKG_VERSION:=2.1.5
+PKG_RELEASE:=20260114
 
 PKG_MAINTAINER:=sirpdboy team <herboy2008@gmail.com>
 
