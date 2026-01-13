@@ -28,17 +28,8 @@ define Package/automount
     +(!TARGET_ramips&&USB_SUPPORT):kmod-usb-storage-uas \
     +kmod-fs-ext4 \
     +kmod-fs-exfat \
-    +kmod-fs-vfat
-  PKGARCH:=all
-endef
-
-define Package/ntfs3-mount
-  SECTION:=utils
-  CATEGORY:=Utilities
-  SUBMENU:=Filesystem
-  TITLE:=NTFS mount script for Paragon NTFS3 driver
-  DEPENDS:=+kmod-fs-ntfs3
-  VARIANT:=ntfs3-mount
+    +kmod-fs-vfat\
+    +ntfs3-mount
   PKGARCH:=all
 endef
 
