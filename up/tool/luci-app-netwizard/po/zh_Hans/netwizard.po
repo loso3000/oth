@@ -270,8 +270,8 @@ msgstr "无法自动重定向到新IP地址"
 msgid "Configuration has been saved successfully. You can manually access the router management interface."
 msgstr "配置已保存成功，可以手动访问路由器管理界面。"
 
-msgid ""
-msgstr ""
+msgid "Enable detection update prompts"
+msgstr "启用检测更新提示"
 
 msgid ""
 msgstr ""

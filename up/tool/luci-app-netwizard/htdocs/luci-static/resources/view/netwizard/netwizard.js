@@ -634,9 +634,9 @@ return view.extend({
         o.default = '1';
         o.rmempty = false;
 	
-        //o = s.taboption('othersetup', form.Flag, 'updatacheck', _('Update detection prompt'));
-        //o.default = '0';
-        //o.rmempty = false;
+        o = s.taboption('othersetup', form.Flag, 'updatacheck', _('Enable detection update prompts'));
+        o.default = '1';
+        o.rmempty = false;
 	
         var originalSave = m.save;
         var currentLanIP = this.lan_ip;

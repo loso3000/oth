@@ -39,13 +39,11 @@ validate_cidr() {
 
 setipv6() {
     local mode=$1
-    local wan_proto=${2:-"dhcp"}
-    $UCIDEL network.wan6 2>/dev/null
-    $UCIDEL network.lan6 2>/dev/null
-    
     case $mode in
         0) # 禁用IPv6
             uci -q batch <<EOF
+delete network.wan6
+
 delete dhcp.@dnsmasq[0].filter_aaaa
 set dhcp.@dnsmasq[0].filter_aaaa='1'
 set dhcp.lan.ra='disabled'
@@ -66,6 +64,15 @@ EOF
         1) # PPPoE IPv6
             uci -q batch <<EOF
 delete dhcp.@dnsmasq[0].filter_aaaa
+delete network.wan6.reqaddress='try'
+delete dhcp.lan.ra_slaac
+delete dhcp.wan.master
+delete dhcp.wan.ra_flags
+delete network.wan.delegate
+delete network.wan6.delegate
+delete network.lan.delegate
+delete network.wan6.sourcefilter
+delete network.wan6.delegate
 set network.wan.ipv6='auto'
 set network.wan.delegate='1'
 set network.wan6=interface
@@ -75,6 +82,7 @@ set network.wan6.reqaddress='try'
 set network.wan6.reqprefix='auto'
 set network.wan6.extendprefix='1'
 set network.lan.delegate='1'
+set network.lan.ip6ifaceid='eui64'
 set dhcp.lan.ra='hybrid'
 set dhcp.lan.dhcpv6='hybrid'
 set dhcp.lan.ndp='relay'
@@ -90,6 +98,10 @@ EOF
         2) # 旁路由模式IPv6
             uci -q batch <<EOF
 delete dhcp.@dnsmasq[0].filter_aaaa
+del dhcp.lan.ra_slaac
+del dhcp.lan.ra_default
+del network.lan.delegate
+del network.lan6.delegate
 set network.lan.delegate='1'
 set network.lan.ip6assign='64'
 set dhcp.lan.ra='relay'
@@ -103,6 +115,7 @@ set network.lan6.reqaddress='try'
 set network.lan6.reqprefix='auto'
 set network.lan6.extendprefix='1'
 set network.lan6.norelease='1'
+set dhcp.lan6=dhcp
 set dhcp.lan6.interface='lan6'
 set dhcp.lan6.ignore='1'
 set dhcp.lan6.master='1'
@@ -115,6 +128,15 @@ EOF
         3) # DHCP IPv6
             uci -q batch <<EOF
 delete dhcp.@dnsmasq[0].filter_aaaa
+delete dhcp.wan.master
+delete dhcp.wan.ra_flags
+delete network.wan.delegate
+delete network.wan6.delegate
+delete network.lan.delegate
+delete network.wan6.sourcefilter
+delete network.wan6.delegate
+del dhcp.lan.ra_default
+delete dhcp.wan.ra_flags
 set network.wan.ipv6='auto'
 set network.wan.delegate='1'
 set network.lan.delegate='1'
@@ -124,6 +146,7 @@ set network.wan6.proto='dhcpv6'
 set network.wan6.reqaddress='try'
 set network.wan6.reqprefix='auto'
 set network.wan6.extendprefix='1'
+set network.wan6.ifname="${wan_interface}"
 set dhcp.lan.ra='hybrid'
 set dhcp.lan.dhcpv6='hybrid'
 set dhcp.lan.ndp='relay'
@@ -213,7 +236,6 @@ sethttps() {
             $UCISET uhttpd.main.cert="$certscrt"
             $UCISET uhttpd.main.key="$certskey"
         fi
-        
         /etc/init.d/uhttpd start 2>/dev/null
     fi
 }
@@ -365,7 +387,7 @@ configure_network() {
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             if [ -n "${wan_dns}" ]; then
                 $UCISET network.wan.peerdns='0'
-                uci -q add_list network.wan.dns="${wan_dns}"
+                $UCIADD network.wan.dns="${wan_dns}"
             else
                 $UCIDEL network.wan.peerdns
                 $UCIDEL network.wan.dns
@@ -388,7 +410,7 @@ configure_network() {
                     fi
                     if [ -n "${wan_dns}" ]; then
                         $UCISET network.wan.defaultroute='1'
-                        uci -q add_list network.wan.dns="${wan_dns}"
+                        $UCIADD network.wan.dns="${wan_dns}"
                     else
                         $UCIDEL network.wan.dns
                     fi
@@ -399,7 +421,7 @@ configure_network() {
                     $UCISET network.wan.delegate='0'
                     if [ -n "${wan_dns}" ]; then
                         $UCISET network.wan.peerdns='0'
-                        uci -q add_list network.wan.dns="${wan_dns}"
+                        $UCIADD network.wan.dns="${wan_dns}"
                     else
                         $UCIDEL network.wan.peerdns
                         $UCIDEL network.wan.dns
@@ -430,7 +452,7 @@ configure_network() {
                         $UCISET firewall.@zone[0].masq='1'
                     fi
                     if [ -n "$lan_dns" ]; then
-                        uci -q add_list network.lan.dns="$lan_dns"
+                        $UCIADD network.lan.dns="$lan_dns"
                     else
 		       $UCIDEL network.lan.dns
                     fi
@@ -442,7 +464,7 @@ configure_network() {
                     $UCIDEL network.lan.netmask
                     if [ -n "$lan_dns" ]; then
                         $UCISET network.lan.peerdns='0'
-                        uci -q add_list network.lan.dns="$lan_dns"
+                        $UCIADD network.lan.dns="$lan_dns"
                     else
                        $UCIDEL network.lan.peerdns
 		       $UCIDEL network.lan.dns
@@ -456,7 +478,7 @@ configure_network() {
             
             $UCISET firewall.@zone[0].masq='1'
             $UCIDEL firewall.@zone[0].network
-            uci -q add_list firewall.@zone[0].network='lan'
+            $UCIADD firewall.@zone[0].network='lan'
             [ `uci show network | grep utun | wc -l` -gt 1 ] && uci add firewall.@zone[0].network='utun'
 
             [ "x$ipv6" = "x1" ] && {
@@ -465,7 +487,7 @@ configure_network() {
                 $UCISET network.lan6.delegate='1'
                 $UCISET network.lan6.$ifname="@lan"
                 setipv6 2
-                uci -q add_list firewall.@zone[0].network='lan6'
+                $UCIADD firewall.@zone[0].network='lan6'
             } || setipv6 0
             
             $UCIDEL network.wan
