@@ -3460,7 +3460,8 @@ body.lang_pl.node-main-login .cbi-value-title {
     max-width: 14rem;
     width: 10rem
 }
-.history-tooltip {
+.bandix-container .traffic-increments-tooltip
+.bandix-container .history-tooltip {
   background-color: rgba(var(--primary-rgbbody),1)!important;
   color: var(--body-color) !important;
   border: 1px solid rgba(255, 255, 255, 0)!important;
@@ -3505,7 +3506,7 @@ body.lang_pl.node-main-login .cbi-value-title {
   border: 1px solid var(--inputborder-color);
 }
 
-.bandix_modal {
+.bandix-modal-overlay.show .bandix-modal {
   background-color: rgba(var(--primary-rgbbody), 1)!important
 }
 
