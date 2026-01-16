@@ -323,13 +323,9 @@ configure_network() {
     lannet=$(echo "$netname")
     wan_interface=$(echo "$netname")
     elif [ "$netsum" -ge 2 ]; then
-        wan_interface=$(echo "$netname" | grep '^eth' | tail -n 1)
-        if [ -z "$wan_interface" ]; then
-            wan_interface=$(echo "$netname" | grep -E '^en[opx][0-9]+' | tail -n 1)
-        fi
-        if [ -z "$wan_interface" ]; then
-            wan_interface=$(echo "$netname" | grep -v '^wl' | grep -v '^wlan' | head -n 1)
-        fi
+        [ -z "$wan_interface" ] && wan_interface=$(echo "$netname" | grep '^eth' | tail -n 1)
+        [ -z "$wan_interface" ] && wan_interface=$(echo "$netname" | grep -v '^wl' | grep -v '^wlan' | head -n 1)
+        [ -z "$wan_interface" ] && wan_interface=$(echo "$netname" | grep -E '^en[opx][0-9]+' | tail -n 1)
         lannet=""
         for eth_interface in $netname; do
             if [ "$eth_interface" != "$wan_interface" ]; then
