@@ -3194,28 +3194,27 @@ body.lang_pl.node-main-login .cbi-value-title {
 
 [data-page^="admin-status-routes"] #view table,
 [data-page^="admin-status-processes"] #view table,
-[data-page^="admin-status-realtime"] #view table[id*=connections] {
-    border: 1px;
-    font-weight: 400;
-    font-style: normal;
+[data-page^="admin-status-realtime"] #view table[id*=connections]  {
+
     line-height: 1;
     font-family: inherit;
     text-align: left;
     min-width: inherit;
     overflow-x: auto;
     overflow-y: hidden;
-    background-color: rgba(var(--primary-rgbbody), 0.5);
+    background-color: rgba(var(--primary-rgbbody), 0.1);
     -webkit-overflow-scrolling: touch;
     margin-bottom: 20px;
     margin-top: 5px;
 }
 
+[data-page^="admin-status-realtime"] #view>div,
 [data-page^="admin-status-channel"] #view>div:first-child,
 [data-page^="admin-status-channel"] #view>div>div>div>div,
 [data-page^="admin-status-channel"] #view>div>div>div>div>div,
 [data-page^="admin-status-realtime"] #view>div>div>div>div,
-[data-page^="admin-status-realtime"] #view>div>div>div {
-    background-color: rgba(var(--primary-rgbbody), 0.5) !important;
+[data-page^="admin-status-realtime"] #view>div>div>div{
+    background-color: rgba(var(--primary-rgbbody), 0.1) !important;
     border-radius: var(--radius2);
     border: 0px solid #000 !important
 }
