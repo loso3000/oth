@@ -40,128 +40,121 @@ validate_cidr() {
 setipv6() {
     local mode=$1
     case $mode in
-        0) # 禁用IPv6
+        0)
             uci -q batch <<EOF
-delete network.wan6
-delete dhcp.@dnsmasq[0].filter_aaaa
-set dhcp.@dnsmasq[0].filter_aaaa='1'
-set dhcp.lan.ra='disabled'
-set dhcp.lan.dhcpv6='disabled'
-set dhcp.lan.ndp='disabled'
-set network.wan.ipv6='0'
-set network.wan.delegate='0'
-set network.lan.delegate='0'
-delete dhcp.wan.ra_flags
-add_list dhcp.wan.ra_flags='none'
-EOF
-            for option in ra ra_default ra_slaac dhcpv6 ra_flags; do
-                $UCIDEL dhcp.lan.$option 2>/dev/null
-                $UCIDEL dhcp.wan.$option 2>/dev/null
-            done
-            ;;
-        1) # PPPoE IPv6
-            uci -q batch <<EOF
-delete dhcp.@dnsmasq[0].filter_aaaa
-delete network.wan6.reqaddress='try'
-delete dhcp.lan.ra_slaac
-delete dhcp.wan.master
-delete dhcp.wan.ra_flags
-delete network.wan.delegate
-delete network.wan6.delegate
-delete network.lan.delegate
-delete network.wan6.sourcefilter
-delete network.wan6.delegate
-set network.wan.ipv6='auto'
-set network.wan.delegate='1'
-set network.wan6=interface
-set network.wan6.proto='dhcpv6'
-set network.wan6.ifname='@wan'
-set network.wan6.reqaddress='try'
-set network.wan6.reqprefix='auto'
-set network.wan6.extendprefix='1'
-set network.lan.delegate='1'
-set network.lan.ip6ifaceid='eui64'
-set dhcp.lan.ra='hybrid'
-set dhcp.lan.dhcpv6='hybrid'
-set dhcp.lan.ndp='relay'
-set dhcp.lan.ra_management='1'
-set dhcp.lan.ra_default='1'
-set dhcp.wan6.master='1'
-set dhcp.wan6.ra='relay'
-set dhcp.wan6.dhcpv6='relay'
-set dhcp.wan6.ndp='relay'
+                delete network.wan6
+                set dhcp.lan.ra=''
+                set dhcp.lan.dhcpv6=''
+                set dhcp.lan.ndp=''
+                set dhcp.@dnsmasq[0].filter_aaaa="1"
+                delete dhcp.lan.ra
+                delete dhcp.lan.ra_default
+                delete dhcp.lan.ra_slaac
+                delete dhcp.lan.dhcpv6
+                delete dhcp.lan.ra_flags
+                delete dhcp.wan.ra
+                delete dhcp.wan.ndp
+                delete dhcp.wan.ra_flags
+                delete dhcp.lan.dns
+                add_list dhcp.wan.ra_flags='none'
+                set network.lan.delegate='0'
+                set network.wan.ipv6='0'
+                set network.wan.delegate='0'
 EOF
             ;;
-        2) # 旁路由模式IPv6
+        1) #pppoe
             uci -q batch <<EOF
-delete dhcp.@dnsmasq[0].filter_aaaa
-del dhcp.lan.ra_slaac
-del dhcp.lan.ra_default
-del network.lan.delegate
-del network.lan6.delegate
-set network.lan.delegate='1'
-set network.lan.ip6assign='64'
-set dhcp.lan.ra='relay'
-set dhcp.lan.dhcpv6='relay'
-set dhcp.lan.ndp='relay'
-set dhcp.lan.ra_management='1'
-set network.lan6=interface
-set network.lan6.proto='dhcpv6'
-set network.lan6.ifname='@lan'
-set network.lan6.reqaddress='try'
-set network.lan6.reqprefix='auto'
-set network.lan6.extendprefix='1'
-set network.lan6.norelease='1'
-set dhcp.lan6=dhcp
-set dhcp.lan6.interface='lan6'
-set dhcp.lan6.ignore='1'
-set dhcp.lan6.master='1'
-set dhcp.lan6.ra='relay'
-set dhcp.lan6.dhcpv6='relay'
-set dhcp.lan6.ndp='relay'
+                set dhcp.lan.ra='hybrid'
+                set dhcp.lan.dhcpv6='hybrid'
+                delete dhcp.@dnsmasq[0].filter_aaaa
+                set dhcp.lan.ndp='relay'
+                set dhcp.lan.ra_management='1'
+                set dhcp.lan.ra_default='1'
+                delete dhcp.lan.ra_flags
+                set dhcp.wan.master='1'
+                set network.wan.ipv6='auto'
+                delete dhcp.lan.ra_slaac
+                delete dhcp.wan.master
+                delete dhcp.wan.ra_flags
+                delete network.wan.delegate
+                delete network.wan6.delegate
+                delete network.lan.delegate
+                delete network.wan6.sourcefilter
+                delete network.wan6.delegate
+                set network.wan6.extendprefix='1'
+                set network.lan.ip6ifaceid='eui64'
+                delete network.wan6.reqaddress='try'
+                set network.wan6.reqprefix='auto'
+                set dhcp.wan6.master='1'
+                set dhcp.wan6.ra='relay'
+                set dhcp.wan6.dhcpv6='relay'
+                set dhcp.wan6.ndp='relay'
 EOF
             ;;
-            
-        3) # DHCP IPv6
+        2) #siderouter
             uci -q batch <<EOF
-delete dhcp.@dnsmasq[0].filter_aaaa
-delete dhcp.wan.master
-delete dhcp.wan.ra_flags
-delete network.wan.delegate
-delete network.wan6.delegate
-delete network.lan.delegate
-delete network.wan6.sourcefilter
-delete network.wan6.delegate
-del dhcp.lan.ra_default
-delete dhcp.wan.ra_flags
-set network.wan.ipv6='auto'
-set network.wan.delegate='1'
-set network.lan.delegate='1'
-set network.lan.ip6assign='64'
-set network.wan6=interface
-set network.wan6.proto='dhcpv6'
-set network.wan6.reqaddress='try'
-set network.wan6.reqprefix='auto'
-set network.wan6.extendprefix='1'
-set network.wan6.ifname="${wan_interface}"
-set dhcp.lan.ra='hybrid'
-set dhcp.lan.dhcpv6='hybrid'
-set dhcp.lan.ndp='relay'
-set dhcp.lan.ra_management='1'
-set dhcp.lan.ra_slaac='1'
-set dhcp.wan6.master='1'
-set dhcp.wan6.ra='relay'
-set dhcp.wan6.dhcpv6='relay'
-set dhcp.wan6.ndp='relay'
+                del dhcp.lan.ra_default
+                del dhcp.lan.ra_slaac
+                set dhcp.lan.ra='relay'
+                set dhcp.lan.dhcpv6='relay'
+                set dhcp.lan.ndp='relay'
+                delete dhcp.@dnsmasq[0].filter_aaaa
+                set dhcp.lan6=dhcp
+                set dhcp.lan6.interface='lan6'
+                set dhcp.lan6.ignore='1'
+                set dhcp.lan.ra_management='1'
+                del network.lan.delegate
+                set network.lan.ip6assign='64'
+                set network.lan6.extendprefix='1'
+                set network.lan.ip6ifaceid='eui64'
+                del network.lan6.delegate
+                set network.lan6.reqaddress='try'
+                set network.lan6.reqprefix='auto'
+                set network.lan6.norelease='1'
+                set dhcp.lan6.master='1'
+                set dhcp.lan6.ra='relay'
+                set dhcp.lan6.dhcpv6='relay'
+                set dhcp.lan6.ndp='relay'
+EOF
+            ;;
+        3)  #dhcp
+            uci -q batch <<EOF
+                set dhcp.lan.ra='hybrid'
+                set dhcp.lan.dhcpv6='hybrid'
+                set dhcp.lan.ndp='relay'
+                delete dhcp.@dnsmasq[0].filter_aaaa
+                set dhcp.lan.ra_management='1'
+                set dhcp.lan.ra_slaac='1'
+                del dhcp.lan.dns
+                del dhcp.lan.ra_default
+                delete dhcp.wan.ra_flags
+                del dhcp.wan.ra
+                del dhcp.wan.dhcpv6
+                del dhcp.wan.ndp
+                add_list dhcp.wan.ra_flags='none'
+                set network.wan.ipv6='auto'
+                set network.lan.ip6assign='64'
+                set network.wan6.ifname="${wan_interface}"
+                set network.wan6.reqaddress=try
+                set network.wan6.reqprefix=auto
+                delete dhcp.wan.master
+                delete dhcp.wan.ra_flags
+                delete network.wan.delegate
+                delete network.wan6.delegate
+                delete network.lan.delegate
+                delete network.wan6.sourcefilter
+                delete network.wan6.delegate
+                set network.wan6.extendprefix='1'
+                set network.lan.ip6ifaceid='eui64'
+                set dhcp.wan6.master='1'
+                set dhcp.wan6.ra='relay'
+                set dhcp.wan6.dhcpv6='relay'
+                set dhcp.wan6.ndp='relay'
 EOF
             ;;
     esac
-    # 提交更改
-    uci commit network 2>/dev/null
-    uci commit dhcp 2>/dev/null
 }
 
-# 设置SYN Flood保护
 setsynflood(){
     if [ "x$synflood" = "x1" ] ;then
         $UCISET firewall.@defaults[0].syn_flood='1'
@@ -222,7 +215,7 @@ sethttps() {
             $UCIADD uhttpd.main.listen_https='[::]:443'
             $UCISET uhttpd.main.redirect_https='1' 
             hostname=$(uci -q get system.@system[0].hostname | awk '{print tolower($0)}' 2>/dev/null || echo 'openwrt')
-            $UCISET network.lan.hostname="${hostname}"
+            $UCISET network.lan.hostname=${hostname}
             $UCISET dhcp.@dnsmasq[0].domain="${hostname}.lan"
             # openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"
             openssl req -new -newkey rsa:2048 -days 365 -sha256 -keyout $certskey -out $certscrt -subj "/C=CN/CN=$hostname.lan"
@@ -230,7 +223,6 @@ sethttps() {
             $UCISET uhttpd.main.cert="$certscrt"
             $UCISET uhttpd.main.key="$certskey"
         fi
-        /etc/init.d/uhttpd start 2>/dev/null
     fi
 }
 
@@ -309,10 +301,11 @@ configure_network() {
     $UCIDEL network.lan.gateway
     $UCIDEL network.lan.dns
     $UCIDEL firewall.@zone[0].masq
-    sed -i '/^config forwarding/,/^$/d' /etc/config/firewall
-    $UCIDEL network.wan
-    $UCIDEL network.wan6
-    $UCIDEL network.lan6
+    sed -i '/^config forwarding/,/^$/d' /etc/config/firewall  # del forwarding
+    # uci -q delete firewall.@forwarding[0] >/dev/null 2>&1
+    [ `uci -q get network.wan 2>/dev/null` ] && $UCIDEL network.wan
+    [ `uci -q get network.wan6 2>/dev/null` ] && $UCIDEL network.wan6
+    [ `uci -q get network.lan6 2>/dev/null` ] && $UCIDEL network.lan6
     netname=$(ls /sys/class/net/ 2>/dev/null | grep -E '^(eth[0-9]+|en[op][0-9]+s[0-9]+|usb[0-9]+|wlan[0-9]+|wl[0-9]+)' | sort)
     netsum=$(echo "$netname" | wc -l 2>/dev/null || echo 0)
     if [ "$netsum" -eq 0 ]; then
@@ -322,7 +315,7 @@ configure_network() {
     elif [ "$netsum" -eq 1 ]; then
     lannet=$(echo "$netname")
     wan_interface=$(echo "$netname")
-    elif [ "$netsum" -ge 2 ]; then
+    elif [ "$netsum" -gt 1 ]; then
         [ -z "$wan_interface" ] && wan_interface=$(echo "$netname" | grep '^eth' | tail -n 1)
         [ -z "$wan_interface" ] && wan_interface=$(echo "$netname" | grep -v '^wl' | grep -v '^wlan' | head -n 1)
         [ -z "$wan_interface" ] && wan_interface=$(echo "$netname" | grep -E '^en[opx][0-9]+' | tail -n 1)
@@ -338,13 +331,13 @@ configure_network() {
 
     if [ -n "$wan_interface" ] && [ "$wan_proto" != "siderouter" ]; then
         $UCISET network.wan=interface
-        $UCISET network.wan.$ifname="${wan_interface}"
-        $UCISET network.wan.metric='1'
         $UCISET network.wan6=interface
         $UCISET network.wan6.proto='dhcpv6'
         $UCISET network.wan6.delegate='1'
          $UCIDEL dhcp.wan.master
          $UCIDEL dhcp.lan.master
+        $UCISET network.wan.metric='1'
+        $UCISET network.wan.$ifname="${wan_interface}"
         [ "$wan_proto" == "pppoe" ] && $UCISET network.wan6.$ifname="@wan" || $UCISET network.wan6.$ifname="${wan_interface}"
 	 # firewall
          $UCIDEL firewall.@zone[1].network
@@ -581,8 +574,7 @@ EOF
 }
 
 boot() {
-    XBOOT=1
-    start
+    XBOOT=1    start
 }
 
 start() {
