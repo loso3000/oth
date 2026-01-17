@@ -165,12 +165,6 @@ setsynflood(){
     fi
 }
 
-setforwarding(){
-    $UCIDEL firewall.@forwarding[0] >/dev/null 2>&1
-    $UCIADD firewall forwarding >/dev/null 2>&1 
-    $UCISET firewall.@forwarding[-1].src='lan'
-    $UCISET firewall.@forwarding[-1].dest='wan'
-}
 
 # 设置HTTPS
 sethttps() {
@@ -353,8 +347,7 @@ configure_network() {
             $UCISET network.wan.proto='pppoe'
             [ -n "${wan_pppoe_user}" ] && $UCISET network.wan.username="${wan_pppoe_user}"
             [ -n "${wan_pppoe_pass}" ] && $UCISET network.wan.password="${wan_pppoe_pass}"
-            
-            [ "x$forwarding" = "x1" ] && setforwarding
+
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             if [ -n "${wan_dns}" ]; then
                         $UCISET network.wan.peerdns='0'
@@ -406,7 +399,6 @@ configure_network() {
                     ;;
             esac
 
-            [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
 
             ;;
