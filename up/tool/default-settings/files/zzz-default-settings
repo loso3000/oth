@@ -206,9 +206,12 @@ echo "OPENWRT_RELEASE='"${EZVER}"'" >> /etc/os-release
 }
 sed -i 's/immortalwrt/openwrt/g' /etc/config/luci
 
-# uci set firewall.@defaults[0].synflood_protect='1'
-# uci set firewall.@defaults[0].input='DROP'
-# uci set firewall.@defaults[0].flow_offloading='1'
+uci del firewall.@defaults[0].syn_flood
+uci del firewall.@defaults[0].fullcone
+uci del firewall.@defaults[0].fullcone6
+uci del firewall.@defaults[0].flow_offloading
+uci del firewall.@defaults[0].flow_offloading_hw
+uci del firewall.@defaults[0].synflood_protect
 
 # docker mirror
 # [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
