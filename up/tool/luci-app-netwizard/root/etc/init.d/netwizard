@@ -149,7 +149,7 @@ EOF
                 set dhcp.wan6.master='1'
                 set dhcp.wan6.ra='relay'
                 set dhcp.wan6.dhcpv6='relay'
-                set dhcp.wan6.ndp='relay'
+                set dhcp.wan6.ndp='relay' 
 EOF
             ;;
     esac
@@ -165,6 +165,12 @@ setsynflood(){
     fi
 }
 
+setforwarding(){
+    uci -q delete firewall.@forwarding[0]
+    uci add firewall forwarding >/dev/null 2>&1
+    $UCISET firewall.@forwarding[-1].src='lan'
+    $UCISET firewall.@forwarding[-1].dest='wan'
+}
 
 # 设置HTTPS
 sethttps() {
@@ -296,7 +302,9 @@ configure_network() {
     $UCIDEL network.lan.dns
     $UCIDEL firewall.@zone[0].masq
     sed -i '/^config forwarding/,/^$/d' /etc/config/firewall  # del forwarding
-    # uci -q delete firewall.@forwarding[0] >/dev/null 2>&1
+    if uci -q get firewall.@forwarding[0] >/dev/null 2>&1; then
+    uci -q delete firewall.@forwarding[0]
+    fi
     [ `uci -q get network.wan 2>/dev/null` ] && $UCIDEL network.wan
     [ `uci -q get network.wan6 2>/dev/null` ] && $UCIDEL network.wan6
     [ `uci -q get network.lan6 2>/dev/null` ] && $UCIDEL network.lan6
@@ -342,12 +350,22 @@ configure_network() {
           } || $UCISET firewall.@zone[1].network='wan wan6'
     fi
 
+     $UCISET firewall.@defaults[0].drop_invalid='1'
     case "${wan_proto}" in
         pppoe)
             $UCISET network.wan.proto='pppoe'
             [ -n "${wan_pppoe_user}" ] && $UCISET network.wan.username="${wan_pppoe_user}"
             [ -n "${wan_pppoe_pass}" ] && $UCISET network.wan.password="${wan_pppoe_pass}"
-
+	    $UCISET firewall.@zone[0].masq='1'
+            [ "x$forwarding" = "x1" ] && {
+                setforwarding
+                [ "x$ipv6" = "x1" ] &&  { 
+		add firewall forwarding
+                set firewall.@forwarding[-1].src='lan'
+                set firewall.@forwarding[-1].dest='wan'
+                set firewall.@forwarding[-1].family='ipv6' 
+		}
+	    }
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             if [ -n "${wan_dns}" ]; then
                         $UCISET network.wan.peerdns='0'
@@ -398,7 +416,7 @@ configure_network() {
                     fi
                     ;;
             esac
-
+	    [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
 
             ;;
@@ -417,7 +435,6 @@ configure_network() {
                     fi
                     if [ -n "$lan_gateway" ]; then
                         $UCISET network.lan.gateway="${lan_gateway}"
-                        $UCISET firewall.@zone[0].masq='1'
                     fi
                     if [ -n "$lan_dns" ]; then
 			for dns in ${lan_dns}; do

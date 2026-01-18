@@ -608,6 +608,13 @@ return view.extend({
         o.depends('dnsset', '1');
         o.rmempty = false;
 
+        o = s.taboption('wansetup', form.Flag, 'forwarding', _('Forcefully Forwarding'),
+            _('Forcefully add LAN to WAN forwarding'));
+        o.default = '1';
+        o.depends('wan_proto', 'pppoe');
+        o.depends('wan_proto', 'dhcp');
+        o.rmempty = false;
+
         o = s.taboption('wansetup', form.Flag, 'https', _('Redirect to HTTPS'),
             _('Enable automatic redirection of HTTP requests to HTTPS port.'));
         o.default = '0';
