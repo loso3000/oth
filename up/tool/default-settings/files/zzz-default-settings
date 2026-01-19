@@ -78,22 +78,6 @@ uci -q delete wireless.default_${r}
     uci -q commit wireless
 }
 
-setup_network()
-{
-    ifname=$(uci -q get network.lan.ifname) 
-    [ "x$ifname" = "x" ] && ifname="device" || ifname="ifname" 
-     wan_interface=`uci -q get network.wan.$ifname` 
-    netname=$(ls /sys/class/net/ | grep -E '^(eth[0-9]+|usb[0-9]+|lan[0-9]+|wan)$')
-    netsum=$(echo "$netname" | wc -l)
-    if [ $netsum -gt 1 ] ;then
-        lannet=''
-        for i in $(seq 1 $netsum); do 
-            [[ -n ${wan_interface} && "${wan_interface}" == "$(echo "$netname" | sed -n ${i}p)" ]] || lannet="${lannet} $(echo "$netname" | sed -n ${i}p)"
-        done
-        lannet=$(echo "$lannet" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-        [ "x$ifname" = "xdevice" ] && uci -q set network.@$ifname[0].ports="${lannet}" || uci -q set network.lan.$ifname="${lannet}"
-    fi
-}
 
 test -n "${DISTRIB_ID}" || DISTRIB_ID=EzOpWrt
 DISTRIB_ID=$(echo -n $DISTRIB_ID | tr a-z A-Z)
@@ -113,7 +97,7 @@ sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh   >/dev/n
 wifi up
 
 frmware=`cat /etc/ezopenwrt_version | awk -F '_' '{printf $2}'`
-if [ "$frmware" = "Super" ] || [ "$frmware" = "Mini"  || [ "$frmware" = "dz"  ] ; then
+if [ "$frmware" = "Super" ] || [ "$frmware" = "Mini" || [ "$frmware" = "dz"  ] ; then
 sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
 sed -i 's/nas/services/g' /usr/share/luci/menu.d/luci-app-samba4.json
 sed -i 's/vpn/services/g' /usr/share/luci/menu.d/luci-app-zerotier.json
@@ -158,7 +142,38 @@ sed -i 's/root.*/root::0:0:99999:7:::/g' /etc/shadow
 
 [ x$debug = x1 ] && echo $ver
 }
+
 uci -q get system.@imm_init[0] > "/dev/null" || uci -q add system imm_init > "/dev/null"
+
+if ! uci -q get system.@imm_init[0].lang > "/dev/null"; then
+	uci -q batch <<-EOF
+		set luci.main.lang="auto"
+		commit luci
+
+		set system.@imm_init[0].lang="1"
+		commit system
+	EOF
+fi
+
+ln -sf "/sbin/ip" "/usr/bin/ip"
+
+case "$DISTRIB_TARGET" in
+"bcm4908"/*|\
+"bcm53xx"/*|\
+"ramips/mt7621"|\
+"x86"/*)
+	if ! uci -q get system.@imm_init[0].packet_steering > "/dev/null"; then
+	uci -q batch <<-EOF
+		set network.globals="globals"
+		set network.@globals[0].packet_steering="1"
+		commit network
+
+		set system.@imm_init[0].packet_steering="1"
+		commit system
+	EOF
+	fi
+	;;
+esac
 
 if ! uci -q get system.@imm_init[0].system_chn > "/dev/null"; then
 	uci -q batch <<-EOF
@@ -184,6 +199,7 @@ if [ -z "$opkg_mirror" ]; then
 		commit system
 	EOF
 fi
+
 
 # sed -i '/coremark/d' /etc/crontabs/root
 ln -sf /sbin/ip /usr/bin/ip
@@ -213,7 +229,13 @@ uci del firewall.@defaults[0].synflood_protect
 # docker mirror
 # [ -f '/etc/opkg/distfeeds.conf.server' ] && mv -f  /etc/opkg/distfeeds.conf.server /etc/opkg/distfeeds.conf
 # sed -i.bak "s,releases/*/,24.10-SNAPSHOT/,g" "/etc/opkg/distfeeds.conf"
-sed -i.bak 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf"
+CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf | cut -d/ -f2)
+# kernelver=$(uname -r | sed 's/-.*//' | cut -d. -f1-3)
+kernelver=`echo $CURRENT_HASH  | sed 's/-.*//' | cut -d. -f1-3`
+[ `curl -fks --max-time 15 https://mirror.nju.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/x86/64/kmods/  | grep $kernelver | awk -F 'href=\"' '{print $2}'| awk -F '\/\"' '{print $1}' ` ] && \
+NEW_HASH=`curl -fks --max-time 15 https://mirror.nju.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/x86/64/kmods/  | grep $kernelver | awk -F 'href=\"' '{print $2}'| awk -F '\/\"' '{print $1}' `
+[ -n "$NEW_HASH" ] && sed -i "s|${CURRENT_HASH}|${NEW_HASH}|g" /etc/opkg/distfeeds.conf || sed -i "/${CURRENT_HASH}/d" /etc/opkg/distfeeds.conf
+sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf"
 sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf"
 #tv
 test $ver -lt 3 && {
@@ -343,39 +365,6 @@ fi
 [ -f '/etc/init.d/watchdog' ] &&/etc/init.d/watchdog restart
 #no login 
 sed -i '$ s|exec /bin/login$|exec /bin/sh -l|' /usr/libexec/login.sh
-
-uci -q get system.@imm_init[0] > "/dev/null" || uci -q add system imm_init > "/dev/null"
-
-if ! uci -q get system.@imm_init[0].lang > "/dev/null"; then
-	uci -q batch <<-EOF
-		set luci.main.lang="auto"
-		commit luci
-
-		set system.@imm_init[0].lang="1"
-		commit system
-	EOF
-fi
-
-ln -sf "/sbin/ip" "/usr/bin/ip"
-
-case "$DISTRIB_TARGET" in
-"bcm4908"/*|\
-"bcm53xx"/*|\
-"ramips/mt7621"|\
-"x86"/*)
-	if ! uci -q get system.@imm_init[0].packet_steering > "/dev/null"; then
-	uci -q batch <<-EOF
-		set network.globals="globals"
-		set network.@globals[0].packet_steering="1"
-		commit network
-
-		set system.@imm_init[0].packet_steering="1"
-		commit system
-	EOF
-	fi
-	;;
-esac
-
 
 cat >>/etc/hosts<<\EOF
 140.82.113.25                 alive.github.com
