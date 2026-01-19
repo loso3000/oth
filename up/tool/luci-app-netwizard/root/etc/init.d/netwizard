@@ -238,7 +238,7 @@ configure_network() {
     config_get lan_gateway "$cfg" lan_gateway
     config_get lan_dns "$cfg" lan_dns
     config_get dns_tables "$cfg" dns_tables 
-    config_get forwarding "$cfg" forwarding '1'
+    config_get forwarding "$cfg" forwarding
     config_get https "$cfg" https '0'
     config_get wan_ipaddr "$cfg" wan_ipaddr
     config_get wan_netmask "$cfg" wan_netmask
@@ -266,10 +266,7 @@ configure_network() {
     $UCIDEL network.lan.gateway
     $UCIDEL network.lan.dns
     $UCIDEL firewall.@zone[0].masq
-    sed -i '/^config forwarding/,/^$/d' /etc/config/firewall  # del forwarding
-    if uci -q get firewall.@forwarding[0] >/dev/null 2>&1; then
-    uci -q delete firewall.@forwarding[0]
-    fi
+
     [ `uci -q get network.wan 2>/dev/null` ] && $UCIDEL network.wan
     [ `uci -q get network.wan6 2>/dev/null` ] && $UCIDEL network.wan6
     [ `uci -q get network.lan6 2>/dev/null` ] && $UCIDEL network.lan6
