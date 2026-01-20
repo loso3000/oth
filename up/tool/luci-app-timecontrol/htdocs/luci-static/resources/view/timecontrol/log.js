@@ -1,4 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0
+/*
 
+ * Copyright (C) 2022-2026 sirpdboy <herboy2008@gmail.com>
+ */
 'use strict';
 'require dom';
 'require fs';
@@ -26,9 +30,32 @@ return view.extend({
 				font-size: small; 
 				color: #666; /* 深灰色文字 */
 			}
+			/* 倒序显示相关样式 */
+			.log-container {
+				display: flex;
+				flex-direction: column-reverse;
+				max-height: 800px;
+				overflow-y: auto;
+				border-radius: 3px;
+				margin-top: 10px;
+				padding: 5px;
+			}
+			.log-line {
+				padding: 3px 0;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.4;
+			}
+			.log-line:last-child {
+				border-bottom: none;
+			}
+			.log-timestamp {
+				font-weight: bold;
+				margin-right: 10px;
+			}
 		`;
 
-		var log_textarea = E('div', { 'id': 'log_textarea' },
+		var log_container = E('div', { 'class': 'log-container', 'id': 'log_container' },
 			E('img', {
 				'src': L.resource(['icons/loading.gif']),
 				'alt': _('Loading...'),
@@ -38,6 +65,81 @@ return view.extend({
 
 		var log_path = '/var/log/timecontrol.log';
 		var lastLogContent = '';
+
+		// 解析日志行的时间戳，用于排序
+		function parseLogTimestamp(logLine) {
+			// 假设日志格式为: [2024-01-01 12:00:00] INFO: some message
+			var timestampMatch = logLine.match(/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]/);
+			if (timestampMatch) {
+				return new Date(timestampMatch[1]).getTime();
+			}
+			// 如果没有时间戳，使用当前时间
+			return Date.now();
+		}
+
+		// 倒序排列日志行（最新的在上面）
+		function reverseLogLines(logContent) {
+			if (!logContent || logContent.trim() === '') {
+				return logContent;
+			}
+			
+			// 按行分割
+			var lines = logContent.split('\n');
+			
+			// 过滤空行
+			lines = lines.filter(function(line) {
+				return line.trim() !== '';
+			});
+			
+			// 按时间戳排序（最新的在前面）
+			lines.sort(function(a, b) {
+				var timeA = parseLogTimestamp(a);
+				var timeB = parseLogTimestamp(b);
+				return timeB - timeA; // 降序排列
+			});
+			
+			// 重新组合为字符串
+			return lines.join('\n');
+		}
+
+		// 将日志内容转换为HTML行
+		function formatLogLines(logContent) {
+			if (!logContent || logContent.trim() === '') {
+				return E('div', { 'class': 'log-line' }, _('Log is clean.'));
+			}
+			
+			var lines = logContent.split('\n');
+			var formattedLines = [];
+			
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i].trim();
+				if (line === '') continue;
+				
+				// 提取时间戳
+				var timestampMatch = line.match(/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]/);
+				var timestampSpan = null;
+				var messageSpan = null;
+				
+				if (timestampMatch) {
+					timestampSpan = E('span', { 
+						'class': 'log-timestamp',
+						'title': timestampMatch[1]
+					}, timestampMatch[0]);
+					messageSpan = E('span', {}, line.substring(timestampMatch[0].length));
+				} else {
+					messageSpan = E('span', {}, line);
+				}
+				
+				var lineDiv = E('div', { 'class': 'log-line' }, [
+					timestampSpan,
+					messageSpan
+				].filter(function(el) { return el !== null; }));
+				
+				formattedLines.push(lineDiv);
+			}
+			
+			return E('div', {}, formattedLines);
+		}
 
 		var clear_log_button = E('div', {}, [
 			E('button', {
@@ -53,9 +155,9 @@ return view.extend({
 							button.disabled = false;
 							button.textContent = _('Clear Logs');
 							// 立即刷新日志显示框
-							var log = E('pre', { 'wrap': 'pre' }, [_('Log is clean.')]);
-							dom.content(log_textarea, log);
-							lastLogContent = '';
+							var logContent = _('Log is clean.');
+							lastLogContent = logContent;
+							dom.content(log_container, formatLogLines(logContent));
 						})
 						.catch(function () {
 							button.textContent = _('Failed to clear log.');
@@ -69,30 +171,45 @@ return view.extend({
 		poll.add(L.bind(function () {
 			return fs.read_direct(log_path, 'text')
 				.then(function (res) {
-					var newContent = res.trim() || _('Log is clean.');
-
-					if (newContent !== lastLogContent) {
-						var log = E('pre', { 'wrap': 'pre' }, [newContent]);
-						dom.content(log_textarea, log);
-						log.scrollTop = log.scrollHeight;
-						lastLogContent = newContent;
+					var logContent = res.trim();
+					if (logContent === '') {
+						logContent = _('Log is clean.');
+					}
+					
+					// 检查内容是否有变化
+					if (logContent !== lastLogContent) {
+						// 倒序排列日志
+						var reversedLog = reverseLogLines(logContent);
+						// 格式化为HTML
+						var formattedLog = formatLogLines(reversedLog);
+						dom.content(log_container, formattedLog);
+						lastLogContent = logContent;
+						
+						// 滚动到顶部（因为最新的在上面）
+						log_container.scrollTop = 0;
 					}
 				}).catch(function (err) {
-					var log;
+					var logContent;
 					if (err.toString().includes('NotFoundError')) {
-						log = E('pre', { 'wrap': 'pre' }, [_('Log file does not exist.')]);
+						logContent = _('Log file does not exist.');
 					} else {
-						log = E('pre', { 'wrap': 'pre' }, [_('Unknown error: %s').format(err)]);
+						logContent = _('Unknown error: %s').format(err);
 					}
-					dom.content(log_textarea, log);
+					
+					if (logContent !== lastLogContent) {
+						dom.content(log_container, formatLogLines(logContent));
+						lastLogContent = logContent;
+					}
 				});
 		}));
 
+		// 启动轮询
+		poll.start();
 		return E('div', { 'class': 'cbi-map' }, [
 			E('style', [css]),
 			E('div', { 'class': 'cbi-section' }, [
 				clear_log_button,
-				log_textarea,
+				log_container,
 				E('small', {}, _('Refresh every 5 seconds.').format(L.env.pollinterval)),
 				E('div', { 'class': 'cbi-section-actions cbi-section-actions-right' })
 			]),

@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0
+/*
+
+ * Copyright (C) 2022-2026 sirpdboy <herboy2008@gmail.com>
+ */
 'use strict';
 'require view';
 'require fs';
@@ -37,7 +42,6 @@ function checkTimeControlProcess() {
     });
 }
 
-// 渲染服务状态显示
 function renderServiceStatus(isRunning, pid) {
     var statusText = isRunning ? _('RUNNING') : _('NOT RUNNING');
     var color = isRunning ? 'green' : 'red';
@@ -114,13 +118,13 @@ return view.extend({
     load: function() {
         return Promise.all([
             uci.load('timecontrol'),
-            network.getDevices()
+            network.getHostHints()
         ]);
     },
 
     render: function(data) {
         var m, s, o;
-        var hostList = [];
+	let hosts = data[1]?.hosts;
 
         m = new form.Map('timecontrol', _('Internet Time Control'),
             _('Users can limit their internet usage time through MAC and IP, with available IP ranges such as 192.168.110.00 to 192.168.10.200') + '<br/>' +
@@ -203,37 +207,41 @@ return view.extend({
         o.rmempty = false;
         o.default = '1';
 	
-        o = s.option(form.Value, 'mac', _('IP/MAC Address'));
-        o.rmempty = false;
-        o.placeholder = '192.168.10.100 or 00:11:22:33:44:55';
-        
-        getHostList().then(function(hosts) {
-            hostList = hosts;
-            o.value('', _('-- Please select or enter manually --'));
-            
-            if (hosts.length > 0) {
-                hosts.forEach(function(host) {
-                    var displayName = '';
-                    if (host.name) {
-                        displayName = host.name + ' - ';
-                    }
-                    displayName += host.ipv4 + ' (' + host.mac + ')';
-                    
-                    // 添加IP选项
-                    o.value(host.ipv4, displayName);
-                    
-                    // 添加MAC选项
-                    var macDisplay = host.mac;
-                    if (host.name) {
-                        macDisplay += ' - ' + host.name;
-                    }
-                    if (host.ipv4) {
-                        macDisplay += ' (' + host.ipv4 + ')';
-                    }
-                    o.value(host.mac, macDisplay);
-                });
-            }
-        });
+o = s.option(form.Value, 'mac', _('IP/MAC Address'));
+o.rmempty = false;
+if (hosts) {
+    var hostOptions = {};
+    
+    Object.keys(hosts).forEach(function(mac) {
+        var host = hosts[mac];
+        var name = host.name || _(' ');
+        var ips = L.toArray(host.ipaddrs || host.ipv4 || []);
+
+        if (ips.length > 0) {
+            ips.forEach(function(ip) {
+	            var macDisplay = 'MAC: %s (%s - %s)'.format(mac,ip, name);
+        hostOptions['mac:' + mac] = macDisplay;
+                var ipDisplay = 'IP: %s (%s - %s)'.format(ip, mac, name);
+                hostOptions['ip:' + ip] = ipDisplay;
+            });
+        }
+    });
+    var sortedKeys = Object.keys(hostOptions).sort(function(a, b) {
+        return hostOptions[a].localeCompare(hostOptions[b]);
+    });
+    
+    sortedKeys.forEach(function(key) {
+        if (key.startsWith('ip:')) {
+            o.value(key.substring(3), hostOptions[key]); // 移除'ip:'前缀
+        }
+    });
+
+    sortedKeys.forEach(function(key) {
+        if (key.startsWith('mac:')) {
+            o.value(key.substring(4), hostOptions[key]); // 移除'mac:'前缀
+        }
+    });
+}
 
         o = s.option(form.Value, 'timestart', _('Start Control Time'));
         o.placeholder = '00:00';
@@ -245,7 +253,7 @@ return view.extend({
         o.default = '00:00';
         o.rmempty = false;
 
-        o = s.option(form.ListValue, 'week', _('Week Day (1~7)'));
+        o = s.option(form.Value, 'week', _('Week Day (1~7)'));
         o.value('0', _('Everyday'));
         o.value('1', _('Monday'));
         o.value('2', _('Tuesday'));
