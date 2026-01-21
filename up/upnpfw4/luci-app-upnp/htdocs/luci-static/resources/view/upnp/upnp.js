@@ -30,13 +30,14 @@ const callUciGet = rpc.declare({
     method: 'get',
     params: ['config', 'section', 'option']
 });
-
-var iprul = 'http://192.168.10.1/'; 
-callUciGet('network', 'lan', 'ipaddr').then(function(res) {
-    if (res && res.value) {
-        const ipAddress = res.value.split('/')[0];
-        iprul = `http://${ipAddress}/`;
-    }
+var iprul = uci.get('upnpd', 'config', 'presentation_url') ; 
+if (!iprul) {
+    callUciGet('network', 'lan', 'ipaddr').then(function(res) {
+        if (res && res.value) {
+            const ipAddress = res.value.split('/')[0];
+                iprul = `http://${ipAddress}/`;
+        }
+	}
 });
 
 function handleDelRule(num, ev) {
