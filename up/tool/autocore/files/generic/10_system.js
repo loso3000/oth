@@ -2,7 +2,6 @@
 'require baseclass';
 'require fs';
 'require rpc';
-'require uci';
 
 var callLuciDescription = rpc.declare({
 	object: 'luci',
@@ -105,28 +104,7 @@ return baseclass.extend({
 				E('td', { 'class': 'td left' }, [ (fields[i + 1] != null) ? fields[i + 1] : '?' ])
 			]));
 		}
-        table.appendChild(E('tr', { 
-            'class': 'tr' 
-        }, [
-            E('td', { 
-                'class': 'td left',
-                'width': '33%'
-            }, _('Help')),
-            E('td', { 
-                'class': 'td left'
-            }, [
-                E('a', {
-                    'href': 'https://github.com/sirpdboy/openwrt/issues',
-                    'class': 'btn cbi-button cbi-button-reset',
-                    'target': '_blank'
-                }, _('Update suggestions')),
-                ' ',
-                E('a', {
-                    'href': 'https://t.me/joinchat/RV6mxIxZJVDByibQ',
-                    'class': 'btn cbi-button cbi-button-save',
-                    'target': '_blank'
-                }, _('TG Chat group'))
-            ])]));
+
 
 		return table;
 	}
