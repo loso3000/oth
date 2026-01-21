@@ -132,7 +132,7 @@ CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf 2>/dev/null | cut 
         response=$(curl -fks --max-time 10 "https://mirror.nju.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/x86/64/kmods/" 2>/dev/null)
         if [ -n "$response" ]; then
             NEW_HASH=$(echo "$response" | grep "$kernelver" | awk -F 'href="' '{print $2}' | awk -F '/"' '{print $1}' | head -1)
-            [ -n "$NEW_HASH" ] && sed -i "s|${CURRENT_HASH}|${NEW_HASH}|g" /etc/opkg/distfeeds.conf
+            [ -n "$NEW_HASH" ] && sed -i "s|${CURRENT_HASH}|${NEW_HASH}|g" /etc/opkg/distfeeds.conf || sed -i '/${CURRENT_HASH}/d' /etc/opkg/distfeeds.conf
         fi
 
 sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf" 2>/dev/null
@@ -264,12 +264,15 @@ else
     /etc/init.d/dockerd disable 2>/dev/null
     /etc/init.d/dockerd stop 2>/dev/null
 fi
-
+# 禁用ipv6前缀
+sed -i 's/^[^#].*option ula/#&/' /etc/config/network
 sed -i "/log-facility/d" "/etc/dnsmasq.conf" 2>/dev/null
 echo "log-facility=/dev/null" >> "/etc/dnsmasq.conf"
 
 echo 'hsts=0' > /root/.wgetrc
 
 rm -rf /tmp/luci-* 2>/dev/null
-
+if [ ! -f "/boot/init.sh" ]; then
+bash /boot/init.sh
+fi
 exit 0
