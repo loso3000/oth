@@ -6,16 +6,10 @@ uci -q add base_config base >/dev/null 2>&1
 ver=0
 }
 uci -q set luci.main.lang='auto'
-uci -q set luci.main.mediaurlbase='/luci-static/kucat'
-
-
+[ -f '/www/luci-static/kucat/css/style.css' ] && uci -q set luci.main.mediaurlbase='/luci-static/kucat'
 
 debug=0
-
-
 uci -q set fstab.@global[0].check_fs=1
-
-
 frmware=`cat /etc/ezopenwrt_version | awk -F '_' '{printf $2}'`
 if [ "$frmware" = "Super" ] || [ "$frmware" = "Mini" || [ "$frmware" = "dz"  ] ; then
 sed -i 's/nas/services/g' /usr/lib/lua/luci/controller/samba4.lua
