@@ -207,7 +207,6 @@ return view.extend({
 		o = s.taboption('advanced', form.Value, 'presentation_url', _('Presentation URL'),
 			_('Report custom router web interface (presentation) URL'));
 		o.placeholder = iprul;
-		o.rmempty  = false;
 		o.depends('enable_upnp', '1');
 
 		o = s.taboption('advanced', form.Value, 'uuid', _('Device UUID'));
