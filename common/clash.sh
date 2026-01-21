@@ -9,17 +9,19 @@ CLASH_TUN_URL=$(curl -fsSL https://api.github.com/repos/vernesong/OpenClash/cont
 CLASH_META_URL="https://raw.githubusercontent.com/vernesong/OpenClash/core/master/meta/clash-linux-${1}.tar.gz"
 GEOIP_URL="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat"
 GEOSITE_URL="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat"
+Country_url='https://testingcf.jsdelivr.net/gh/alecthw/mmdb_china_ip_list@release/lite/Country.mmdb'
 
 wget -qO- $CLASH_DEV_URL | tar xOvz > files/etc/openclash/core/clash
 wget -qO- $CLASH_TUN_URL | gunzip -c > files/etc/openclash/core/clash_tun
 wget -qO- $CLASH_META_URL | tar xOvz > files/etc/openclash/core/clash_meta
 wget -qO- $GEOIP_URL > files/etc/openclash/GeoIP.dat
 wget -qO- $GEOSITE_URL > files/etc/openclash/GeoSite.dat
+wget -qO- $Country_url > files/etc/openclash/Country.mmdb
 
 [ -f files/etc/openclash/core/clash ] || mv -f ./package/other/patch/openclash/core/clash files/etc/openclash/core/clash
 [ -f files/etc/openclash/core/clash_tun ] || mv -f ./package/other/patch/openclash/core/clash_tun files/etc/openclash/core/clash_tun
 [ -f files/etc/openclash/core/clash_meta ] || mv -f ./package/other/patch/openclash/core/clash_meta files/etc/openclash/core/clash_meta
 [ -f files/etc/openclash/GeoIP.dat ] || mv -f ./package/other/patch/openclash/GeoIP.dat files/etc/openclash/GeoIP.dat
 [ -f files/etc/openclash/GeoSite.dat ] || mv -f ./package/other/patch/openclash/GeoSite.dat files/etc/openclash/GeoSite.dat
+[ -f files/etc/openclash/Country.mmdb ] || mv -f ./package/other/patch/openclash/Country.mmdb files/etc/openclash/Country.mmdb
 chmod +x files/etc/openclash/core/clash*
-
