@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ddns-go
-PKG_VERSION:=6.12.5
+PKG_VERSION:=6.15.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -54,7 +54,7 @@ define Package/ddns-go/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) $(CURDIR)/files/luci-ddns-go.uci-default $(1)/etc/uci-defaults/luci-ddns-go
 	$(INSTALL_DIR) $(1)/etc/config/
-	$(INSTALL_CONF) $(CURDIR)/files/ddns-go.conf $(1)/etc/config/ddns-go
+	$(INSTALL_CONF) $(CURDIR)/files/ddns-go.config $(1)/etc/config/ddns-go
 endef
 
 define Package/ddns-go/conffiles
