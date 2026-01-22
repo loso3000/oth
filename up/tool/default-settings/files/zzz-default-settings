@@ -183,7 +183,7 @@ test $ver -lt 5 && {
     done
     
     uci -q set dropbear.@dropbear[0].Interface='lan'
-    uci -q set dropbear.main.Interface=='lan'
+    uci -q set dropbear.main.Interface='lan'
     uci -q commit dropbear
 
     uci -q batch <<EOF
