@@ -328,12 +328,7 @@ configure_network() {
             [ -n "${wan_pppoe_user}" ] && $UCISET network.wan.username="${wan_pppoe_user}"
             [ -n "${wan_pppoe_pass}" ] && $UCISET network.wan.password="${wan_pppoe_pass}"
 	    $UCISET firewall.@zone[0].masq='1'
-            [ "x$forwarding" = "x1" ] && {
-                setforwarding
-                [ "x$ipv6" = "x1" ] &&  { 
-                set firewall.@forwarding[-1].family='ipv6' 
-		}
-	    }
+	    [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             if [ -n "${wan_dns}" ]; then
                         $UCISET network.wan.peerdns='0'
