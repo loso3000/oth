@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
-# Copyright (C) 2021-2025 sirpdboy  <herboy2008@gmail.com>
+# Copyright (C) 2021-2026 sirpdboy  <herboy2008@gmail.com>
 # 
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
@@ -13,7 +13,7 @@ PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/jeessy2/ddns-go/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=skip
+PKG_HASH:=f4443c44c7247fee49bfbd8e06b7c03b2f59cb99968e685b5655017cbd8dabf8
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
@@ -43,7 +43,6 @@ define Package/ddns-go/description
   ddns-go is a automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service,
   support Alidns Dnspod Cloudflare Hicloud Callback Baiducloud porkbun GoDaddy Google Domains.
 endef
-
 define Package/ddns-go/install
 	$(call GoPackage/Package/Install/Bin,$(1))
 
@@ -54,13 +53,12 @@ define Package/ddns-go/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) $(CURDIR)/files/luci-ddns-go.uci-default $(1)/etc/uci-defaults/luci-ddns-go
 	$(INSTALL_DIR) $(1)/etc/config/
-	$(INSTALL_CONF) $(CURDIR)/files/ddns-go.config $(1)/etc/config/ddns-go
+	$(INSTALL_CONF) $(CURDIR)/files/ddns-go.conf $(1)/etc/config/ddns-go
 endef
 
 define Package/ddns-go/conffiles
 /etc/config/ddns-go
 /etc/ddns-go/ddns-go-config.yaml
 endef
-
 $(eval $(call GoBinPackage,ddns-go))
 $(eval $(call BuildPackage,ddns-go))
