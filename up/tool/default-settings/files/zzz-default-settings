@@ -126,14 +126,15 @@ for option in syn_flood fullcone fullcone6 flow_offloading flow_offloading_hw sy
 done
 
 CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf 2>/dev/null | cut -d/ -f2)
+    if [ -n "$CURRENT_HASH" ]; then
         kernelver=$(echo "$CURRENT_HASH" | sed 's/-.*//' | cut -d. -f1-3)
         NEW_HASH=""
-
         response=$(curl -fks --max-time 10 "https://mirror.nju.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/x86/64/kmods/" 2>/dev/null)
         if [ -n "$response" ]; then
             NEW_HASH=$(echo "$response" | grep "$kernelver" | awk -F 'href="' '{print $2}' | awk -F '/"' '{print $1}' | head -1)
             [ -n "$NEW_HASH" ] && sed -i "s|${CURRENT_HASH}|${NEW_HASH}|g" /etc/opkg/distfeeds.conf ||  sed -i "s|${CURRENT_HASH}|6.6.119-1-f8c5d7fde74fa4fedf4370775255c515|g" /etc/opkg/distfeeds.conf
-        fi
+        fi0
+    fi
 sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)\.[0-9]\{1,\}/|\1-SNAPSHOT/|g' "/etc/opkg/distfeeds.conf" 2>/dev/null
 sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf" 2>/dev/null
 sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
