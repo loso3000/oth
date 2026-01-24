@@ -9,8 +9,6 @@ UCIADDLIST='uci -q add_list'
 LOCK=/var/lock/netwizard-boot.lock
 LOCK_TIMEOUT=300
 
-. /lib/functions/uci-defaults.sh
-
 log() {
     echo "netwizard:$1"
 }
@@ -345,11 +343,9 @@ configure_network() {
             fi
         done
         lannet=$(echo "$lannet" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-        [ -n "$wan_interface" ] && ucidef_set_interface_wan "$wan_interface"
     fi
     
     if [ -n "$wan_interface" ] && [ "$wan_proto" != "siderouter" ]; then
-        $UCISET network.wan=interface
         $UCISET network.wan=interface
         $UCISET network.wan6=interface
         $UCISET network.wan6.proto='dhcpv6'
@@ -358,13 +354,7 @@ configure_network() {
         $UCIDEL dhcp.lan.master
         $UCISET network.wan.metric='1'
         $UCISET network.wan.$ifname="${wan_interface}"
-        
-        if [ "$wan_proto" = "pppoe" ]; then
-            $UCISET network.wan6.$ifname="@wan"
-        else
-            $UCISET network.wan6.$ifname="${wan_interface}"
-        fi
-        
+        [ "$wan_proto" == "pppoe" ] && $UCISET network.wan6.$ifname="@wan" || $UCISET network.wan6.$ifname="${wan_interface}"
         # firewall
 	$UCIDEL dhcp.wan.ra_flags
         $UCIADD firewall zone
@@ -510,9 +500,8 @@ configure_network() {
             fi
             ;;
     esac
-    
-    [ -n "$lannet" ] && ucidef_set_interface_lan "$lannet"
-    
+
+    [ "x$ifname" = "xdevice" ] && $UCISET network.@$ifname[0].ports="${lannet}" || $UCISET network.lan.$ifname="${lannet}"
     if [ "$wan_proto" != "siderouter" ]; then
         [ -n "${lan_ipaddr}" ] && $UCISET network.lan.ipaddr="${lan_ipaddr}"
         [ -n "${lan_netmask}" ] && $UCISET network.lan.netmask="${lan_netmask}"
@@ -520,10 +509,8 @@ configure_network() {
     
     setsynflood
     sethttps "$cfg"
-    
     sed -i "/dhcp_option '6/d" /etc/config/dhcp 2>/dev/null
     sed -i "/list dns/d" /etc/config/dhcp 2>/dev/null
-    
     if [ "x$lan_dhcp" = "x1" ]; then
         $UCIDEL dhcp.lan.force
         $UCISET dhcp.lan.ignore='1'
@@ -591,12 +578,12 @@ COMMIT_EOF
     
     if [ $? -eq 0 ]; then
         {
-            sleep 2
+
+            /etc/init.d/network restart 2>/dev/null
             /etc/init.d/system reload 2>/dev/null
             /etc/init.d/rpcd reload 2>/dev/null
             /etc/init.d/uhttpd reload 2>/dev/null
-            /etc/init.d/network restart 2>/dev/null
-            sleep 3
+            sleep 1
             /etc/init.d/dnsmasq reload 2>/dev/null
             /etc/init.d/firewall reload 2>/dev/null
         } >/dev/null 2>&1 &
