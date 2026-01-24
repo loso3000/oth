@@ -561,8 +561,7 @@ configure_network() {
         
         $UCISET netwizard.default.old_wifi_ssid="${wifi_ssid}"
         $UCISET netwizard.default.old_wifi_key="${wifi_key}"
-        
-        [ -n "$(uci changes wireless 2>/dev/null)" ] && uci commit wireless
+        uci commit wireless
     fi
     
     # 提交所有配置
@@ -605,10 +604,7 @@ boot() {
 }
 
 start() {
-    if check_lock; then
-        exit 0
-    fi
-    
+    [ -f $LOCK ] && exit 0
     [ "x$XBOOT" = "x1" ] && exit 0
     
     # 检查依赖
@@ -629,35 +625,4 @@ start() {
 
 stop() {
     rm -f $LOCK 2>/dev/null
-}
-
-test_ipv6() {
-    log "Testing IPv6 connectivity..."
-    
-    local wan_proto
-    wan_proto=$(uci -q get network.wan.proto 2>/dev/null || echo "siderouter")
-    
-    if ip -6 addr show dev br-lan 2>/dev/null | grep -q inet6; then
-        log "LAN has IPv6 address"
-        ip -6 addr show dev br-lan 2>/dev/null | grep inet6
-    else
-        log "LAN has no IPv6 address"
-    fi
-    
-    if [ "$wan_proto" != "siderouter" ]; then
-        if ip -6 addr show dev wan 2>/dev/null | grep -q inet6; then
-            log "WAN has IPv6 address"
-            ip -6 addr show dev wan 2>/dev/null | grep inet6
-        else
-            log "WAN has no IPv6 address"
-        fi
-    fi
-    
-    if ping6 -c 2 -W 3 2001:4860:4860::8888 >/dev/null 2>&1; then
-        log "IPv6 connectivity test PASSED"
-        return 0
-    else
-        log "IPv6 connectivity test FAILED"
-        return 1
-    fi
 }
