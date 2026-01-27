@@ -1,0 +1,50 @@
+#!/bin/sh
+# Copyright (C) 2022 jjm2473
+
+if [ ! -f /etc/config/fstab ]; then
+    /usr/libexec/blockmount.sh detect 2>/dev/null
+fi
+uci -q batch <<-EOF >/dev/null
+    set system.@system[-1].zonename='Asia/Shanghai'
+    set system.@system[-1].timezone='CST-8'
+    commit system
+EOF
+
+
+if ! grep -qFw router /proc/device-tree/chosen/default-firewall; then
+
+    WAN_IF=`jsonfilter -i /etc/board.json -e '@.network.wan.device'`
+    if [ -n "$WAN_IF" -a -e /etc/config/minidlna ]; then
+        uci -q batch <<-EOF >/dev/null
+            set minidlna.@minidlna[0].interface='br-lan,$WAN_IF'
+            commit minidlna
+EOF
+    fi
+    if [ -e /etc/config/ttyd ]; then
+        uci -q batch <<-EOF >/dev/null
+            delete ttyd.@ttyd[0].interface
+            commit ttyd
+EOF
+    fi
+    for samba in samba4 samba ; do
+        if [ -e /etc/config/$samba ]; then
+            uci -q batch <<-EOF >/dev/null
+                set $samba.@samba[0].interface='lan wan'
+                commit $samba
+EOF
+        fi
+    done
+fi
+
+uci -q batch <<-EOF >/dev/null
+    commit dockerd
+EOF
+
+uci -q batch <<-EOF >/dev/null
+    set luci.apply.rollback=30
+    set luci.apply.holdoff=2
+    commit luci
+EOF
+
+
+exit 0
