@@ -34,14 +34,35 @@ local ss_type = ucic:get_first(name, 'server_subscribe', 'ss_type', 'ss-rust')
 -- 根据 ss_type 选择对应的程序
 local ss_program = "sslocal"
 if ss_type == "ss-rust" then
-    ss_program = "sslocal"  -- Rust 版本使用 sslocal
+	ss_program = "sslocal"  -- Rust 版本使用 sslocal
 elseif ss_type == "ss-libev" then
-    ss_program = "ss-redir"  -- Libev 版本使用 ss-redir
+	ss_program = "ss-redir"  -- Libev 版本使用 ss-redir
+end
+-- 从 UCI 配置读取 xray_hy2_type 设置
+local xray_hy2_type = ucic:get_first(name, 'server_subscribe', 'xray_hy2_type', 'hysteria2')
+local xray_hy2_program = "hysteria"
+if xray_hy2_type == "xray" then
+	xray_hy2_program = "xray"  -- Hysteria2 使用 Xray
+elseif xray_hy2_type == "hysteria2" then
+	xray_hy2_program = "hysteria"  -- Hysteria2 使用 Hysteria
 end
 local v2_ss = luci.sys.exec('type -t -p ' .. ss_program .. ' 2>/dev/null') ~= "" and "ss" or "v2ray"
 local has_ss_type = luci.sys.exec('type -t -p ' .. ss_program .. ' 2>/dev/null') ~= "" and ss_type
 local v2_tj = luci.sys.exec('type -t -p trojan') ~= "" and "trojan" or "v2ray"
-local hy2_type = luci.sys.exec('type -t -p hysteria') ~= "" and "hysteria2"
+-- 检查程序是否存在
+local program_exists = luci.sys.exec('type -t -p ' .. xray_hy2_program .. ' 2>/dev/null') ~= ""
+-- 初始化变量
+local hy2_type = nil
+local has_xray_hy2_type = nil
+if program_exists then
+	-- 设置节点类型
+	if xray_hy2_type == "hysteria2" then
+		hy2_type = "hysteria2"
+	else
+		hy2_type = "v2ray"  -- 当使用 Xray 时，节点类型是 "v2ray"
+		has_xray_hy2_type = "hysteria2"  -- 可用的协议类型是 Hysteria2
+	end
+end
 local tuic_type = luci.sys.exec('type -t -p tuic-client') ~= "" and "tuic"
 local log = function(...)
 	print(os.date("%Y-%m-%d %H:%M:%S ") .. table.concat({...}, " "))
@@ -194,19 +215,29 @@ local function processData(szType, content)
 		--	log(k.."="..v)
 		-- end
 
-		-- 如果 hy2 程序未安装则跳过订阅	
-		if not hy2_type then
+		-- 如果 hy2 程序未安装则跳过订阅
+		if not (hy2_type or has_xray_hy2_type) then
 			return nil
+		end
+	
+		if xray_hy2_type == "hysteria2" then
+			if params.protocol then
+				result.flag_transport = "1"
+				result.transport_protocol = params.protocol or "udp"
+			end
+			if params.pinSHA256 then
+				result.pinsha256 = params.pinSHA256
+			end
+		else
+			result.v2ray_protocol = has_xray_hy2_type
 		end
 
 		result.alias = url.fragment and UrlDecode(url.fragment) or nil
+		result.xray_hy2_type = xray_hy2_type
 		result.type = hy2_type
 		result.server = url.host
 		result.server_port = url.port or 443
-		if params.protocol then
-			result.flag_transport = "1"
-			result.transport_protocol = params.protocol or "udp"
-		end
+
 		result.hy2_auth = url.user
 		result.uplink_capacity = tonumber((params.upmbps or ""):match("^(%d+)")) or nil
 		result.downlink_capacity = tonumber((params.downmbps or ""):match("^(%d+)")) or nil
@@ -219,7 +250,7 @@ local function processData(szType, content)
 			result.obfs_type = params.obfs
 			result.salamander = params["obfs-password"] or params["obfs_password"]
 		end
-		if (params.sni and params.sni ~= "") or (params.alpn and params.alpn ~= "") then
+		if (params.security and params.security == "tls") or (params.sni and params.sni ~= "") or (params.alpn and params.alpn ~= "") then
 			result.tls = "1"
 			if params.sni then
 				result.tls_host = params.sni
@@ -234,9 +265,6 @@ local function processData(szType, content)
 		end
 		if params.insecure == "1" then
 			result.insecure = params.insecure
-		end
-		if params.pinSHA256 then
-			result.pinsha256 = params.pinSHA256
 		end
 	elseif szType == 'ssr' then
 		-- 去掉前后空白和#注释
@@ -276,12 +304,18 @@ local function processData(szType, content)
 		alias = alias .. remarks
 		result.alias = alias
 	elseif szType == "vmess" then
-		-- 去掉前后空白和#注释
+		-- 去掉前后空白和注释
 		local link = trim(content:gsub("#.*$", ""))
 
-		-- 解析正常节点
-		local success, info = pcall(jsonParse, link)
-		if not success or type(info) ~= "table" then
+		-- Base64 解码
+		local decoded = base64Decode(link)
+		if not decoded or decoded == "" then
+			return nil
+		end
+
+		-- 解析 JSON
+		local ok, info = pcall(jsonParse, decoded)
+		if not ok or type(info) ~= "table" then
 			return nil
 		end
 
@@ -318,9 +352,9 @@ local function processData(szType, content)
 			result.xhttp_host = info.host
 			result.xhttp_path = info.path
 			-- 检查 extra 参数是否存在且非空
-			if params.extra and params.extra ~= "" then
+			if info.extra and info.extra ~= "" then
 				result.enable_xhttp_extra = "1"
-				result.xhttp_extra = params.extra
+				result.xhttp_extra = info.extra
 			end
 			-- 尝试解析 JSON 数据
 			local success, Data = pcall(jsonParse, info.extra or "")
@@ -754,13 +788,16 @@ local function processData(szType, content)
 				-- 未指定peer（sni）默认使用remote addr
 				result.tls_host = params.peer or params.sni
 			end
-			if params.allowInsecure then
+			params.allowinsecure = params.allowinsecure or params.insecure
+			if params.allowinsecure then
 				-- 处理 insecure 参数
 				if params.allowinsecure == "1" or params.allowinsecure == "0" then
-					result.insecure = params.allowInsecure
+					result.insecure = params.allowinsecure
 				else
 					result.insecure = string.lower(params.allowinsecure) == "true" and "1" or "0"
 				end
+			else
+				result.insecure = "0"
 			end
 			if params.tfo then
 				-- 处理 fast open 参数
@@ -877,13 +914,13 @@ local function processData(szType, content)
 
 		-- TLS / Reality 标志
 		local security = params.security or ""
-		result.tls = (params.security == "tls" or security == "xtls") and "1" or "0"
+		result.tls = (security == "tls" or security == "xtls") and "1" or "0"
 		result.reality = (security == "reality") and "1" or "0"
 
 		-- 统一 TLS / Reality 公共字段
 		result.tls_host = params.sni
 		result.fingerprint = params.fp
-		result.tls_flow = (security == "tls" or security == "reality") and params.flow or nil
+		result.tls_flow = params.flow or nil
 
 		-- 处理 alpn 列表
 		if params.alpn and params.alpn ~= "" then
@@ -892,6 +929,11 @@ local function processData(szType, content)
 				table.insert(alpn, v)
 			end
 			result.tls_alpn = alpn
+		end
+
+		-- 处理 insecure 参数
+		if params.allowInsecure and params.allowInsecure ~= "" then
+			result.insecure = "1"
 		end
 
 		-- Reality 参数
@@ -983,10 +1025,11 @@ local function processData(szType, content)
 		local Info = content
 		if Info:find("@") then
 			local contents = split(Info, "@")
-			if contents[1]:find(":") then
-				local userinfo = split(contents[1], ":")
-				result.tuic_uuid = UrlDecode(userinfo[1])
-				result.tuic_passwd = UrlDecode(userinfo[2])
+			local userinfo_raw = UrlDecode(contents[1] or "") -- 如有Url编码进行解码
+			if userinfo_raw:find(":") then
+				local userinfo = split(userinfo_raw, ":")
+				result.tuic_uuid = userinfo[1]
+				result.tuic_passwd = userinfo[2]
 			end
 			Info = (contents[2] or ""):gsub("/%?", "?")
 		end
@@ -1012,9 +1055,16 @@ local function processData(szType, content)
 		end
 
 		result.type = tuic_type
-		result.tuic_ip = params.sni or ""
+		result.tuic_ip = params.ip or ""
 		result.udp_relay_mode = params.udp_relay_mode or "native"
 		result.congestion_control = params.congestion_control or "cubic"
+		result.heartbeat = params.heartbeat or "3"
+		result.timeout = params.timeout or "8"
+		result.gc_interval = params.gc_interval or "3"
+		result.gc_lifetime = params.gc_lifetime or "15"
+		result.send_window = params.send_window or "20971520"
+		result.receive_window = params.receive_window or "10485760"
+		result.tuic_max_package_size = params.max_packet_size or "1500"
 
 		-- alpn 支持逗号或分号分隔
 		if params.alpn and params.alpn ~= "" then
@@ -1023,6 +1073,45 @@ local function processData(szType, content)
 				table.insert(alpn, v)
 			end
 			result.tuic_alpn = alpn
+		end
+
+		-- 处理 disable_sni 参数
+		if params.disable_sni then
+			if params.disable_sni == "1" or params.disable_sni == "0" then
+				result.disable_sni = params.disable_sni
+		else
+				result.disable_sni = string.lower(params.disable_sni) == "true" and "1" or "0"
+			end
+		end
+
+		-- 处理 zero_rtt_handshake 参数
+		if params.zero_rtt_handshake then
+			if params.zero_rtt_handshake == "1" or params.zero_rtt_handshake == "0" then
+				result.zero_rtt_handshake = params.zero_rtt_handshake
+		else
+				result.zero_rtt_handshake = string.lower(params.zero_rtt_handshake) == "true" and "1" or "0"
+			end
+		end
+
+		-- 处理 dual_stack 参数
+		if params.dual_stack then
+			if params.dual_stack == "1" or params.dual_stack == "0" then
+				result.dual_stack = params.dual_stack
+		else
+				result.dual_stack = string.lower(params.dual_stack) == "true" and "1" or "0"
+			end
+			-- 处理 ipstack_prefer 参数
+			if params.ipstack_prefer and params.ipstack_prefer ~= "" then
+				result.ipstack_prefer = params.ipstack_prefer
+			end
+		end
+
+		-- 兼容 allowInsecure / allowlnsecure / insecure
+		if params.allowInsecure or params.allowlnsecure or params.insecure then
+			local insecure = params.allowInsecure or params.allowlnsecure or params.insecure
+			if insecure == true or insecure == "1" or insecure == "true" then
+				result.insecure = "1"
+			end
 		end
 	end
 	if not result.alias then
