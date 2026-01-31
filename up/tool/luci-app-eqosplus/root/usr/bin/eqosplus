@@ -26,7 +26,7 @@ fi
 bin_nft=$(which nft)
 bin_tc=$(which tc)
 bin_ip=$(which ip)
-DEBUG=1
+DEBUG=0
 
 nft_type() {
     if command -v nft >/dev/null; then
