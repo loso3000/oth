@@ -125,6 +125,10 @@ for option in syn_flood fullcone fullcone6 flow_offloading flow_offloading_hw sy
     uci -q del firewall.@defaults[0].$option
 done
 
+sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)\.[0-9]\{1,\}/|\1-SNAPSHOT/|g' "/etc/opkg/distfeeds.conf" 2>/dev/null
+sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf" 2>/dev/null
+sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
+sed -i.bak "s,https://downloads.openwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
 CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf 2>/dev/null | cut -d/ -f2)
     if [ -n "$CURRENT_HASH" ]; then
         kernelver=$(echo "$CURRENT_HASH" | sed 's/-.*//' | cut -d. -f1-3)
@@ -135,10 +139,6 @@ CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf 2>/dev/null | cut 
             [ -n "$NEW_HASH" ] && sed -i "s|${CURRENT_HASH}|${NEW_HASH}|g" /etc/opkg/distfeeds.conf ||  sed -i "s|${CURRENT_HASH}|6.6.119-1-f8c5d7fde74fa4fedf4370775255c515|g" /etc/opkg/distfeeds.conf
         fi
     fi
-sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)\.[0-9]\{1,\}/|\1-SNAPSHOT/|g' "/etc/opkg/distfeeds.conf" 2>/dev/null
-sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf" 2>/dev/null
-sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
-sed -i.bak "s,https://downloads.openwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
 
 test $ver -lt 3 && {
     ver=3
