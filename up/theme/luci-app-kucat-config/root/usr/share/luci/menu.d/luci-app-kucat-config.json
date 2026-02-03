@@ -4,7 +4,8 @@
 		"title": "KuCat Config",
 		"order": 90,
 		"action": {
-            "type": "firstchild"
+			"type": "view",
+			"path": "kucat-config"
         }
     },
     "admin/system/kucat-config/config": {

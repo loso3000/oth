@@ -3295,14 +3295,13 @@ body.lang_pl.node-main-login .cbi-value-title {
     background-color: rgba(var(--primary-rgbbody), 0.7) !important;
     box-shadow: 0 0.1rem 0.3rem var(--input-boxcolor)
 }
+
 [data-page^="admin-services-passwall"] #add_link_div,
 [data-page^="admin-services-passwall"] #reassign_group_div,
 [data-page^="admin-services-passwall"] .up-modal {
     background: rgba(var(--primary-rgbbody), 95) !important;
     border: none!important;
 }
-
-
 
 [data-page^="admin-services-shadowsocksr"]>.block:active,
 .block:active,
@@ -3513,7 +3512,18 @@ body.lang_pl.node-main-login .cbi-value-title {
   border: 1px solid var(--inputborder-color);
 }
 
-.bandix-modal-overlay.show .bandix-modal {
+.bandix-container .usage-ranking-list {
+    max-height: 100%!important;
+    gap: 5px;
+}
+
+.bandix-container .form-input,
+.bandix-container select,
+.bandix-container input {
+  border-radius: 0!important; 
+}
+
+.show .bandix-modal {
   background-color: rgba(var(--primary-rgbbody), 1)!important
 }
 

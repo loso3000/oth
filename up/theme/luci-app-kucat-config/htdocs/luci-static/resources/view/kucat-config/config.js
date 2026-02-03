@@ -178,18 +178,18 @@ return view.extend({
 		o.rmempty = false;
 		o.default = '0';
 
-		// o = s.option(form.Value, 'colortools', _('RGB color values'))
-		// o.default = '0 0 0';
-		// o.rmempty = false;
+		 o = s.option(form.Value, 'colortools', _('RGB color values'))
+		 o.default = '0 0 0';
+		 o.rmempty = false;
 
-		// o.render = function(section_id, option_index, cfgvalue) {
-		// 	var el = form.Value.prototype.render.apply(this, arguments);
-		// 	setTimeout(function() {
-		// 		const textInput = document.querySelector('[id^="widget.cbid.kucat."][id$=".colortools"]');
-		// 		createColorPickerrgb(textInput);
-		// 	}, 0);
-		// 	return el;
-		// };
+		 o.render = function(section_id, option_index, cfgvalue) {
+		 	var el = form.Value.prototype.render.apply(this, arguments);
+		 	setTimeout(function() {
+		 		const textInput = document.querySelector('[id^="widget.cbid.kucat."][id$=".colortools"]');
+		 		createColorPickerrgb(textInput);
+		 	}, 0);
+		 	return el;
+		 };
 		// Status Homekey settings
 		o = s.option( form.ListValue, 'gohome', _('Status Homekey settings'));
 		o.value('overview', _('Overview'));
