@@ -22,7 +22,10 @@ return view.extend({
 
         m = new form.Map('kucat', _('KuCat Theme Color Schemes List'), 
             _('Pre set 6 color schemes, enable wallpaper as desktop wallpaper, theme RGB values such as 255,0,0 (representing red), dark mode with wallpaper blur for better effect. No matter how many schemes are enabled, only the first scheme should be used'));
-        var s = m.section(form.TableSection, 'theme', '');
+        
+
+        
+	var s = m.section(form.TableSection, 'theme', '');
         s.addremove = true;
         s.anonymous = true;
         s.sortable = false;
@@ -91,6 +94,25 @@ return view.extend({
         o.rmempty = false;
         o.default = '0.1';
 
-		return m.render();
-	}
+	s = m.section(form.TypedSection, 'basic', '');
+	s.anonymous = true;
+		o = s.option(form.Button, '_save', _('Save current settings'));
+		o.inputstyle = 'apply';
+		o.inputtitle = _('Save & Apply');
+		o.onclick = function() {
+   	 	   ui.changes.apply(true);
+ 		   return this.map.save(null, true).then(function() {
+ 		       return fs.exec('/usr/bin/kucat-config');
+ 		   }).then(function(res) {
+ 		       if (res.code === 0) {
+  		          location.href = location.pathname + '?_=' + Date.now();
+   		     }
+ 		   }).catch(console.error);
+		};
+        return m.render();
+	},
+
+	handleSaveApply: null,
+	handleSave: null,
+	handleReset: null
 });
