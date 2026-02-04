@@ -56,22 +56,74 @@ get_target_ip() {
     fi
 }
 
+get_system_disk() {
+    rom_dev=$(df -h | grep boot | awk '{print $1}' | head -1 )
+    [ -z ${rom_dev} ] && rom_dev=`df -P /boot 2>/dev/null | awk 'NR==2 {print $1}'`
+    [ -z ${rom_dev} ] && rom_dev=`blkid -t TYPE="squashfs" |awk -F : '{print $1}'`
+    [ -z ${rom_dev} ] && TDISK=`lsblk -l -o NAME,MOUNTPOINTS | grep -E '/rom'| grep -v '/rom/' | head -1 | awk '{print $1}'` && rom_dev="/dev/$TDISK"
+    if [ -n "$rom_dev" ]; then
+        case "$rom_dev" in
+            /dev/sd[a-z][0-9]*)
+                disk=$(echo "$rom_dev" | sed 's/[0-9]*$//')
+                ;;
+            /dev/nvme[0-9]*n[0-9]*p[0-9]*)
+                disk=$(echo "$rom_dev" | sed 's/p[0-9]*$//')
+                ;;
+            /dev/mmcblk[0-9]*p[0-9]*)
+                disk=$(echo "$rom_dev" | sed 's/p[0-9]*$//')
+                ;;
+            /dev/vd[a-z][0-9]*)
+                disk=$(echo "$rom_dev" | sed 's/[0-9]*$//')
+                ;;
+            /dev/mtdblock*)
+                disk="$rom_dev"
+                ;;
+            /dev/ubiblock*)
+                disk="$rom_dev"
+                ;;
+            /dev/root)
+                # 特殊处理 /dev/root
+                disk=$(lsblk -no PKNAME / 2>/dev/null)
+                if [ -n "$disk" ]; then
+                    disk="/dev/$disk"
+                fi
+                ;;
+            *)
+                # 尝试通用匹配
+                if echo "$rom_dev" | grep -qE '^/dev/[a-z]+[0-9]+'; then
+                    disk=$(echo "$rom_dev" | sed 's/[0-9]*$//')
+                fi
+                ;;
+        esac
+    fi
+    
+    if [ -n "$disk" ] && [ ! -b "$disk" ]; then
+        disk=""
+    fi
+    
+    echo "$disk"
+}
+
 execute_flash_script() {
     local keep="$1"
     local expsize="$2"
     local bopkg="$3"
     LOG_FILE="/tmp/ezotaflash.log"
+    IMAGE_TMP="/tmp/firmware.img"
 
     echo "Starting flash at $(date)" > $LOG_FILE
     chmod 644 $LOG_FILE
     echo "Verify firmware files" >> $LOG_FILE
     sleep 1
-    
-    if ! image_supported "/tmp/firmware.img"; then
+    if ! image_supported "$IMAGE_TMP"; then
         echo "ERROR: Invalid firmware image" >> $LOG_FILE
-        return 1
+        exit 1
     fi
-    
+    decompressed_size=$(gzip -dc "$IMAGE_TMP" 2>/dev/null | wc -c)
+    if [ -z "$decompressed_size" ] || [ "$decompressed_size" -eq 0 ]; then
+ 	    echo "ERROR: Invalid firmware image ,please redownload."  >> $LOG_FILE
+ 	    exit 1
+    fi
     # 获取目标IP并记录
     target_ip=$(get_target_ip "$keep" "$expsize")
     echo "WEB IP Address: $target_ip" >> $LOG_FILE
@@ -85,22 +137,41 @@ EOF
     if [ "$expsize" -gt 0 ]; then
         echo "DD flash mode" >> $LOG_FILE
         local image_extractedpath=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
-        local image_extracteddev=$(echo -n "/dev/$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $2}')" | tr -d '\n')
+        local image_extracteddev=$(get_system_disk)
         local image_extracted=$(echo -n "$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}')/image_extracted.img" | tr -d '\n')
-        
-        if [ -z "$image_extractedpath" ] || [ -z "$image_extracteddev" ]; then
-            echo "ERROR: Could not determine expansion path or device" >> $LOG_FILE
-            return 1
-        fi
+
+	if [ ! -w "$image_extractedpath" ]; then
+ 	    echo "Error: The target directory is not writable"  >> $LOG_FILE
+  	    exit 1
+	fi
+	echo "Preparing extracted image" >> $LOG_FILE
+	rm -f "$image_extracted" 2>/dev/null || true
+
+	available_space=$(df -k "$image_extractedpath" 2>/dev/null | tail -1 | awk '{print $4}')
+	available_space=$((available_space * 1024))
+	required_with_buffer=$((decompressed_size * 200 / 100))
+	if [ $required_with_buffer -gt $available_space ]; then
+ 	    echo "Error: Insufficient disk space" >> $LOG_FILE
+ 	    echo "Need: $((required_with_buffer / 1024)) KB (with 100% buffer)" >> $LOG_FILE
+ 	    echo "available: $((available_space / 1024)) KB" >> $LOG_FILE
+ 	    exit 1
+	fi
+	echo "Extracting firmware..." >> $LOG_FILE
+	if gzip -dc "$IMAGE_TMP" > "$image_extracted" ; then
+ 	    actual_size=$(du -sb "$image_extracted" 2>/dev/null | cut -f1)
+ 	    if [ "$actual_size" -eq "$decompressed_size" ] ;then
+ 	        echo "Decompression image successful" >> $LOG_FILE 
+	    else 
+ 	        echo "Warning: File size mismatch" >> $LOG_FILE 
+ 	        exit 1
+ 	    fi
+	else
+ 	    echo "ERROR: Failed to extract firmware" >> $LOG_FILE
+ 	    exit 1
+	fi
+
         cat >> /tmp/otaflash.sh << EOF
-echo "Preparing extracted image" >> \$LOG_FILE
-rm -f "$image_extracted" 2>/dev/null || true
-echo "Extracting firmware..." >> \$LOG_FILE
-gzip -dc "\$IMAGE_TMP" > "$image_extracted" 2>>\$LOG_FILE
-if [ ! -f "$image_extracted" ]; then
-    echo "ERROR: Failed to extract firmware" >> \$LOG_FILE
-    exit 1
-fi
+
 echo "Additional expansion capacity" >> \$LOG_FILE
 # 扩展大小映射
 case $expsize in
@@ -113,7 +184,7 @@ case $expsize in
 esac
 if [ \$dd_size -gt 0 ]; then
     echo "Adding \$dd_size MB expansion" >> \$LOG_FILE
-    dd if=/dev/zero bs=1M count=\$dd_size >> "$image_extracted" 2>>\$LOG_FILE
+    dd if=/dev/zero bs=1M count=\$dd_size >> "$image_extracted"
 fi
 if ! command -v sgdisk >/dev/null 2>&1; then
     echo "Installing sgdisk" >> \$LOG_FILE
@@ -133,7 +204,7 @@ sync
 echo "Rebooting system" >> \$LOG_FILE
 sleep 5
 echo "DD writing image to $image_extracteddev..." >> \$LOG_FILE
-dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync 2>>\$LOG_FILE
+dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync
 echo "DD write completed" >> \$LOG_FILE
 sleep 5
 echo b > /proc/sysrq-trigger
@@ -156,7 +227,6 @@ sleep 5
 
 echo "Rebooting system" >> \$LOG_FILE
 sync
-echo "Executing: sysupgrade -v $args " >> \$LOG_FILE
 /sbin/sysupgrade -v $args "\$IMAGE_TMP" 2>>\$LOG_FILE
 echo "Sysupgrade command executed" >> \$LOG_FILE
 sleep 5
@@ -294,25 +364,26 @@ EOF
                         status="upgrading"
                         message="Running sysupgrade command"
                     elif echo "$log_content" | grep -q "Fix GPT expansion partition"; then
-                        progress=40
+                        progress=60
                         status="expanding"
                         message="Fixing GPT partition table"
-                    elif echo "$log_content" | grep -q "Preparing extracted image"; then
-                        progress=30
-                        status="preparing"
-                        message="Preparing extracted image"
                     elif echo "$log_content" | grep -q "Additional expansion capacity"; then
-                        progress=25
+                        progress=50
                         status="expanding"
                         message="Adding expansion capacity"
-                    elif echo "$log_content" | grep -q "flash mode"; then
-                        progress=20
-                        status="flashing"
-                        message="Flash mode"
+                    elif echo "$log_content" | grep -q "Preparing extracted image"; then
+                        progress=25
+                        status="preparing"
+                        message="Preparing extracted image"
+
                     elif echo "$log_content" | grep -q "Verify firmware files"; then
                         progress=10
                         status="verifying"
                         message="Verifying firmware files"
+                    elif echo "$log_content" | grep -q "flash mode"; then
+                        progress=5
+                        status="flashing"
+                        message="Flash mode"
                     # 检查失败状态
                     elif echo "$log_content" | grep -qi "error\|fail"; then
                         progress=0
