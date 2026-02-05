@@ -1,7 +1,7 @@
 #!/bin/sh
 # OpenWrt 24.10 JavaScript版本 author sirpdboy herboy2008@gmail.com github@sirpdboy 
 
-#   Copyright (C) 2019-2025 The Sirpdboy Team <herboy2008@gmail.com> 
+#   Copyright (C) 2019-2026 The Sirpdboy Team <herboy2008@gmail.com> 
 # 
 # Licensed to the public under the Apache License 2.0
 
@@ -22,7 +22,7 @@ image_supported() {
 # 获取当前IP
 get_current_ip() {
     local ip=""
-    ip=`uci -q get network.lan.ipaddr`
+    ip=$(uci -q get network.lan.ipaddr)
     [ -z "$ip" ] && ip="${HTTP_HOST:-192.168.10.1}"
     ip=$(echo "$ip" | cut -d: -f1 | cut -d/ -f1)
     [ -z "$ip" ] && ip="192.168.10.1"
@@ -56,11 +56,31 @@ get_target_ip() {
     fi
 }
 
+image_comped() {
+    local image_file="$1"
+    
+    if [ ! -f "$image_file" ]; then
+        return 1
+    fi
+    
+    # 检查是否为有效的镜像文件
+    if file "$image_file" | grep -q "gzip compressed data"; then
+        return 0
+    elif file "$image_file" | grep -q "filesystem data"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 get_system_disk() {
     rom_dev=$(df -h | grep boot | awk '{print $1}' | head -1 )
-    [ -z ${rom_dev} ] && rom_dev=`df -P /boot 2>/dev/null | awk 'NR==2 {print $1}'`
-    [ -z ${rom_dev} ] && rom_dev=`blkid -t TYPE="squashfs" |awk -F : '{print $1}'`
-    [ -z ${rom_dev} ] && TDISK=`lsblk -l -o NAME,MOUNTPOINTS | grep -E '/rom'| grep -v '/rom/' | head -1 | awk '{print $1}'` && rom_dev="/dev/$TDISK"
+    [ -z "${rom_dev}" ] && rom_dev=$(mount | grep ' /boot' | awk '{print $1}' 2>/dev/null)
+    [ -z "${rom_dev}" ] && rom_dev=$(df -P /boot 2>/dev/null | awk 'NR==2 {print $1}')
+    [ -z "${rom_dev}" ] && rom_dev=$(blkid -t TYPE="squashfs" | awk -F : '{print $1}')
+    [ -z "${rom_dev}" ] && TDISK=$(lsblk -l -o NAME,MOUNTPOINTS | grep -E '/rom' | grep -v '/rom/' | head -1 | awk '{print $1}') && rom_dev="/dev/$TDISK"
+    
+    local disk=""
     if [ -n "$rom_dev" ]; then
         case "$rom_dev" in
             /dev/sd[a-z][0-9]*)
@@ -104,6 +124,78 @@ get_system_disk() {
     echo "$disk"
 }
 
+get_disk_size_mb() {
+    local disk="$1"
+    local device=$(basename "$disk" 2>/dev/null)
+    local size_mb=0
+    
+    if [ ! -b "$disk" ]; then
+        echo 0
+        return
+    fi
+    
+    # 尝试多种方法
+    if command -v lsblk >/dev/null 2>&1; then
+        # 方法1: lsblk
+        local size_bytes=$(lsblk -b -n -o SIZE "$disk" 2>/dev/null | head -1)
+        [ -n "$size_bytes" ] && size_mb=$((size_bytes / 1024 / 1024))
+    elif [ -f "/sys/block/$device/size" ]; then
+        # 方法2: /sys/block
+        local num_sectors=$(cat "/sys/block/$device/size" 2>/dev/null)
+        if [ -n "$num_sectors" ]; then
+            local sector_size=512
+            if [ -f "/sys/block/$device/queue/logical_block_size" ]; then
+                sector_size=$(cat "/sys/block/$device/queue/logical_block_size" 2>/dev/null)
+                [ -z "$sector_size" ] && sector_size=512
+            fi
+            size_mb=$((num_sectors * sector_size / 1024 / 1024))
+        fi
+    elif command -v fdisk >/dev/null 2>&1; then
+        # 方法3: fdisk
+        local output=$(fdisk -l "$disk" 2>/dev/null)
+        local size_bytes=$(echo "$output" | grep -E "^Disk.*bytes" | grep -oE '[0-9]+ bytes' | head -1 | cut -d' ' -f1)
+        [ -n "$size_bytes" ] && size_mb=$((size_bytes / 1024 / 1024))
+    fi
+    
+    echo $size_mb
+}
+get_disk_free_mb() {
+    local disk="$1"
+    if [ -b "$disk" ]; then
+        # 使用lsblk获取未分区空间
+        local free_space=$(lsblk -b "$disk" -o SIZE | tail -1)
+        echo $((free_space / 1024 / 1024))
+    else
+        echo 0
+    fi
+}
+
+get_disk_freedisk_kb() {
+    local path="$1"
+    if [ -d "$path" ] || [ -f "$path" ]; then
+        # 直接获取路径的可用空间（KB）
+        df -k "$path" 2>/dev/null | tail -1 | awk '{print $4}'
+    else
+        echo 0
+    fi
+}
+
+# 获取解压后的固件大小
+get_decompressed_size() {
+    local image_file="$1"
+    local decompressed_size=0
+    
+    if image_comped "$image_file"; then
+        # 压缩镜像，获取解压后大小
+        decompressed_size=$(gzip -dc "$image_file" 2>/dev/null | wc -c)
+    else
+        # 非压缩镜像，直接获取大小
+        decompressed_size=$(du -sb "$image_file" 2>/dev/null | cut -f1)
+    fi
+    
+    echo ${decompressed_size:-0}
+}
+
 execute_flash_script() {
     local keep="$1"
     local expsize="$2"
@@ -113,22 +205,34 @@ execute_flash_script() {
 
     echo "Starting flash at $(date)" > $LOG_FILE
     chmod 644 $LOG_FILE
-    echo "Verify firmware files" >> $LOG_FILE
     sleep 1
+
+    echo "Verify firmware files" >> $LOG_FILE
+    
+
     if ! image_supported "$IMAGE_TMP"; then
         echo "ERROR: Invalid firmware image" >> $LOG_FILE
         exit 1
     fi
-    decompressed_size=$(gzip -dc "$IMAGE_TMP" 2>/dev/null | wc -c)
-    if [ -z "$decompressed_size" ] || [ "$decompressed_size" -eq 0 ]; then
- 	    echo "ERROR: Invalid firmware image ,please redownload."  >> $LOG_FILE
- 	    exit 1
-    fi
+        # 获取系统磁盘
+    image_extracteddev=$(get_system_disk)
+    
+    # 获取磁盘大小
+    DISK_SIZE_MB=$(get_disk_size_mb "$image_extracteddev")
+
+    # 获取解压后的固件大小
+    ORIGINAL_SIZE=$(get_decompressed_size "$IMAGE_TMP")
+    ORIGINAL_SIZE_MB=$((ORIGINAL_SIZE / 1024 / 1024))
+    
+
+    echo "Target Disk size:  $((DISK_SIZE_MB / 1024))GB ($DISK_SIZE_MB MB)" >> $LOG_FILE
+    echo "Image size: $((ORIGINAL_SIZE_MB / 1024))GB ($ORIGINAL_SIZE_MB MB)" >> $LOG_FILE
+
     # 获取目标IP并记录
     target_ip=$(get_target_ip "$keep" "$expsize")
     echo "WEB IP Address: $target_ip" >> $LOG_FILE
-
-    cat > /tmp/otaflash.sh << EOF
+    sleep 1
+    cat > /tmp/otaflash.sh << 'EOF'
 #!/bin/sh
 LOG_FILE="/tmp/ezotaflash.log"
 IMAGE_TMP="/tmp/firmware.img"
@@ -137,64 +241,94 @@ EOF
     if [ "$expsize" -gt 0 ]; then
         echo "DD flash mode" >> $LOG_FILE
         local image_extractedpath=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
-        local image_extracteddev=$(get_system_disk)
-        local image_extracted=$(echo -n "$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}')/image_extracted.img" | tr -d '\n')
+        local image_extracted="${image_extractedpath}/image_extracted.img"
+        if [ ! -w "$image_extractedpath" ]; then
+            echo "Error: The target directory is not writable"  >> $LOG_FILE
+            exit 1
+        fi
 
-	if [ ! -w "$image_extractedpath" ]; then
- 	    echo "Error: The target directory is not writable"  >> $LOG_FILE
-  	    exit 1
-	fi
-	echo "Preparing extracted image" >> $LOG_FILE
-	rm -f "$image_extracted" 2>/dev/null || true
+        # 计算可扩展大小（保留1%空间）
+        EXPANDABLE_SIZE=$((DISK_SIZE_MB - (DISK_SIZE_MB / 100)))
+        if [ $EXPANDABLE_SIZE -lt 0 ]; then
+            EXPANDABLE_SIZE=0
+        fi
+        rm -f "$image_extracted" 2>/dev/null || true
+	
+        # 获取磁盘剩余空间
+        local available_space_kb=$(get_disk_freedisk_kb "$image_extractedpath")
+        local original_size_kb=$((ORIGINAL_SIZE / 1024))
+        local required_with_buffer_kb=$((original_size_kb * 120 / 100))
 
-	available_space=$(df -k "$image_extractedpath" 2>/dev/null | tail -1 | awk '{print $4}')
-	available_space=$((available_space * 1024))
-	required_with_buffer=$((decompressed_size * 200 / 100))
-	if [ $required_with_buffer -gt $available_space ]; then
- 	    echo "Error: Insufficient disk space" >> $LOG_FILE
- 	    echo "Need: $((required_with_buffer / 1024)) KB (with 100% buffer)" >> $LOG_FILE
- 	    echo "available: $((available_space / 1024)) KB" >> $LOG_FILE
- 	    exit 1
-	fi
-	echo "Extracting firmware..." >> $LOG_FILE
-	if gzip -dc "$IMAGE_TMP" > "$image_extracted" ; then
- 	    actual_size=$(du -sb "$image_extracted" 2>/dev/null | cut -f1)
- 	    if [ "$actual_size" -eq "$decompressed_size" ] ;then
- 	        echo "Decompression image successful" >> $LOG_FILE 
-	    else 
- 	        echo "Warning: File size mismatch" >> $LOG_FILE 
- 	        exit 1
- 	    fi
-	else
- 	    echo "ERROR: Failed to extract firmware" >> $LOG_FILE
- 	    exit 1
-	fi
+        if [ $required_with_buffer_kb -gt $available_space_kb ]; then
+            echo "Error: Insufficient disk space" >> $LOG_FILE
+            echo "Need: $((required_with_buffer_kb / 1024)) MB (with 20% buffer)" >> $LOG_FILE
+            echo "Available: $((available_space_kb / 1024)) MB" >> $LOG_FILE
+            exit 1
+        fi
+        
+        echo "Extracting firmware..." >> $LOG_FILE
+        
+        if gzip -dc "$IMAGE_TMP" > "$image_extracted" 2>>$LOG_FILE; then
+            actual_size=$(du -sb "$image_extracted" 2>/dev/null | cut -f1)
+            if [ "$actual_size" -eq "$ORIGINAL_SIZE" ]; then
+                echo "Decompression successful: $((actual_size / 1024 / 1024)) MB" >> $LOG_FILE 
+            else 
+                echo "Warning: File size mismatch. Expected: $ORIGINAL_SIZE, Actual: $actual_size" >> $LOG_FILE 
+            fi
+        else
+            echo "ERROR: Failed to extract firmware" >> $LOG_FILE
+            exit 1
+        fi
+
+        echo "Additional expansion capacity" >> $LOG_FILE
+        
+        # 扩展大小映射
+        case $expsize in
+            1) dd_size=1 ;;
+            2) dd_size=4096 ;;
+            3) dd_size=10240 ;;
+            4) dd_size=20480 ;;
+            5) dd_size=51200 ;;
+            6) dd_size=102400 ;;
+            *) dd_size=0 ;;
+        esac
+        
+        # 计算实际扩展大小
+        if [ $dd_size -gt 1 ]; then
+            # 使用用户选择的大小，但不能超过可用空间
+            EXPANSION_MB=$dd_size
+        else
+            EXPANSION_MB=$EXPANDABLE_SIZE
+        fi
+        
+        if [ $EXPANSION_MB -gt 0 ]; then
+            echo "Expanding image by ${EXPANSION_MB}MB"  >> $LOG_FILE
+            if dd if=/dev/zero bs=1M count=$EXPANSION_MB >> "$image_extracted"  2>>$LOG_FILE; then
+                echo "Expansion successful" >> $LOG_FILE
+            else
+                echo "ERROR: Failed to expand image" >> $LOG_FILE
+                exit 1
+            fi
+        else
+            echo "No expansion requested" >> $LOG_FILE
+        fi
 
         cat >> /tmp/otaflash.sh << EOF
 
-echo "Additional expansion capacity" >> \$LOG_FILE
-# 扩展大小映射
-case $expsize in
-    1) dd_size=4096 ;;
-    2) dd_size=10240 ;;
-    3) dd_size=20480 ;;
-    4) dd_size=51200 ;;
-    5) dd_size=102400 ;;
-    *) dd_size=0 ;;
-esac
-if [ \$dd_size -gt 0 ]; then
-    echo "Adding \$dd_size MB expansion" >> \$LOG_FILE
-    dd if=/dev/zero bs=1M count=\$dd_size >> "$image_extracted"
-fi
-if ! command -v sgdisk >/dev/null 2>&1; then
-    echo "Installing sgdisk" >> \$LOG_FILE
-    opkg update >/dev/null 2>&1
-    opkg install sgdisk >/dev/null 2>&1
-fi
 echo "Fix GPT expansion partition" >> \$LOG_FILE
-sgdisk -e "$image_extracted" >/dev/null 2>&1 || true
+if command -v sgdisk >/dev/null 2>&1; then
+    sgdisk -e "$image_extracted" >/dev/null 2>&1 || true
+else
+    echo "sgdisk not found, skipping GPT fix" >> \$LOG_FILE
+fi
+
 echo "Expand partition" >> \$LOG_FILE
-echo -e "resizepart 2 -1\\nq" | parted "$image_extracted" >/dev/null 2>&1
+if command -v parted >/dev/null 2>&1; then
+    echo -e "resizepart 2 -1\\nq" | parted "$image_extracted"  2>>\$LOG_FILE
+else
+    echo "parted not found, skipping partition resize" >> \$LOG_FILE
+fi
+
 echo "Writing image to flash" >> \$LOG_FILE
 sleep 2
 echo "Stopping services..." >> \$LOG_FILE
@@ -204,10 +338,17 @@ sync
 echo "Rebooting system" >> \$LOG_FILE
 sleep 5
 echo "DD writing image to $image_extracteddev..." >> \$LOG_FILE
-dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync
-echo "DD write completed" >> \$LOG_FILE
-sleep 5
-echo b > /proc/sysrq-trigger
+if dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync  2>>\$LOG_FILE; then
+    echo "DD write completed successfully" >> \$LOG_FILE
+else
+    echo "ERROR: DD write failed" >> \$LOG_FILE
+    exit 1
+fi
+
+echo "Flash completed at \$(date)" >> \$LOG_FILE
+sync
+sleep 3
+# echo b > /proc/sysrq-trigger
 EOF
     else
         echo "Sysupgrade flash mode" >> $LOG_FILE
@@ -227,6 +368,8 @@ sleep 5
 
 echo "Rebooting system" >> \$LOG_FILE
 sync
+
+echo "Executing sysupgrade" >> \$LOG_FILE
 /sbin/sysupgrade -v $args "\$IMAGE_TMP" 2>>\$LOG_FILE
 echo "Sysupgrade command executed" >> \$LOG_FILE
 sleep 5
@@ -238,9 +381,7 @@ EOF
 echo "Flash script completed at \$(date)" >> $LOG_FILE
 
 EOF
-    
     chmod +x /tmp/otaflash.sh
-    # 执行刷机脚本（在后台运行）
     echo "Executing flash script" >> $LOG_FILE
     /bin/sh /tmp/otaflash.sh >/dev/null 2>&1 &
     
