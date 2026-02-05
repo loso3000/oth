@@ -241,11 +241,11 @@ return view.extend({
    		     }
  		   }).catch(console.error);
 		};
-
         return m.render();
 	},
 
 	handleSaveApply: null,
 	handleSave: null,
 	handleReset: null
+
 });
