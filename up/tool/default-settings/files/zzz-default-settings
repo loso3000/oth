@@ -181,8 +181,9 @@ test $ver -lt 5 && {
 	    sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
         fi
     done
-    
-    uci -q set dropbear.@dropbear[0].Interface='lan'
+
+    uci -q set dropbear.main._direct='1'
+    uci -q set dropbear.main.DirectInterface='lan'
     uci -q set dropbear.main.Interface='lan'
     uci -q commit dropbear
 
