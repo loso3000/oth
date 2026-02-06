@@ -170,12 +170,38 @@ SHOW_INFO() {
 }
 
 GIT_API() {
-    get_github_api    "$ApiFile"  
+    get_github_api "$ApiFile"  
     [ ! -s "${ApiFile}" ] && {
         LOG  "未检测到 ApiFile 文件!"
         return 1
-    }
-    for i in $(seq 0 $(jq ".assets[]|length" ${ApiFile} | wc -l));do
+    }  
+    if jq '.[0] | has("assets")' "${ApiFile}" 2>/dev/null | grep -q true; then 
+      for i in $(seq 0 $(jq '.[0].assets | length' "${ApiFile}"));do
+        name=$(jq -r --argjson idx "$i" '.[0].assets[$idx].name // empty' "$ApiFile")
+        if echo "$name" | grep -q "$OS_ARCH"; then
+            if ! echo "$name" | grep -q "$EZVER" && ! echo "$name" ; then
+                continue
+            fi
+            case ${name} in
+            *img.gz )
+                browser_download_url=$(jq -r --argjson idx "$i" '.[0].assets[$idx].browser_download_url // empty' "$ApiFile")
+                size=$(jq -r --argjson idx "$i" '.[0].assets[$idx].size // empty' "$ApiFile" | awk '{a=$1/1048576} {printf("%.2f\n",a)}')
+                updated_at=$(jq -r --argjson idx "$i" '.[0].assets[$idx].updated_at // empty' "$ApiFile" | sed 's/[-:TZ]//g')
+                download_count=$(jq -r --argjson idx "$i" '.[0].assets[$idx].download_count // empty' "$ApiFile")
+
+                [[ ! ${browser_download_url} || ${browser_download_url} == null ]] && continue
+                [[ ! ${size} || ${size} == null || ${size} == 0 ]] && size="-" || size="${size}MB"
+                [[ ! ${updated_at} || ${updated_at} == null ]] && updated_at="-"
+                [[ ! ${download_count} || ${download_count} == null ]] && download_count="-"
+                printf "%-75s %-5s %-10s %-15s %-20s %s\n" ${name} ${download_count} ${updated_at} ${size} ${tagname} ${browser_download_url} >> ${ApiInfo}
+                [ $DEBUG = 1 ] && LOG  " SHOW_API: ${name} ${download_count} ${updated_at} ${size} ${browser_download_url} "
+                return
+            ;;
+            esac
+        fi	 
+    done
+   elif jq 'has("assets")' "${ApiFile}" | grep -q true; then
+   for i in $(seq 0 $(jq '.assets | length' "${ApiFile}"));do
         name=$(jq -r --argjson idx "$i" '.assets[$idx].name // empty' "$ApiFile")
         if echo "$name" | grep -q "$OS_ARCH"; then
             if ! echo "$name" | grep -q "$EZVER" && ! echo "$name" ; then
@@ -183,7 +209,6 @@ GIT_API() {
             fi
             case ${name} in
             *img.gz )
-                browser_download_url=$(cat "$ApiFile" | jq -r ".assets[$i] | .browser_download_url" )
                 browser_download_url=$(jq -r --argjson idx "$i" '.assets[$idx].browser_download_url // empty' "$ApiFile")
                 size=$(jq -r --argjson idx "$i" '.assets[$idx].size // empty' "$ApiFile" | awk '{a=$1/1048576} {printf("%.2f\n",a)}')
                 updated_at=$(jq -r --argjson idx "$i" '.assets[$idx].updated_at // empty' "$ApiFile" | sed 's/[-:TZ]//g')
@@ -200,6 +225,9 @@ GIT_API() {
             esac
         fi	 
     done
+   else
+     echo "No assets field found"
+   fi
     unset i
 }
 
@@ -427,21 +455,24 @@ footFile="${TmpPath}/ota.footer"
 Author="sirpdboy/openwrt"
 ezverfile="ezopenwrt_version"
 ota_init || exit 255
+need_proxy=1
 PROXYLIST="ghproxy.net gh-proxy.org gh-proxy.com"
+proxytesturl="https://www.google.com/generate_204"
 max_retries=2
 for i in $(seq 1 $max_retries); do
-    http_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 10 "www.github.com")
-    if [[ "$http_code" =~ ^2[0-9]{2}$ ]]; then
-        PROXY=""
+
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 3 "$proxytesturl" 2>/dev/null)
+    if [[ "$http_code" =~ ^3[0-9]{2}$ ]] || [[ "$http_code" =~ ^2[0-9]{2}$ ]] || [ "$http_code" = "204" ]; then
+            need_proxy=0
         break
     fi
 done
-
-if [[ ! "$http_code" =~ ^2[0-9]{2}$ ]]; then
+    
+if [ $need_proxy -eq 1 ]; then
 
    for xy in $PROXYLIST; do
         http_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 "${xy}")
-       if [[ "$http_code" =~ ^2[0-9]{2}$ ]]; then
+       if [[ "$http_code" =~ ^2[0-9]{2}$ ]] || [[ "$http_code" =~ ^3[0-9]{2}$ ]]; then
         PROXY="https://${xy}/"
         break
        fi
