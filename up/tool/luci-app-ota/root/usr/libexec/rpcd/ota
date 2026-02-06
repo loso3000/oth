@@ -124,10 +124,10 @@ get_system_disk() {
     echo "$disk"
 }
 
-get_disk_size_mb() {
+get_disk_size_kb() {
     local disk="$1"
     local device=$(basename "$disk" 2>/dev/null)
-    local size_mb=0
+    local size_kb=0
     
     if [ ! -b "$disk" ]; then
         echo 0
@@ -138,7 +138,7 @@ get_disk_size_mb() {
     if command -v lsblk >/dev/null 2>&1; then
         # 方法1: lsblk
         local size_bytes=$(lsblk -b -n -o SIZE "$disk" 2>/dev/null | head -1)
-        [ -n "$size_bytes" ] && size_mb=$((size_bytes / 1024 / 1024))
+        [ -n "$size_bytes" ] && size_kb=$((size_bytes / 1024 ))
     elif [ -f "/sys/block/$device/size" ]; then
         # 方法2: /sys/block
         local num_sectors=$(cat "/sys/block/$device/size" 2>/dev/null)
@@ -148,16 +148,16 @@ get_disk_size_mb() {
                 sector_size=$(cat "/sys/block/$device/queue/logical_block_size" 2>/dev/null)
                 [ -z "$sector_size" ] && sector_size=512
             fi
-            size_mb=$((num_sectors * sector_size / 1024 / 1024))
+            size_kb=$((num_sectors * sector_size / 1024 ))
         fi
     elif command -v fdisk >/dev/null 2>&1; then
         # 方法3: fdisk
         local output=$(fdisk -l "$disk" 2>/dev/null)
         local size_bytes=$(echo "$output" | grep -E "^Disk.*bytes" | grep -oE '[0-9]+ bytes' | head -1 | cut -d' ' -f1)
-        [ -n "$size_bytes" ] && size_mb=$((size_bytes / 1024 / 1024))
+        [ -n "$size_bytes" ] && size_kb=$((size_bytes / 1024 ))
     fi
     
-    echo $size_mb
+    echo $size_kb
 }
 get_disk_free_mb() {
     local disk="$1"
@@ -214,18 +214,17 @@ execute_flash_script() {
         echo "ERROR: Invalid firmware image" >> $LOG_FILE
         exit 1
     fi
-        # 获取系统磁盘
-    image_extracteddev=$(get_system_disk)
-    
-    # 获取磁盘大小
-    DISK_SIZE_MB=$(get_disk_size_mb "$image_extracteddev")
+    # 获取系统磁盘
+    upsys_disk=$(get_system_disk)
+    # 获取系統磁盘大小
+    upsys_disk_size=$(get_disk_size_kb "$upsys_disk")
+    upsys_disk_size_mb=$((upsys_disk_size /1024))
 
     # 获取解压后的固件大小
     ORIGINAL_SIZE=$(get_decompressed_size "$IMAGE_TMP")
     ORIGINAL_SIZE_MB=$((ORIGINAL_SIZE / 1024 / 1024))
-    
 
-    echo "Target Disk size:  $((DISK_SIZE_MB / 1024))GB ($DISK_SIZE_MB MB)" >> $LOG_FILE
+    echo "Upgrade system space:  $((upsys_disk_size_mb / 1024))GB ($upsys_disk_size_mb MB)" >> $LOG_FILE
     echo "Image size: $((ORIGINAL_SIZE_MB / 1024))GB ($ORIGINAL_SIZE_MB MB)" >> $LOG_FILE
 
     # 获取目标IP并记录
@@ -240,36 +239,35 @@ EOF
     
     if [ "$expsize" -gt 0 ]; then
         echo "DD flash mode" >> $LOG_FILE
-        local image_extractedpath=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
-        local image_extracted="${image_extractedpath}/image_extracted.img"
-        if [ ! -w "$image_extractedpath" ]; then
-            echo "Error: The target directory is not writable"  >> $LOG_FILE
+        local save_image_disk=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
+        local save_image_disk_file="${save_image_disk}/image_extracted.img"
+        if [ ! -w "$save_image_disk" ]; then
+            echo "Error: The Save Image directory is not writable,Please partexp!"  >> $LOG_FILE
             exit 1
         fi
-
+        rm -f "$save_image_disk_file" 2>/dev/null || true
         # 计算可扩展大小（保留1%空间）
-        EXPANDABLE_SIZE=$((DISK_SIZE_MB - (DISK_SIZE_MB / 100)))
-        if [ $EXPANDABLE_SIZE -lt 0 ]; then
-            EXPANDABLE_SIZE=0
-        fi
-        rm -f "$image_extracted" 2>/dev/null || true
-	
-        # 获取磁盘剩余空间
-        local available_space_kb=$(get_disk_freedisk_kb "$image_extractedpath")
-        local original_size_kb=$((ORIGINAL_SIZE / 1024))
-        local required_with_buffer_kb=$((original_size_kb * 120 / 100))
+        local upsys_exp_size=$((upsys_disk_size_mb - 1024))
 
-        if [ $required_with_buffer_kb -gt $available_space_kb ]; then
+        # 获取存儲IMG磁盘剩余空间
+        local save_image_disk_size=$(get_disk_freedisk_kb "$save_image_disk")
+	local save_image_disk_size_mb=$((save_image_disk_size / 1024))
+
+        # 获取存儲文件解壓大小
+        local original_size_kb=$((ORIGINAL_SIZE / 1024))
+        local required_with_buffer_kb=$((original_size_kb * 110 / 100))
+        echo "Save image size: $((save_image_disk_size_mb / 1024))GB ($save_image_disk_size_mb MB)" >> $LOG_FILE
+        if [ $required_with_buffer_kb -gt $save_image_disk_size ]; then
             echo "Error: Insufficient disk space" >> $LOG_FILE
-            echo "Need: $((required_with_buffer_kb / 1024)) MB (with 20% buffer)" >> $LOG_FILE
-            echo "Available: $((available_space_kb / 1024)) MB" >> $LOG_FILE
+            echo "Need: $((required_with_buffer_kb / 1024)) MB (with 10% buffer)" >> $LOG_FILE
+            echo "Available: $((save_image_disk_size / 1024)) MB" >> $LOG_FILE
             exit 1
         fi
-        
+	save_image_disk_exp_size=$((save_image_disk_size_mb - ORIGINAL_SIZE_MB - (save_image_disk_size__mb / 100)))
         echo "Extracting firmware..." >> $LOG_FILE
         
-        if gzip -dc "$IMAGE_TMP" > "$image_extracted" 2>>$LOG_FILE; then
-            actual_size=$(du -sb "$image_extracted" 2>/dev/null | cut -f1)
+        if gzip -dc "$IMAGE_TMP" > "$save_image_disk_file" 2>>$LOG_FILE; then
+            actual_size=$(du -sb "$save_image_disk_file" 2>/dev/null | cut -f1)
             if [ "$actual_size" -eq "$ORIGINAL_SIZE" ]; then
                 echo "Decompression successful: $((actual_size / 1024 / 1024)) MB" >> $LOG_FILE 
             else 
@@ -296,18 +294,26 @@ EOF
         # 计算实际扩展大小
         if [ $dd_size -gt 1 ]; then
             # 使用用户选择的大小，但不能超过可用空间
-            EXPANSION_MB=$dd_size
-        else
-            EXPANSION_MB=$EXPANDABLE_SIZE
+            if [ $dd_size -gt $save_image_disk_size ]; then
+                EXPANSION_MB=$save_image_disk_size_mb
+                echo "Warning:Expansion space is larger than storage space.USE:($save_image_disk_size_mb MB)" >> $LOG_FILE
+            else   
+                EXPANSION_MB=$dd_size
+            fi
+        elif [ $upsys_exp_size -gt $save_image_disk_size ]; then
+                EXPANSION_MB=$save_image_disk_size_mb
+                echo "Warning: The upgrade target space exceeds the storage space.USE:($save_image_disk_size_mb MB)" >> $LOG_FILE
+        else  
+                EXPANSION_MB=$upsys_exp_size
         fi
+
         
         if [ $EXPANSION_MB -gt 0 ]; then
             echo "Expanding image by ${EXPANSION_MB}MB"  >> $LOG_FILE
-            if dd if=/dev/zero bs=1M count=$EXPANSION_MB >> "$image_extracted"  2>>$LOG_FILE; then
+            if dd if=/dev/zero bs=1M count=$EXPANSION_MB >> "$save_image_disk_file"  2>>$LOG_FILE; then
                 echo "Expansion successful" >> $LOG_FILE
             else
-                echo "ERROR: Failed to expand image" >> $LOG_FILE
-                exit 1
+                echo "Warning: expand image $EXPANSION_MB Failed" >> $LOG_FILE
             fi
         else
             echo "No expansion requested" >> $LOG_FILE
@@ -317,14 +323,14 @@ EOF
 
 echo "Fix GPT expansion partition" >> \$LOG_FILE
 if command -v sgdisk >/dev/null 2>&1; then
-    sgdisk -e "$image_extracted" >/dev/null 2>&1 || true
+    sgdisk -e "$save_image_disk_file" >/dev/null 2>&1 || true
 else
     echo "sgdisk not found, skipping GPT fix" >> \$LOG_FILE
 fi
 
 echo "Expand partition" >> \$LOG_FILE
 if command -v parted >/dev/null 2>&1; then
-    echo -e "resizepart 2 -1\\nq" | parted "$image_extracted"  2>>\$LOG_FILE
+    echo -e "resizepart 2 -1\\nq" | parted "$save_image_disk_file"  2>>\$LOG_FILE
 else
     echo "parted not found, skipping partition resize" >> \$LOG_FILE
 fi
@@ -337,8 +343,8 @@ sleep 2
 sync
 echo "Rebooting system" >> \$LOG_FILE
 sleep 5
-echo "DD writing image to $image_extracteddev..." >> \$LOG_FILE
-if dd if="$image_extracted" of="$image_extracteddev" bs=4k conv=fsync  2>>\$LOG_FILE; then
+echo "DD writing image to $upsys_disk..." >> \$LOG_FILE
+if dd if="$save_image_disk_file" of="$upsys_disk" bs=4k conv=fsync  2>>\$LOG_FILE; then
     echo "DD write completed successfully" >> \$LOG_FILE
 else
     echo "ERROR: DD write failed" >> \$LOG_FILE
