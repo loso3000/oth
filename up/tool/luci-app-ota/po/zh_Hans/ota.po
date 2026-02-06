@@ -52,6 +52,9 @@ msgstr "不扩展 (系统升级)"
 msgid "DD mode (Expansion)"
 msgstr "DD 模式刷机 (扩展)"
 
+msgid "Expand AUTO (DD Mode)"
+msgstr "扩展自动(DD 模式)"
+
 msgid "Expand by 4G (DD Mode)"
 msgstr "扩展 4G (DD 模式)"
 

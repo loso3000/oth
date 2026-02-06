@@ -1,8 +1,8 @@
 #!/bin/sh
-# OpenWrt 24.10 JavaScript版本 author sirpdboy herboy2008@gmail.com github@sirpdboy 
-
-#   Copyright (C) 2019-2026 The Sirpdboy Team <herboy2008@gmail.com> 
-# 
+# OpenWrt 24.10 JavaScript版本 author sirpdboy herboy2008@gmail.com github@sirpdboy
+#
+# Copyright (C) 2019-2026 The Sirpdboy Team <herboy2008@gmail.com>
+#
 # Licensed to the public under the Apache License 2.0
 
 . /usr/share/libubox/jshn.sh
@@ -32,7 +32,7 @@ get_current_ip() {
 get_firmware_ip() {
     local json_file="/tmp/run/ezota/ezota.json"
     local default_ip="192.168.10.1"
-    
+
     if [ -f "$json_file" ]; then
         local ip=$(cat "$json_file" | grep -o '"ip"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | cut -d'"' -f4)
         [ -n "$ip" ] && echo "$ip" || echo "$default_ip"
@@ -45,10 +45,10 @@ get_firmware_ip() {
 get_target_ip() {
     local keep="$1"
     local expsize="$2"
-    
+
     local current_ip=$(get_current_ip)
     local firmware_ip=$(get_firmware_ip)
-    
+
     if [ "$keep" = "1" -a "$expsize" = "0" ]; then
         echo "$current_ip"
     else
@@ -58,11 +58,11 @@ get_target_ip() {
 
 image_comped() {
     local image_file="$1"
-    
+
     if [ ! -f "$image_file" ]; then
         return 1
     fi
-    
+
     # 检查是否为有效的镜像文件
     if file "$image_file" | grep -q "gzip compressed data"; then
         return 0
@@ -79,7 +79,7 @@ get_system_disk() {
     [ -z "${rom_dev}" ] && rom_dev=$(df -P /boot 2>/dev/null | awk 'NR==2 {print $1}')
     [ -z "${rom_dev}" ] && rom_dev=$(blkid -t TYPE="squashfs" | awk -F : '{print $1}')
     [ -z "${rom_dev}" ] && TDISK=$(lsblk -l -o NAME,MOUNTPOINTS | grep -E '/rom' | grep -v '/rom/' | head -1 | awk '{print $1}') && rom_dev="/dev/$TDISK"
-    
+
     local disk=""
     if [ -n "$rom_dev" ]; then
         case "$rom_dev" in
@@ -116,11 +116,11 @@ get_system_disk() {
                 ;;
         esac
     fi
-    
+
     if [ -n "$disk" ] && [ ! -b "$disk" ]; then
         disk=""
     fi
-    
+
     echo "$disk"
 }
 
@@ -128,12 +128,12 @@ get_disk_size_kb() {
     local disk="$1"
     local device=$(basename "$disk" 2>/dev/null)
     local size_kb=0
-    
+
     if [ ! -b "$disk" ]; then
         echo 0
         return
     fi
-    
+
     # 尝试多种方法
     if command -v lsblk >/dev/null 2>&1; then
         # 方法1: lsblk
@@ -156,7 +156,6 @@ get_disk_size_kb() {
         local size_bytes=$(echo "$output" | grep -E "^Disk.*bytes" | grep -oE '[0-9]+ bytes' | head -1 | cut -d' ' -f1)
         [ -n "$size_bytes" ] && size_kb=$((size_bytes / 1024 ))
     fi
-    
     echo $size_kb
 }
 get_disk_free_mb() {
@@ -184,7 +183,6 @@ get_disk_freedisk_kb() {
 get_decompressed_size() {
     local image_file="$1"
     local decompressed_size=0
-    
     if image_comped "$image_file"; then
         # 压缩镜像，获取解压后大小
         decompressed_size=$(gzip -dc "$image_file" 2>/dev/null | wc -c)
@@ -192,7 +190,6 @@ get_decompressed_size() {
         # 非压缩镜像，直接获取大小
         decompressed_size=$(du -sb "$image_file" 2>/dev/null | cut -f1)
     fi
-    
     echo ${decompressed_size:-0}
 }
 
@@ -208,7 +205,6 @@ execute_flash_script() {
     sleep 1
 
     echo "Verify firmware files" >> $LOG_FILE
-    
 
     if ! image_supported "$IMAGE_TMP"; then
         echo "ERROR: Invalid firmware image" >> $LOG_FILE
@@ -236,7 +232,7 @@ execute_flash_script() {
 LOG_FILE="/tmp/ezotaflash.log"
 IMAGE_TMP="/tmp/firmware.img"
 EOF
-    
+
     if [ "$expsize" -gt 0 ]; then
         echo "DD flash mode" >> $LOG_FILE
         local save_image_disk=$(head -n 1 /etc/partexppath 2>/dev/null | awk '{print $1}' | tr -d '\n')
@@ -265,21 +261,18 @@ EOF
         fi
 	save_image_disk_exp_size=$((save_image_disk_size_mb - ORIGINAL_SIZE_MB - (save_image_disk_size__mb / 100)))
         echo "Extracting firmware..." >> $LOG_FILE
-        
         if gzip -dc "$IMAGE_TMP" > "$save_image_disk_file" 2>>$LOG_FILE; then
             actual_size=$(du -sb "$save_image_disk_file" 2>/dev/null | cut -f1)
             if [ "$actual_size" -eq "$ORIGINAL_SIZE" ]; then
-                echo "Decompression successful: $((actual_size / 1024 / 1024)) MB" >> $LOG_FILE 
-            else 
-                echo "Warning: File size mismatch. Expected: $ORIGINAL_SIZE, Actual: $actual_size" >> $LOG_FILE 
+                echo "Decompression successful: $((actual_size / 1024 / 1024)) MB" >> $LOG_FILE
+            else
+                echo "Warning: File size mismatch. Expected: $ORIGINAL_SIZE, Actual: $actual_size" >> $LOG_FILE
             fi
         else
             echo "ERROR: Failed to extract firmware" >> $LOG_FILE
             exit 1
         fi
-
         echo "Additional expansion capacity" >> $LOG_FILE
-        
         # 扩展大小映射
         case $expsize in
             1) dd_size=1 ;;
@@ -290,30 +283,28 @@ EOF
             6) dd_size=102400 ;;
             *) dd_size=0 ;;
         esac
-        
+
         # 计算实际扩展大小
         if [ $dd_size -gt 1 ]; then
             # 使用用户选择的大小，但不能超过可用空间
             if [ $dd_size -gt $save_image_disk_size ]; then
                 EXPANSION_MB=$save_image_disk_size_mb
                 echo "Warning:Expansion space is larger than storage space.USE:($save_image_disk_size_mb MB)" >> $LOG_FILE
-            else   
+            else
                 EXPANSION_MB=$dd_size
             fi
         elif [ $upsys_exp_size -gt $save_image_disk_size ]; then
                 EXPANSION_MB=$save_image_disk_size_mb
                 echo "Warning: The upgrade target space exceeds the storage space.USE:($save_image_disk_size_mb MB)" >> $LOG_FILE
-        else  
+        else
                 EXPANSION_MB=$upsys_exp_size
         fi
-
-        
         if [ $EXPANSION_MB -gt 0 ]; then
             echo "Expanding image by ${EXPANSION_MB}MB"  >> $LOG_FILE
-            if dd if=/dev/zero bs=1M count=$EXPANSION_MB >> "$save_image_disk_file"  2>>$LOG_FILE; then
+            if dd if=/dev/zero bs=1M count=$EXPANSION_MB >> "$save_image_disk_file"; then
                 echo "Expansion successful" >> $LOG_FILE
             else
-                echo "Warning: expand image $EXPANSION_MB Failed" >> $LOG_FILE
+                echo "Warning: System hard drive:$EXPANSION_MB MB , maximum expansion:$save_image_disk_size_mb MB" >> $LOG_FILE
             fi
         else
             echo "No expansion requested" >> $LOG_FILE
@@ -354,7 +345,7 @@ fi
 echo "Flash completed at \$(date)" >> \$LOG_FILE
 sync
 sleep 3
-# echo b > /proc/sysrq-trigger
+echo b > /proc/sysrq-trigger
 EOF
     else
         echo "Sysupgrade flash mode" >> $LOG_FILE

@@ -207,11 +207,12 @@ return view.extend({
             '                    <div class="cbi-value-field">',
             '                        <select name="expsize" id="expsize" style="width: auto">',
             '                            <option value="0" selected="selected">' + _('No expansion (Sysupgrade)') + '</option>',
-            '                            <option value="1">' + _('Expand by 4G (DD Mode)') + '</option>',
-            '                            <option value="2">' + _('Expand by 10G (DD Mode)') + '</option>',
-            '                            <option value="3">' + _('Expand by 20G (DD Mode)') + '</option>',
-            '                            <option value="4">' + _('Expand by 50G (DD Mode)') + '</option>',
-            '                            <option value="5">' + _('Expand by 100G (DD Mode)') + '</option>',
+            '                            <option value="1">' + _('Expand AUTO (DD Mode)') + '</option>',
+            '                            <option value="2">' + _('Expand by 4G (DD Mode)') + '</option>',
+            '                            <option value="3">' + _('Expand by 10G (DD Mode)') + '</option>',
+            '                            <option value="4">' + _('Expand by 20G (DD Mode)') + '</option>',
+            '                            <option value="5">' + _('Expand by 50G (DD Mode)') + '</option>',
+            '                            <option value="6">' + _('Expand by 100G (DD Mode)') + '</option>',
             '                        </select>',
             '                    </div>',
             '                </div>',
@@ -1318,7 +1319,7 @@ if (response.status === 'complete' || response.status === 'rebooting') {
                            _('Default IP after flash:') + ' ' + this.targetIP + '\n\n' +
                            _('The device will reboot!');
         } else {
-            var sizes = ['0', '4G', '10G', '20G', '50G', '100G'];
+            var sizes = ['0','1', '4G', '10G', '20G', '50G', '100G'];
             var size = sizes[expsize];
             confirmMessage = _('Are you sure you want to flash the firmware using %s mode?').format(mode) + '\n\n' +
                            _('⚠️ WARNING: DD mode does NOT preserve settings!') + '\n' +
