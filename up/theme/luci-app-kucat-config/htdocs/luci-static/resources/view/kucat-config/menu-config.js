@@ -22,92 +22,94 @@ return view.extend({
     title: _('KuCat Menu Configuration'),
 
     load: function() {
-        return Promise.all([
-            this.loadAllMenus(),
-            this.loadBasicMenus()
-        ]);
+        var self = this;
+        
+        // 先加载菜单配置
+        return this.loadBasicMenus().then(function(basicSet) {
+            // 等待菜单渲染完成后再获取所有菜单
+            return new Promise(function(resolve) {
+                // 延迟一段时间，等待菜单渲染完成
+                setTimeout(function() {
+                    self.loadAllMenus().then(function(allMenus) {
+                        resolve([allMenus, basicSet]);
+                    });
+                }, 500);
+            });
+        });
     },
 
     /**
-     * 获取所有菜单 - 修复异步加载问题
+     * 获取所有菜单 - 从已渲染的DOM中获取
      */
     loadAllMenus: function() {
         var self = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function(resolve) {
             var menus = [];
             var menuSet = new Set();
             
             try {
-                // 先确保菜单已加载
-                ui.menu.load().then(function() {
-                    // 获取菜单树 - 使用与主题相同的方法
-                    var menuTree = ui.menu.getTree();
+                // 从页面中获取所有菜单链接
+                var menuLinks = document.querySelectorAll('#mainmenu a, .slide-menu a, .nav a, [data-title]');
+                
+                //console.log('Found menu links:', menuLinks.length);
+                
+                menuLinks.forEach(function(link) {
+                    var href = link.getAttribute('href');
+                    var text = link.textContent.trim() || link.getAttribute('data-title');
                     
-                    if (!menuTree || !menuTree.children) {
-                        console.debug('No menu tree available');
-                        resolve(self.getFallbackMenus());
-                        return;
-                    }
-                    
-                    // 递归收集菜单的函数
-                    function collectMenus(node, parentPath) {
-                        if (!node) return;
+                    if (href && href.indexOf('/admin/') !== -1) {
+                        // 提取路径，移除 /admin/ 前缀
+                        var path = href.replace(/.*\/admin\//, '');
+                        path = path.replace(/\/$/, ''); // 移除末尾的斜杠
                         
-                        // 获取当前节点的子菜单
-                        var children = ui.menu.getChildren(node);
-                        
-                        children.forEach(function(child) {
-                            if (child && child.title) {
-                                var currentPath = parentPath ? parentPath + '/' + child.name : child.name;
-                                
-                                if (!menuSet.has(currentPath)) {
-                                    menuSet.add(currentPath);
-                                    menus.push({
-                                        path: currentPath,
-                                        title: child.title
-                                    });
-                                }
-                                
-                                // 递归获取子菜单
-                                if (child.children) {
-                                    collectMenus(child, currentPath);
-                                }
-                            }
-                        });
-                    }
-                    
-                    // 从 admin 节点开始收集
-                    if (menuTree.children.admin) {
-                        collectMenus(menuTree.children.admin, '');
-                    }
-                    
-                    // 也收集其他顶级节点（如 fwx_ 开头的菜单）
-                    for (var name in menuTree.children) {
-                        if (name !== 'admin' && menuTree.children[name]) {
-                            collectMenus(menuTree.children[name], name);
+                        // 确保路径有效
+                        if (path && path !== '#' && !menuSet.has(path) && text && text !== '') {
+                            menuSet.add(path);
+                            menus.push({
+                                path: path,
+                                title: text
+                            });
+                            
+                            //console.log('Added menu:', path, text);
                         }
                     }
-                    
-                    // 去重
-                    var uniqueMenus = self.deduplicateMenus(menus);
-                    
-                    // 如果收集到的菜单太少，使用备用列表
-                    if (uniqueMenus.length < 10) {
-                        console.debug('Too few menus collected, using fallback');
-                        resolve(self.getFallbackMenus());
-                    } else {
-                        resolve(uniqueMenus);
-                    }
-                    
-                }).catch(function(err) {
-                    console.debug('Menu load error:', err);
-                    resolve(self.getFallbackMenus());
                 });
                 
+                // 如果通过链接获取不到，尝试从 data-title 属性获取
+                if (menus.length === 0) {
+                    var menuItems = document.querySelectorAll('[data-title]');
+                    menuItems.forEach(function(item) {
+                        var title = item.getAttribute('data-title');
+                        var href = item.getAttribute('href');
+                        
+                        if (href && href.indexOf('/admin/') !== -1) {
+                            var path = href.replace(/.*\/admin\//, '').replace(/\/$/, '');
+                            if (path && !menuSet.has(path) && title) {
+                                menuSet.add(path);
+                                menus.push({
+                                    path: path,
+                                    title: title
+                                });
+                            }
+                        }
+                    });
+                }
+                
+                // 如果还是获取不到，使用主题的默认菜单
+                if (menus.length === 0) {
+                    //console.log('No menus found from DOM, using fallback');
+                    menus = self.getFallbackMenus();
+                }
+                
             } catch (e) {
-                console.debug('Error in loadAllMenus:', e);
-                resolve(self.getFallbackMenus());
+                console.debug('Error loading menus:', e);
+                menus = self.getFallbackMenus();
             }
+            
+            // 去重并排序
+            var uniqueMenus = self.deduplicateMenus(menus);
+            //console.log('Final menus count:', uniqueMenus.length);
+            resolve(uniqueMenus);
         });
     },
 
@@ -122,8 +124,14 @@ return view.extend({
             }
         });
         
-        // 按路径排序
+        // 按主分类和路径排序
         uniqueMenus.sort(function(a, b) {
+            var catA = (a.path || '').split('/')[0];
+            var catB = (b.path || '').split('/')[0];
+            
+            if (catA !== catB) {
+                return catA.localeCompare(catB);
+            }
             return (a.path || '').localeCompare(b.path || '');
         });
         
@@ -131,6 +139,7 @@ return view.extend({
     },
 
     getFallbackMenus: function() {
+        // 从主题的 getDefaultBasicMenus 中获取默认菜单
         return [
             { path: 'status/overview', title: 'Overview' },
             { path: 'status/processes', title: 'Processes' },
@@ -166,14 +175,7 @@ return view.extend({
             { path: 'fwx_parental_control', title: 'Parental Control' },
             { path: 'fwx_user', title: 'User Management' },
             { path: 'fwx_internet_record', title: 'Internet Record' },
-            { path: 'fwx_advance', title: 'Advance Settings' },
-            { path: 'docker/overview', title: 'Docker Overview' },
-            { path: 'docker/containers', title: 'Docker Containers' },
-            { path: 'docker/images', title: 'Docker Images' },
-            { path: 'docker/networks', title: 'Docker Networks' },
-            { path: 'vpn/tailscale', title: 'Tailscale VPN' },
-            { path: 'vpn/openvpn', title: 'OpenVPN' },
-            { path: 'vpn/wireguard', title: 'WireGuard' }
+            { path: 'fwx_advance', title: 'Advance Settings' }
         ];
     },
 
@@ -273,12 +275,15 @@ return view.extend({
             }
         });
         
+        //console.log('Basic menus count:', basicMenus.length);
+        //console.log('Advanced menus count:', advancedMenus.length);
+        
         return E('div', { 'class': 'cbi-map', 'id': 'kucat-menu-config' }, [
             E('style', {}, [this.getStyles()]),
             E('h2', { 'class': 'cbi-page-title' }, [_('KuCat Menu Configuration')]),
             E('div', { 'class': 'cbi-section' }, [
                 E('div', { 'class': 'cbi-section-descr' }, [
-                    _('Configure the menu displayed in custom mode. Select items and use the buttons to switch between lists.')
+                    _('Configure which menus appear in Basic mode. Select items and use buttons to move between lists.')
                 ]),
                 
                 E('div', { 'class': 'cbi-section-node' }, [
@@ -353,7 +358,7 @@ return view.extend({
             '    transition: background 0.2s ease;' +
             '}' +
             '#kucat-menu-config .menu-list-item:hover {' +
-            '    background: rgba(255,255,255,0.1);' +
+            '    background: rgba(50,50,50,0.1);' +
             '}' +
             '#kucat-menu-config .menu-item-label {' +
             '    display: flex;' +
@@ -426,10 +431,6 @@ return view.extend({
     renderDualList: function(basicMenus, advancedMenus) {
         var self = this;
         
-        // 按主分类排序
-        basicMenus.sort(self.sortByMainCategory.bind(self));
-        advancedMenus.sort(self.sortByMainCategory.bind(self));
-        
         var basicListContent = E('div', { 'class': 'list-content', 'id': 'basic-list-content' });
         var advancedListContent = E('div', { 'class': 'list-content', 'id': 'advanced-list-content' });
         
@@ -446,7 +447,7 @@ return view.extend({
         return E('div', { 'class': 'dual-list-container' }, [
             E('div', { 'class': 'list-box basic-list' }, [
                 E('div', { 'class': 'list-header' }, [
-                    E('h3', {}, [_('Custom Menu')]),
+                    E('h3', {}, [_('Basic Mode Menus')]),
                     E('span', { 'class': 'list-count' }, [basicMenus.length + ' ' + _('items')])
                 ]),
                 basicListContent,
@@ -455,7 +456,7 @@ return view.extend({
                         'class': 'cbi-button cbi-button-remove',
                         'click': ui.createHandlerFn(self, 'handleRemoveSelected'),
                         'disabled': basicMenus.length === 0 ? 'disabled' : null
-                    }, [_('Remove') + ' →'])
+                    }, [_('Remove Selected →')])
                 ])
             ]),
             
@@ -464,18 +465,18 @@ return view.extend({
                     'class': 'cbi-button cbi-button-add',
                     'click': ui.createHandlerFn(self, 'handleAddSelected'),
                     'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                }, ['← ' + _('Add')]),
+                }, ['← ']),
                 E('button', {
                     'class': 'cbi-button cbi-button-remove',
                     'click': ui.createHandlerFn(self, 'handleRemoveSelected'),
                     'disabled': basicMenus.length === 0 ? 'disabled' : null,
                     'style': 'margin-top: 10px;'
-                }, [_('Remove') + ' →'])
+                }, [' →'])
             ]),
             
             E('div', { 'class': 'list-box advanced-list' }, [
                 E('div', { 'class': 'list-header' }, [
-                    E('h3', {}, [_('Full Menus')]),
+                    E('h3', {}, [_('Advanced Mode Menus')]),
                     E('span', { 'class': 'list-count' }, [advancedMenus.length + ' ' + _('items')])
                 ]),
                 advancedListContent,
@@ -484,7 +485,7 @@ return view.extend({
                         'class': 'cbi-button cbi-button-add',
                         'click': ui.createHandlerFn(self, 'handleAddSelected'),
                         'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                    }, ['← ' + _('Add')])
+                    }, ['← ' + _('Add Selected')])
                 ])
             ])
         ]);
@@ -518,30 +519,6 @@ return view.extend({
         return E('div', { 'class': 'menu-list-item' }, [label]);
     },
 
-    /**
-     * 按主分类排序
-     */
-    sortByMainCategory: function(a, b) {
-        // 获取主分类（路径的第一部分）
-        var getMainCategory = function(path) {
-            if (!path) return '';
-            var parts = path.split('/');
-            return parts[0] || '';
-        };
-        
-        var categoryA = getMainCategory(a.path);
-        var categoryB = getMainCategory(b.path);
-        
-        // 先按主分类排序
-        var categoryCompare = categoryA.localeCompare(categoryB);
-        if (categoryCompare !== 0) {
-            return categoryCompare;
-        }
-        
-        // 如果主分类相同，再按完整路径排序
-        return (a.path || '').localeCompare(b.path || '');
-    },
-
     getSelectedItems: function(listId) {
         var container = document.getElementById(listId);
         if (!container) return [];
@@ -564,7 +541,7 @@ return view.extend({
         var selected = this.getSelectedItems('advanced-list-content');
         
         if (selected.length === 0) {
-            alert(_('No items selected'));
+            // alert(_('No items selected'));
             return;
         }
         
@@ -685,6 +662,16 @@ return view.extend({
         this.updateCounts();
         
         //alert(selected.length + ' ' + _('items removed from Basic mode'));
+    },
+
+    sortByMainCategory: function(a, b) {
+        var catA = (a.path || '').split('/')[0];
+        var catB = (b.path || '').split('/')[0];
+        
+        if (catA !== catB) {
+            return catA.localeCompare(catB);
+        }
+        return (a.path || '').localeCompare(b.path || '');
     },
 
     updateCounts: function() {
