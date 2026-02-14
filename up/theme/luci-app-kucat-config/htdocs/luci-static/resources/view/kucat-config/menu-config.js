@@ -304,6 +304,7 @@ return view.extend({
             '#kucat-menu-config .list-box {' +
             '    flex: 1;' +
             '    border: 1px solid #ccc;' +
+            '    border: 1px solid var(--input-boxcolor);' +
             '    border-radius: 4px;' +
             '    display: flex;' +
             '    flex-direction: column;' +
@@ -311,6 +312,7 @@ return view.extend({
             '#kucat-menu-config .list-header {' +
             '    padding: 12px 15px;' +
             '    border-bottom: 1px solid #ccc;' +
+            '    border-bottom: 1px solid var(--input-boxcolor);' +
             '    border-radius: 4px 4px 0 0;' +
             '    display: flex;' +
             '    justify-content: space-between;' +
@@ -338,6 +340,7 @@ return view.extend({
             '#kucat-menu-config .list-footer {' +
             '    padding: 12px 15px;' +
             '    border-top: 1px solid #ccc;' +
+            '    border-top: 1px solid var(--input-boxcolor);' +
             '    border-radius: 0 0 4px 4px;' +
             '    text-align: center;' +
             '}' +
@@ -447,7 +450,7 @@ return view.extend({
         return E('div', { 'class': 'dual-list-container' }, [
             E('div', { 'class': 'list-box basic-list' }, [
                 E('div', { 'class': 'list-header' }, [
-                    E('h3', {}, [_('Basic Mode Menus')]),
+                    E('h3', {}, [_('Custom Menu')]),
                     E('span', { 'class': 'list-count' }, [basicMenus.length + ' ' + _('items')])
                 ]),
                 basicListContent,
@@ -456,7 +459,7 @@ return view.extend({
                         'class': 'cbi-button cbi-button-remove',
                         'click': ui.createHandlerFn(self, 'handleRemoveSelected'),
                         'disabled': basicMenus.length === 0 ? 'disabled' : null
-                    }, [_('Remove Selected →')])
+                    }, [_('Remove')+' →'])
                 ])
             ]),
             
@@ -465,18 +468,18 @@ return view.extend({
                     'class': 'cbi-button cbi-button-add',
                     'click': ui.createHandlerFn(self, 'handleAddSelected'),
                     'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                }, ['← ']),
+                }, ['← ' + _('Add')]),
                 E('button', {
                     'class': 'cbi-button cbi-button-remove',
                     'click': ui.createHandlerFn(self, 'handleRemoveSelected'),
                     'disabled': basicMenus.length === 0 ? 'disabled' : null,
                     'style': 'margin-top: 10px;'
-                }, [' →'])
+                }, [_('Remove') + ' →'])
             ]),
             
             E('div', { 'class': 'list-box advanced-list' }, [
                 E('div', { 'class': 'list-header' }, [
-                    E('h3', {}, [_('Advanced Mode Menus')]),
+                    E('h3', {}, [_('Full Menus')]),
                     E('span', { 'class': 'list-count' }, [advancedMenus.length + ' ' + _('items')])
                 ]),
                 advancedListContent,
@@ -485,7 +488,7 @@ return view.extend({
                         'class': 'cbi-button cbi-button-add',
                         'click': ui.createHandlerFn(self, 'handleAddSelected'),
                         'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                    }, ['← ' + _('Add Selected')])
+                    }, ['← ' + _('Add')])
                 ])
             ])
         ]);
