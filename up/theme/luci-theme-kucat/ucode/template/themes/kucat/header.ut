@@ -311,7 +311,7 @@ class="lang_{{ dispatcher.lang }} {{ ctx.authsession ? 'logged-in' : '' }} {{ le
                             {% endif %}
                         </div>
                         <div class="status" id="indicators"></div>
-                        <span><a class="pdboy-qlogout" href="{{ dispatcher.build_url("admin/logout") }}" title="{{ _('Log_out') }}"></a></span>
+                        <span class="logout-container"><a class="pdboy-qlogout" href="{{ dispatcher.build_url("admin/logout") }}" title="{{ _('Log_out') }}"></a></span>
                     </div>
                 </div>
           </header>

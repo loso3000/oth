@@ -144,11 +144,15 @@
     content: "\e90f"
 }
 
+.icon-advanced:before,
 .icon-menu:before {
+    font-size: 1.5rem ;
     content: "\e20e"
 }
 
+.icon-basic:before ,
 .icon-menu_open:before {
+    font-size: 1.5rem;
     content: "\e92f"
 }
 
@@ -773,6 +777,7 @@ span[data-indicator="uci-changes"]:before {
     text-decoration: none
 }
 
+.category-switch:hover,
 .pdboy-dark:hover,
 .pdboy-light:hover,
 span[data-indicator="uci-changes"]:hover,
@@ -785,6 +790,7 @@ span[data-indicator="uci-changes"]:hover,
     text-decoration: none
 }
 
+.category-switch,
 .pdboy-dark,
 .pdboy-light,
 span[data-indicator="uci-changes"],
@@ -1911,7 +1917,8 @@ textarea:focus
 
 .cbi-dropdown.btn>ul>li {
   min-height: 1.5rem;
-  height: 1.6rem
+  height: 1.6rem;
+  margin: 0 0.2rem 0 0.6rem;
 }
 
 .cbi-dropdown[empty]>ul {
@@ -2760,8 +2767,13 @@ label>input[type="checkbox"],
 label>input[type="radio"] {
     margin-right: 0.8rem;
     position: relative;
-    margin-bottom: 0.8rem;
+   /* margin-bottom: 0.8rem; */
     vertical-align: -webkit-baseline-middle
+}
+
+.cbi-value-field>div>input[type="checkbox"],
+.cbi-value-field>div>input[type="radio"] {
+      margin-top: 0.5rem;
 }
 
 label[data-index][data-depends] {
@@ -3824,6 +3836,29 @@ input,
     color: var(--title-color)
 }
 
+/* hide switch-menu */
+
+.logout-container>a {
+    margin-left: 0.2rem;
+}
+
+.logout-container {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* 菜单项可见性类 */
+.menu-item-basic,
+.menu-item-advanced {
+    transition: opacity 0.3s ease;
+}
+
+/* 确保菜单项正确显示 */
+#mainmenu .nav > li.menu-item-basic,
+#mainmenu .nav > li.menu-item-advanced {
+    display: none;
+}
+
 @keyframes anim-fade-in {
     100% {
         opacity: 1
@@ -3922,6 +3957,11 @@ input,
 }
 
 @media only screen and (max-width: 920px) {
+    /* hide switch-menu
+    .category-switch {
+        display: none !important;
+    } */
+
     .main-right .bfill,
     .bfill .bcontainer .showWord,
     .bfill .bcontainer .flex1 .brand {

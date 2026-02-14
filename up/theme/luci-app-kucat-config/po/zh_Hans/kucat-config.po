@@ -32,6 +32,9 @@ msgstr "壁纸来源"
 msgid "Local wallpaper"
 msgstr "本地壁纸库"
 
+msgid "Menu Configuration"
+msgstr "菜单配置"
+
 msgid "Auto download Bing wallpaper"
 msgstr "自动下载Bing每日壁纸"
 
@@ -181,6 +184,17 @@ msgstr "0：透明，1：不透明（建议：重度透明0.1）"
 msgid "RGB values, such as '255,0,0' for red, suggest dark values"
 msgstr "RGB值，例如红色为'255,0,0'，建议深色值"
 
+msgid "KuCat Menu Configuration"
+msgstr "KuCat自定义菜单配置"
+
+msgid "Configure the menu displayed in custom mode. Select items and use the buttons to switch between lists."
+msgstr "配置在自定义模式下显示的菜单。选择项目并使用按钮在列表之间切换。"
+
+msgid "Custom Menu"
+msgstr "自定义菜单"
+
+msgid "Full Menus"
+msgstr "全部菜单"
 
 msgid "Upload..."
 msgstr "上传..."
