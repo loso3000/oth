@@ -283,7 +283,7 @@ return view.extend({
             E('h2', { 'class': 'cbi-page-title' }, [_('KuCat Menu Configuration')]),
             E('div', { 'class': 'cbi-section' }, [
                 E('div', { 'class': 'cbi-section-descr' }, [
-                    _('Configure which menus appear in Basic mode. Select items and use buttons to move between lists.')
+                    _('Configure the menu displayed in custom mode. Select items and use the buttons to switch between lists.')
                 ]),
                 
                 E('div', { 'class': 'cbi-section-node' }, [
@@ -453,14 +453,7 @@ return view.extend({
                     E('h3', {}, [_('Custom Menu')]),
                     E('span', { 'class': 'list-count' }, [basicMenus.length + ' ' + _('items')])
                 ]),
-                basicListContent,
-                E('div', { 'class': 'list-footer' }, [
-                    E('button', {
-                        'class': 'cbi-button cbi-button-remove',
-                        'click': ui.createHandlerFn(self, 'handleRemoveSelected'),
-                        'disabled': basicMenus.length === 0 ? 'disabled' : null
-                    }, [_('Remove')+' →'])
-                ])
+                basicListContent
             ]),
             
             E('div', { 'class': 'list-controls' }, [
@@ -482,14 +475,7 @@ return view.extend({
                     E('h3', {}, [_('Full Menus')]),
                     E('span', { 'class': 'list-count' }, [advancedMenus.length + ' ' + _('items')])
                 ]),
-                advancedListContent,
-                E('div', { 'class': 'list-footer' }, [
-                    E('button', {
-                        'class': 'cbi-button cbi-button-add',
-                        'click': ui.createHandlerFn(self, 'handleAddSelected'),
-                        'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                    }, ['← ' + _('Add')])
-                ])
+                advancedListContent
             ])
         ]);
     },
