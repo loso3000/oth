@@ -331,14 +331,11 @@ return baseclass.extend({
             const switchBtn = E('a', {
                 'href': '#',
                 'class': 'category-switch',
-                'title': this.currentCategory === 'basic' ? _('Switch to Advanced') : _('Switch to Basic')
+                'title': this.currentCategory === 'basic' ? _('Switch to Full Menus') : _('Switch to Custom Menus')
             }, [
                 E('span', { 
                     'class': 'switch-icon ' + (this.currentCategory === 'basic' ? 'icon-advanced' : 'icon-basic')
                 })
-                // E('span', { 'class': 'switch-text' }, [
-                //     this.currentCategory === 'basic' ? _('Advanced') : _('Basic')
-                // ])
             ]);
 
             switchBtn.addEventListener('click', (e) => {
@@ -374,12 +371,8 @@ return baseclass.extend({
                 if (iconSpan) {
                     iconSpan.className = 'switch-icon ' + (newCategory === 'basic' ? 'icon-advanced' : 'icon-basic');
                 }
-
-                // if (textSpan) {
-                //     textSpan.textContent = newCategory === 'basic' ? _('Advanced') : _('Basic');
-                // }
                 
-                switchBtn.title = newCategory === 'basic' ? _('Switch to Advanced') : _('Switch to Basic');
+                switchBtn.title = newCategory === 'basic' ? _('Switch to Full Menus') : _('Switch to Custom Menus');
             }
         } catch (e) {
             console.debug('Toggle category error:', e);
@@ -425,14 +418,6 @@ return baseclass.extend({
         try {
             this.showMenus();
 
-            // 移动端显示所有菜单
-            if (window.innerWidth <= 920) {
-                const menuItems = document.querySelectorAll('#mainmenu .nav > li, #mainmenu .slide-menu li');
-                menuItems.forEach(item => {
-                    if (item) item.style.display = 'block';
-                });
-                return;
-            }
 
             // 收集所有菜单项的路径信息
             const allMenuItems = document.querySelectorAll('#mainmenu .nav > li, #mainmenu .slide-menu li');
@@ -659,13 +644,7 @@ return baseclass.extend({
                 this.applyCategoryFilter(this.currentCategory);
             } else {
                 this.closeSidebar();
-                if (switchBtn) {
-                    switchBtn.style.display = 'none';
-                }
-                const menuItems = document.querySelectorAll('#mainmenu .nav > li, #mainmenu .slide-menu li');
-                menuItems.forEach(item => {
-                    if (item) item.style.display = 'block';
-                });
+
             }
         } catch (e) {
             console.debug('Handle resize error:', e);

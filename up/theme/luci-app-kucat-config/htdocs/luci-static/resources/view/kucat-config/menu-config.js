@@ -1,3 +1,10 @@
+/*
+ *  luci-app-kucat-config
+ *  Copyright (C) 2021-2026 The Sirpdboy <herboy2008@gmail.com> 
+ *
+ *  Licensed to the public under the Apache License 2.0
+ */
+
 'use strict';
 'require baseclass';
 'require view';
@@ -310,10 +317,9 @@ return view.extend({
             '    flex-direction: column;' +
             '}' +
             '#kucat-menu-config .list-header {' +
-            '    padding: 12px 15px;' +
+            '    padding: 0 15px;' +
             '    border-bottom: 1px solid #ccc;' +
             '    border-bottom: 1px solid var(--input-boxcolor);' +
-            '    border-radius: 4px 4px 0 0;' +
             '    display: flex;' +
             '    justify-content: space-between;' +
             '    align-items: center;' +
@@ -330,12 +336,22 @@ return view.extend({
             '    padding: 3px 8px;' +
             '    border-radius: 12px;' +
             '}' +
+
+            '#kucat-menu-config .selected-count {' +
+            '    margin-left: auto;' +
+            '    font-size: 12px;' +
+            '    color: #666;' +
+            '    background: #e0e0e0;' +
+            '    padding: 2px 8px;' +
+            '    margin: 0px 8px;' +
+            '    border-radius: 12px;' +
+            '}' +
             '#kucat-menu-config .list-content {' +
             '    flex: 1;' +
-            '    padding: 10px;' +
+            '    padding: 1px;' +
             '    overflow-y: auto;' +
             '    min-height: 400px;' +
-            '    max-height: 500px;' +
+            '    max-height: 600px;' +
             '}' +
             '#kucat-menu-config .list-footer {' +
             '    padding: 12px 15px;' +
@@ -356,21 +372,17 @@ return view.extend({
             '}' +
             '#kucat-menu-config .menu-list-item {' +
             '    margin: 2px 0;' +
-            '    padding: 8px 4px 8px 4px;' +
-            '    border-radius: 3px;' +
             '    transition: background 0.2s ease;' +
             '}' +
             '#kucat-menu-config .menu-list-item:hover {' +
-            '    background: rgba(50,50,50,0.1);' +
+            '    background: rgba(50,50,50,0.15);' +
             '}' +
             '#kucat-menu-config .menu-item-label {' +
             '    display: flex;' +
             '    align-items: center;' +
+            '    padding: 4px 8px;' +
             '    cursor: pointer;' +
             '    width: 100%;' +
-            '}' +
-            '#kucat-menu-config .menu-item-label .menu-checkbox {' +
-            '    margin-right: 10px;' +
             '}' +
             '#kucat-menu-config .menu-item-label .menu-title {' +
             '    font-size: 14px;' +
@@ -378,7 +390,6 @@ return view.extend({
             '    flex: 1;' +
             '}' +
             '#kucat-menu-config .menu-item-label .menu-path {' +
-            '    font-size: 11px;' +
             '    margin-left: 10px;' +
             '    font-family: monospace;' +
             '}' +
@@ -387,15 +398,6 @@ return view.extend({
             '    justify-content: flex-start;' +
             '    align-items: center;' +
             '    gap: 10px;' +
-            '}' +
-            '#kucat-menu-config .cbi-button-add,' +
-            '#kucat-menu-config .cbi-button-remove {' +
-            '    padding: 8px 16px;' +
-            '    border: none;' +
-            '    border-radius: 4px;' +
-            '    font-size: 14px;' +
-            '    cursor: pointer;' +
-            '    transition: all 0.2s ease;' +
             '}' +
             '#kucat-menu-config .cbi-button-add {' +
             '    background: #4CAF50;' +
@@ -448,14 +450,29 @@ return view.extend({
         });
         
         return E('div', { 'class': 'dual-list-container' }, [
+            // 左侧 Basic 菜单列表
             E('div', { 'class': 'list-box basic-list' }, [
                 E('div', { 'class': 'list-header' }, [
                     E('h3', {}, [_('Custom Menu')]),
                     E('span', { 'class': 'list-count' }, [basicMenus.length + ' ' + _('items')])
                 ]),
-                basicListContent
+                basicListContent,
+                E('div', { 'class': 'list-footer' }, [
+                    E('button', {
+                        'class': 'cbi-button cbi-button-apply cbi-button-select',
+                        'click': ui.createHandlerFn(self, 'handleSelectAllBasic'),
+                        'disabled': basicMenus.length === 0 ? 'disabled' : null
+                    }, [_('Select All')]),
+                    E('button', {
+                        'class': 'cbi-button cbi-button-reset cbi-button-select',
+                        'click': ui.createHandlerFn(self, 'handleDeselectAllBasic'),
+                        'disabled': basicMenus.length === 0 ? 'disabled' : null
+                    }, [_('Select None')]),
+                    E('span', { 'class': 'selected-count' }, ['0/' + basicMenus.length])
+                ])
             ]),
             
+            // 中间移动按钮
             E('div', { 'class': 'list-controls' }, [
                 E('button', {
                     'class': 'cbi-button cbi-button-add',
@@ -470,12 +487,26 @@ return view.extend({
                 }, [_('Remove') + ' →'])
             ]),
             
+            // 右侧 Advanced 菜单列表
             E('div', { 'class': 'list-box advanced-list' }, [
                 E('div', { 'class': 'list-header' }, [
                     E('h3', {}, [_('Full Menus')]),
                     E('span', { 'class': 'list-count' }, [advancedMenus.length + ' ' + _('items')])
                 ]),
-                advancedListContent
+                advancedListContent,
+                E('div', { 'class': 'list-footer' }, [
+                    E('button', {
+                        'class': 'cbi-button cbi-button-apply cbi-button-select',
+                        'click': ui.createHandlerFn(self, 'handleSelectAllAdvanced'),
+                        'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                    }, [_('Select All')]),
+                    E('button', {
+                        'class': 'cbi-button cbi-button-reset cbi-button-select',
+                        'click': ui.createHandlerFn(self, 'handleDeselectAllAdvanced'),
+                        'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                    }, [_('Select None')]),
+                    E('span', { 'class': 'selected-count' }, ['0/' + advancedMenus.length])
+                ])
             ])
         ]);
     },
@@ -530,7 +561,7 @@ return view.extend({
         var selected = this.getSelectedItems('advanced-list-content');
         
         if (selected.length === 0) {
-            // alert(_('No items selected'));
+            alert(_('No items selected'));
             return;
         }
         
@@ -653,6 +684,70 @@ return view.extend({
         //alert(selected.length + ' ' + _('items removed from Basic mode'));
     },
 
+    /**
+     * 全选Basic列表
+     */
+    handleSelectAllBasic: function() {
+        var basicContainer = document.getElementById('basic-list-content');
+        if (!basicContainer) return;
+        
+        var checkboxes = basicContainer.querySelectorAll('.menu-checkbox');
+        checkboxes.forEach(function(cb) {
+            cb.checked = true;
+        });
+        
+        this.updateButtonStates();
+        this.updateSelectedCount();
+    },
+
+    /**
+     * 取消全选Basic列表
+     */
+    handleDeselectAllBasic: function() {
+        var basicContainer = document.getElementById('basic-list-content');
+        if (!basicContainer) return;
+        
+        var checkboxes = basicContainer.querySelectorAll('.menu-checkbox');
+        checkboxes.forEach(function(cb) {
+            cb.checked = false;
+        });
+        
+        this.updateButtonStates();
+        this.updateSelectedCount();
+    },
+
+    /**
+     * 全选Advanced列表
+     */
+    handleSelectAllAdvanced: function() {
+        var advancedContainer = document.getElementById('advanced-list-content');
+        if (!advancedContainer) return;
+        
+        var checkboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        checkboxes.forEach(function(cb) {
+            cb.checked = true;
+        });
+        
+        this.updateButtonStates();
+        this.updateSelectedCount();
+    },
+
+    /**
+     * 取消全选Advanced列表
+     */
+    handleDeselectAllAdvanced: function() {
+        var advancedContainer = document.getElementById('advanced-list-content');
+        if (!advancedContainer) return;
+        
+        var checkboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        checkboxes.forEach(function(cb) {
+            cb.checked = false;
+        });
+        
+        this.updateButtonStates();
+        this.updateSelectedCount();
+    },
+
     sortByMainCategory: function(a, b) {
         var catA = (a.path || '').split('/')[0];
         var catB = (b.path || '').split('/')[0];
@@ -684,6 +779,35 @@ return view.extend({
         }
         
         this.updateButtonStates();
+        this.updateSelectedCount();
+    },
+
+    /**
+     * 更新选中数量显示
+     */
+    updateSelectedCount: function() {
+        var basicContainer = document.getElementById('basic-list-content');
+        var advancedContainer = document.getElementById('advanced-list-content');
+        
+        if (basicContainer) {
+            var basicSelected = basicContainer.querySelectorAll('.menu-checkbox:checked').length;
+            var basicTotal = basicContainer.querySelectorAll('.menu-checkbox').length;
+            var basicCountEl = document.querySelector('.basic-list .selected-count');
+            
+            if (basicCountEl) {
+                basicCountEl.textContent = basicSelected + '/' + basicTotal;
+            }
+        }
+        
+        if (advancedContainer) {
+            var advancedSelected = advancedContainer.querySelectorAll('.menu-checkbox:checked').length;
+            var advancedTotal = advancedContainer.querySelectorAll('.menu-checkbox').length;
+            var advancedCountEl = document.querySelector('.advanced-list .selected-count');
+            
+            if (advancedCountEl) {
+                advancedCountEl.textContent = advancedSelected + '/' + advancedTotal;
+            }
+        }
     },
 
     handleSave: function() {
@@ -777,6 +901,7 @@ return view.extend({
 
     handleCheckboxChange: function() {
         this.updateButtonStates();
+        this.updateSelectedCount();
     },
 
     updateButtonStates: function() {
@@ -804,5 +929,8 @@ return view.extend({
         addButtons.forEach(function(btn) {
             btn.disabled = !hasAdvancedSelected;
         });
+        
+        // 更新选中计数
+        this.updateSelectedCount();
     }
 });

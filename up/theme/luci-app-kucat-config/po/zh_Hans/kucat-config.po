@@ -199,6 +199,12 @@ msgstr "全部菜单"
 msgid "items"
 msgstr "条"
 
+msgid "Switch to Custom Menus"
+msgstr "切换自定义菜单"
+
+msgid "Switch to Full Menus"
+msgstr "切换全部菜单"
+
 msgid "Upload..."
 msgstr "上传..."
 

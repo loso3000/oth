@@ -213,7 +213,7 @@ if (dayword == "1") {
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="{{ hostname }} - LuCI">
     <meta name="format-detection" content="telephone=no, email=no, address=no">
-
+ 
     <meta name="theme-color" content="#ffffff"> 
     <meta name="color-scheme" content="light dark">
     <meta name="msapplication-TileColor" content="{{ (mode == 'dark' && '#1a1a1a' || '#ffffff' ) }}">
@@ -259,7 +259,7 @@ if (dayword == "1") {
     }
      @media screen and (max-width: 920px) { .main-left {background-color:rgba(var(--primary-rgbbody), 0.95);width: calc(0% + 15rem);}}
     {% endif -%}
-    
+
 	{% if (setbar == "1"): %}
 	header.bar-primary .container-bar-left {width: 300px;display: block;}
 	header.bar-primary .container-bar-right { width: 0; display: none;}

@@ -143,20 +143,23 @@
 .icon-log-out:before {
     content: "\e90f"
 }
-
-.icon-advanced:before,
+.showSide:before,
 .icon-menu:before {
     font-size: 1.5rem ;
     content: "\e20e"
 }
 
-.icon-basic:before ,
+.icon-advanced:before,
 .icon-menu_open:before {
     font-size: 1.5rem;
+    color: lightskyblue;
     content: "\e92f"
 }
 
+.icon-basic:before ,
 .icon-menu_open1:before {
+    font-size: 1.5rem;
+    color: lightskyblue;
     content: "\e930"
 }
 
@@ -3785,7 +3788,6 @@ pre {
     color: var(--menu-hover-color)
 }
 
-.container-bar-right a,
 .a-to-btn {
     text-decoration: none
 }
@@ -4000,15 +4002,8 @@ input,
         overflow-y: hidden
     }
 
-    .sidebar-open .showSide:before {
-        content: "\e92f";
-	text-shadow: 1px 1px 2px var(--input-boxcolor);
-        font-size: 1.7rem 
-    }
     .showSide:before {
-        content: "\e930";
 	text-shadow: 1px 1px 2px var(--input-boxcolor);
-        font-size: 1.7rem 
     }
 
 
