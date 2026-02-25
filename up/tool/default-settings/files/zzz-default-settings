@@ -183,9 +183,6 @@ test $ver -lt 5 && {
     done
 
     uci -q batch <<EOF
-        set dropbear.main._direct='1'
-        set dropbear.main.DirectInterface='lan'
-        set dropbear.main.Interface='lan'
         set luci.apply.rollback=30
         set luci.apply.holdoff=2
         commit luci
@@ -245,6 +242,40 @@ EOF
     fi
     
     [ "$debug" = "1" ] && echo "Version updated to: $ver"
+}
+
+
+test $ver -lt 6 && {
+    ver=6
+# docker
+if [ -f /etc/config/dockerd ]; then
+uci -q batch <<EOF
+del firewall.docker_to_wan
+add firewall zone # =cfg17dc81
+set firewall.@zone[-1].name='docker'
+set firewall.@zone[-1].input='ACCEPT'
+set firewall.@zone[-1].output='ACCEPT'
+set firewall.@zone[-1].forward='ACCEPT'
+add_list firewall.@zone[-1].subnet='172.16.0.0/12'
+set firewall.docker.name='docker'
+set firewall.docker.input='ACCEPT'
+set firewall.docker.output='ACCEPT'
+set firewall.docker.forward='ACCEPT'
+set firewall.docker.subnet='172.16.0.0/12'
+set firewall.docker_to_wan=forwarding
+set firewall.docker_to_wan.src='docker'
+set firewall.docker_to_wan.dest='wan'
+set firewall.docker_to_lan=forwarding
+set firewall.docker_to_lan.src='docker'
+set firewall.docker_to_lan.dest='lan'
+set firewall.lan_to_docker=forwarding
+set firewall.lan_to_docker.src='lan'
+set firewall.lan_to_docker.dest='docker'
+commit firewall
+EOF
+fi
+    
+[ "$debug" = "1" ] && echo "Version updated to: $ver"
 }
 
 for service in miniupnpd turboacc ttyd mwan3 watchdog; do
