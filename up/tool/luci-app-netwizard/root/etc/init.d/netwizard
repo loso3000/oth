@@ -41,7 +41,7 @@ check_lock() {
 setipv6() {
     case $1 in
         0)
-            uci -q batch <<-EOF0
+            uci -q batch <<EOF
                 delete network.wan6
                 delete dhcp.lan.ra
                 set network.wan.ipv6='0'
@@ -57,10 +57,10 @@ setipv6() {
                 delete dhcp.wan.ra_flags
                 add_list dhcp.wan.ra_flags='none'
                 set network.lan.delegate='0'
-EOF0
+EOF
             ;;
-        1)
-            uci -q batch <<-EOF1
+        1) #pppoe
+            uci -q batch <<EOF
                 set dhcp.lan.ra='hybrid'
                 set dhcp.lan.dhcpv6='hybrid'
                 del network.lan.delegate
@@ -82,17 +82,21 @@ EOF0
                 set dhcp.wan6.ra='relay'
                 set dhcp.wan6.dhcpv6='relay'
                 set dhcp.wan6.ndp='relay'
-EOF1
+EOF
             ;;
-        2)
-            uci -q batch <<-EOF2
+        2) #siderouter
+            uci -q batch <<EOF
+                del dhcp.lan.ra_default
+                del dhcp.lan.ra_slaac
                 set dhcp.lan.ra='relay'
                 set dhcp.lan.dhcpv6='relay'
                 set dhcp.lan.ndp='relay'
-                del network.lan.delegate
+                delete dhcp.@dnsmasq[0].filter_aaaa
                 set dhcp.lan6=dhcp
                 set dhcp.lan6.interface='lan6'
                 set dhcp.lan6.ignore='1'
+                set dhcp.lan.ra_management='1'
+                del network.lan.delegate
                 set network.lan.ip6assign='64'
                 set network.lan6.extendprefix='1'
                 set network.lan.ip6ifaceid='eui64'
@@ -104,10 +108,11 @@ EOF1
                 set dhcp.lan6.ra='relay'
                 set dhcp.lan6.dhcpv6='relay'
                 set dhcp.lan6.ndp='relay'
-EOF2
+		set firewall.@zone[0].masq6='1'
+EOF
             ;;
-        3)
-            uci -q batch <<-EOF3
+        3)  #dhcp
+            uci -q batch <<EOF
                 set dhcp.lan.ra='hybrid'
                 set dhcp.lan.dhcpv6='hybrid'
                 set dhcp.lan.ndp='relay'
@@ -126,7 +131,7 @@ EOF2
                 set dhcp.wan6.ra='relay'
                 set dhcp.wan6.dhcpv6='relay'
                 set dhcp.wan6.ndp='relay'
-EOF3
+EOF
             ;;
     esac
 }
@@ -362,15 +367,16 @@ configure_network() {
         $UCISET firewall.@zone[-1].input='REJECT'
         $UCISET firewall.@zone[-1].output='ACCEPT'
         $UCISET firewall.@zone[-1].forward='REJECT'
-
+	
         if [ "x$ifname" = "xdevice" ]; then
             $UCIADDLIST firewall.@zone[-1].network='wan6'
             $UCIADDLIST firewall.@zone[-1].network='wan'
         else
             $UCISET firewall.@zone[-1].network='wan wan6'
         fi
-        
         $UCISET firewall.@zone[-1].masq='1'
+	$UCISET firewall.@zone[-1].masq6='1'
+	$UCISET firewall.@zone[0].masq6='0'
     fi
     
     $UCISET firewall.@defaults[0].drop_invalid='1'
@@ -380,7 +386,6 @@ configure_network() {
             $UCISET network.wan.proto='pppoe'
             [ -n "${wan_pppoe_user}" ] && $UCISET network.wan.username="${wan_pppoe_user}"
             [ -n "${wan_pppoe_pass}" ] && $UCISET network.wan.password="${wan_pppoe_pass}"
-            $UCISET firewall.@zone[0].masq='1'
             [ "x$forwarding" = "x1" ] && setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             
@@ -502,6 +507,27 @@ configure_network() {
     esac
 
     [ "x$ifname" = "xdevice" ] && $UCISET network.@$ifname[0].ports="${lannet}" || $UCISET network.lan.$ifname="${lannet}"
+    if [ -f /etc/config/dockerd ]; then 
+	       DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
+              if [ -n "$DOCKERINDEX" ]; then 
+                 $UCIDEL firewall.@zone[$DOCKERINDEX]
+	      fi
+	     $UCIADD firewall zone
+	     $UCISET firewall.@zone[-1].name='docker'
+	     $UCISET firewall.@zone[-1].input='ACCEPT'
+	     $UCISET firewall.@zone[-1].output='ACCEPT'
+	     $UCISET firewall.@zone[-1].forward='ACCEPT'
+             $UCIADDLIST firewall.@zone[-1].subnet='172.16.0.0/12'
+	      $UCISET firewall.docker_to_wan=forwarding
+	      $UCISET firewall.docker_to_wan.src='docker'
+	      $UCISET firewall.docker_to_wan.dest='wan'
+	      $UCISET firewall.docker_to_lan=forwarding
+	      $UCISET firewall.docker_to_lan.src='docker'
+	      $UCISET firewall.docker_to_lan.dest='lan'
+	      $UCISET firewall.lan_to_docker=forwarding
+	      $UCISET firewall.lan_to_docker.src='lan'
+	      $UCISET firewall.lan_to_docker.dest='docker'
+    fi
     if [ "$wan_proto" != "siderouter" ]; then
         [ -n "${lan_ipaddr}" ] && $UCISET network.lan.ipaddr="${lan_ipaddr}"
         [ -n "${lan_netmask}" ] && $UCISET network.lan.netmask="${lan_netmask}"
