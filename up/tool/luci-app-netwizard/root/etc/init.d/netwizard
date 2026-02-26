@@ -256,7 +256,7 @@ configure_network() {
     local wan_proto wan_ipaddr wan_netmask wan_gateway wan_dns wan_pppoe_user wan_pppoe_pass
     local ipv6 wifi_ssid wifi_key old_wifi_ssid old_wifi_key showhide
     local lan_ipaddr lan_netmask lan_gateway lan_dns lan_dhcp wan_interface lan_proto
-    local dns_tables forwarding https synflood
+    local dns_tables synflood
     local ifname lannet netname netsum i
     
     # 获取配置
@@ -273,8 +273,6 @@ configure_network() {
     config_get lan_gateway "$cfg" lan_gateway
     config_get lan_dns "$cfg" lan_dns
     config_get dns_tables "$cfg" dns_tables
-    config_get forwarding "$cfg" forwarding
-    config_get https "$cfg" https '0'
     config_get wan_ipaddr "$cfg" wan_ipaddr
     config_get wan_netmask "$cfg" wan_netmask
     config_get wan_gateway "$cfg" wan_gateway
@@ -314,8 +312,11 @@ configure_network() {
     $UCIDEL network.lan.gateway
     $UCIDEL network.lan.dns
     $UCIDEL firewall.@zone[0].masq
-    $UCIDEL firewall.@forwarding[0]
-    
+    forwardingidx=$(uci show firewall | grep -E "@forwarding\[[0-9]+\].src='lan'" | sed -n 's/.*@forwarding\[\([0-9]*\)\].src.*/\1/p')
+       if [ -n "$forwardingidx" ]; then 
+           $UCIDEL firewall.@forwarding[$forwardingidx]
+       fi
+
     [ -n "$(uci -q get network.wan)" ] && {
        $UCIDEL network.wan 
        WAN_INDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='wan'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
@@ -386,7 +387,7 @@ configure_network() {
             $UCISET network.wan.proto='pppoe'
             [ -n "${wan_pppoe_user}" ] && $UCISET network.wan.username="${wan_pppoe_user}"
             [ -n "${wan_pppoe_pass}" ] && $UCISET network.wan.password="${wan_pppoe_pass}"
-            [ "x$forwarding" = "x1" ] && setforwarding
+            setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 1 || setipv6 0
             
             if [ -n "${wan_dns}" ]; then
@@ -437,7 +438,7 @@ configure_network() {
                     fi
                     ;;
             esac
-            [ "x$forwarding" = "x1" ] && setforwarding
+            setforwarding
             [ "x$ipv6" = "x1" ] && setipv6 3 || setipv6 0
             ;;
             
@@ -534,7 +535,7 @@ configure_network() {
     fi
     
     setsynflood
-    sethttps "$cfg"
+    # sethttps "$cfg"
     sed -i "/dhcp_option '6/d" /etc/config/dhcp 2>/dev/null
     sed -i "/list dns/d" /etc/config/dhcp 2>/dev/null
     if [ "x$lan_dhcp" = "x1" ]; then

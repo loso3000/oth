@@ -608,17 +608,10 @@ return view.extend({
         o.depends('dnsset', '1');
         o.rmempty = false;
 
-        o = s.taboption('wansetup', form.Flag, 'forwarding', _('Forcefully Forwarding'),
-            _('Forcefully add LAN to WAN forwarding'));
-        o.default = '1';
-        o.depends('wan_proto', 'pppoe');
-        o.depends('wan_proto', 'dhcp');
-        o.rmempty = false;
-
-        o = s.taboption('wansetup', form.Flag, 'https', _('Redirect to HTTPS'),
-            _('Enable automatic redirection of HTTP requests to HTTPS port.'));
-        o.default = '0';
-        o.rmempty = false;
+        // o = s.taboption('wansetup', form.Flag, 'https', _('Redirect to HTTPS'),
+        // _('Enable automatic redirection of HTTP requests to HTTPS port.'));
+        // o.default = '0';
+        // o.rmempty = false;
         
         if (this.has_wifi) {
             var wifi_ssid = s.taboption('wifisetup', form.Value, 'wifi_ssid', _('<abbr title="Extended Service Set Identifier">ESSID</abbr>'));
