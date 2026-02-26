@@ -175,14 +175,7 @@ return view.extend({
             { path: 'control/timecontrol', title: 'Time Control' },
             { path: 'control/watchdog', title: 'Watchdog' },
             { path: 'control/taskplan', title: 'Task Plan' },
-            { path: 'netwizard', title: 'Network Wizard' },
-            { path: 'fwx_dashboard', title: 'Dashboard' },
-            { path: 'fwx_network', title: 'Network' },
-            { path: 'fwx_wireless', title: 'Wireless' },
-            { path: 'fwx_parental_control', title: 'Parental Control' },
-            { path: 'fwx_user', title: 'User Management' },
-            { path: 'fwx_internet_record', title: 'Internet Record' },
-            { path: 'fwx_advance', title: 'Advance Settings' }
+            { path: 'netwizard', title: 'Network Wizard' }
         ];
     },
 
@@ -282,9 +275,6 @@ return view.extend({
             }
         });
         
-        //console.log('Basic menus count:', basicMenus.length);
-        //console.log('Advanced menus count:', advancedMenus.length);
-        
         return E('div', { 'class': 'cbi-map', 'id': 'kucat-menu-config' }, [
             E('style', {}, [this.getStyles()]),
             E('h2', { 'class': 'cbi-page-title' }, [_('KuCat Menu Configuration')]),
@@ -336,7 +326,6 @@ return view.extend({
             '    padding: 3px 8px;' +
             '    border-radius: 12px;' +
             '}' +
-
             '#kucat-menu-config .selected-count {' +
             '    margin-left: auto;' +
             '    font-size: 12px;' +
@@ -458,17 +447,19 @@ return view.extend({
                 ]),
                 basicListContent,
                 E('div', { 'class': 'list-footer' }, [
-                    E('button', {
-                        'class': 'cbi-button cbi-button-apply cbi-button-select',
-                        'click': ui.createHandlerFn(self, 'handleSelectAllBasic'),
-                        'disabled': basicMenus.length === 0 ? 'disabled' : null
-                    }, [_('Select All')]),
-                    E('button', {
-                        'class': 'cbi-button cbi-button-reset cbi-button-select',
-                        'click': ui.createHandlerFn(self, 'handleDeselectAllBasic'),
-                        'disabled': basicMenus.length === 0 ? 'disabled' : null
-                    }, [_('Select None')]),
-                    E('span', { 'class': 'selected-count' }, ['0/' + basicMenus.length])
+                    E('div', { 'class': 'button-group' }, [
+                        E('button', {
+                            'class': 'cbi-button cbi-button-apply cbi-button-select',
+                            'click': ui.createHandlerFn(self, 'handleSelectAllBasic'),
+                            'disabled': basicMenus.length === 0 ? 'disabled' : null
+                        }, [_('Select All')]),
+                        E('button', {
+                            'class': 'cbi-button cbi-button-reset cbi-button-select',
+                            'click': ui.createHandlerFn(self, 'handleDeselectAllBasic'),
+                            'disabled': basicMenus.length === 0 ? 'disabled' : null
+                        }, [_('Select None')]),
+                        E('span', { 'class': 'selected-count' }, ['0/' + basicMenus.length])
+                    ])
                 ])
             ]),
             
@@ -495,17 +486,22 @@ return view.extend({
                 ]),
                 advancedListContent,
                 E('div', { 'class': 'list-footer' }, [
-                    E('button', {
-                        'class': 'cbi-button cbi-button-apply cbi-button-select',
-                        'click': ui.createHandlerFn(self, 'handleSelectAllAdvanced'),
-                        'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                    }, [_('Select All')]),
-                    E('button', {
-                        'class': 'cbi-button cbi-button-reset cbi-button-select',
-                        'click': ui.createHandlerFn(self, 'handleDeselectAllAdvanced'),
-                        'disabled': advancedMenus.length === 0 ? 'disabled' : null
-                    }, [_('Select None')]),
-                    E('span', { 'class': 'selected-count' }, ['0/' + advancedMenus.length])
+                        E('button', {
+                        'class': 'cbi-button cbi-button-save cbi-button-select',
+                        'click': ui.createHandlerFn(self, 'handleRecommendBasic'),
+                        'title': _('Select recommended basic menu items')
+                        }, [_('Commonly Used')]),
+                        E('button', {
+                            'class': 'cbi-button cbi-button-apply cbi-button-select',
+                            'click': ui.createHandlerFn(self, 'handleSelectAllAdvanced'),
+                            'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                        }, [_('Select All')]),
+                        E('button', {
+                            'class': 'cbi-button cbi-button-reset cbi-button-select',
+                            'click': ui.createHandlerFn(self, 'handleDeselectAllAdvanced'),
+                            'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                        }, [_('Select None')]),
+                        E('span', { 'class': 'selected-count' }, ['0/' + advancedMenus.length])
                 ])
             ])
         ]);
@@ -561,7 +557,12 @@ return view.extend({
         var selected = this.getSelectedItems('advanced-list-content');
         
         if (selected.length === 0) {
-            alert(_('No items selected'));
+            ui.addNotification({
+                title: _('Information'),
+                message: _('No items selected'),
+                type: 'info',
+                timeout: 3000
+            });
             return;
         }
         
@@ -617,7 +618,12 @@ return view.extend({
         
         this.updateCounts();
         
-        //alert(selected.length + ' ' + _('items moved to Basic mode'));
+        ui.addNotification({
+            title: _('Success'),
+            message: selected.length + ' ' + _('items moved to Custom Menu'),
+            type: 'info',
+            timeout: 3000
+        });
     },
 
     handleRemoveSelected: function() {
@@ -625,7 +631,12 @@ return view.extend({
         var selected = this.getSelectedItems('basic-list-content');
         
         if (selected.length === 0) {
-            //alert(_('No items selected'));
+            ui.addNotification({
+                title: _('Information'),
+                message: _('No items selected'),
+                type: 'info',
+                timeout: 3000
+            });
             return;
         }
         
@@ -681,7 +692,12 @@ return view.extend({
         
         this.updateCounts();
         
-        //alert(selected.length + ' ' + _('items removed from Basic mode'));
+        ui.addNotification({
+            title: _('Success'),
+            message: selected.length + ' ' + _('items removed from Custom Menu'),
+            type: 'info',
+            timeout: 3000
+        });
     },
 
     /**
@@ -746,6 +762,68 @@ return view.extend({
         
         this.updateButtonStates();
         this.updateSelectedCount();
+    },
+
+    /**
+     * 推荐基本菜单集
+     */
+    handleRecommendBasic: function() {
+        var recommendedPaths = [
+            'status/overview',
+            'status/realtime',
+            'netwizard',
+            'system/system',
+            'system/administration',
+            'system/ttyd',
+            'system/advancedplus',
+            'system/ota',
+            'system/kucat-config',
+            'services/AdGuardHome',
+            'control/eqosplus',
+            'control/timecontrol',
+            'control/watchdog',
+            'control/taskplan',
+            'network/firewall',
+            'network/netspeedtest',
+            'system/partexp'
+        ];
+        
+        this.selectRecommended(recommendedPaths);
+    },
+
+    /**
+     * 选择推荐的菜单项
+     */
+    selectRecommended: function(recommendedPaths) {
+        var advancedContainer = document.getElementById('advanced-list-content');
+        if (!advancedContainer) return;
+        
+        // 先取消所有选中
+        var allCheckboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        allCheckboxes.forEach(function(cb) {
+            cb.checked = false;
+        });
+        
+        // 选中推荐的菜单
+        allCheckboxes.forEach(function(cb) {
+            var path = cb.getAttribute('data-path');
+            if (recommendedPaths.includes(path)) {
+                cb.checked = true;
+            }
+        });
+        
+        // 更新按钮状态和选中计数
+        this.updateButtonStates();
+        this.updateSelectedCount();
+        
+        // 显示提示信息
+        var selectedCount = advancedContainer.querySelectorAll('.menu-checkbox:checked').length;
+        ui.addNotification({
+            title: _('Recommendation Applied'),
+            message: _('Selected ') + selectedCount + _(' recommended menu items'),
+            type: 'info',
+            timeout: 3000
+        });
     },
 
     sortByMainCategory: function(a, b) {
@@ -886,12 +964,24 @@ return view.extend({
             return fs.write('/etc/config/kucat', newContent.join('\n'));
             
         }).then(function() {
-            // alert(_('Configuration saved successfully'));
+            ui.addNotification({
+                title: _('Success'),
+                message: _('Configuration saved successfully'),
+                type: 'info',
+                timeout: 3000
+            });
             // 重新加载页面以显示更新后的列表
-            window.location.reload();
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
         }).catch(function(err) {
             // console.error('Save error:', err);
-            // alert(_('Failed to save configuration: ' + (err.message || 'Unknown error')));
+            ui.addNotification({
+                title: _('Error'),
+                message: _('Failed to save configuration: ' + (err.message || 'Unknown error')),
+                type: 'error',
+                timeout: 5000
+            });
         });
     },
 
