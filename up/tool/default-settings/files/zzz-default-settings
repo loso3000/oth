@@ -13,7 +13,7 @@ test -n "$ver" || {
 }
 
 uci -q set luci.main.lang='auto'
-[ -f '/www/luci-static/kucat/css/style.css' ] && uci -q set luci.main.mediaurlbase='/luci-static/kucat'
+[ -f '/www/luci-static/kucat/css/style.css' ] && uci -q set luci.main.mediaurlbase='/luci-static/kucat' && uci commit luci
 
 debug=0
 uci -q set fstab.@global[0].check_fs=1
@@ -128,7 +128,7 @@ done
 sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)\.[0-9]\{1,\}/|\1-SNAPSHOT/|g' "/etc/opkg/distfeeds.conf" 2>/dev/null
 sed -i 's|\(releases/[0-9]\{1,\}\.[0-9]\{1,\}\)/|\1-SNAPSHOT/|' "/etc/opkg/distfeeds.conf" 2>/dev/null
 sed -i.bak "s,https://downloads.immortalwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
-sed -i.bak "s,https://downloads.openwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
+sed -i.bak2 "s,https://downloads.openwrt.org,$opkg_mirror,g" "/etc/opkg/distfeeds.conf" 2>/dev/null
 CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf 2>/dev/null | cut -d/ -f2)
     if [ -n "$CURRENT_HASH" ]; then
         kernelver=$(echo "$CURRENT_HASH" | sed 's/-.*//' | cut -d. -f1-2)
@@ -141,29 +141,7 @@ CURRENT_HASH=$(grep -o 'kmods/[^/]*' /etc/opkg/distfeeds.conf 2>/dev/null | cut 
 
 test $ver -lt 3 && {
     ver=3
-    
-    HOSTNAME="samsungTV"
-    TAG="googleDNS"
-    MAC=""
-    IPADDR=""
-    DNS1="8.8.4.4"
-    DNS2="8.8.8.8"
-    
-    uci -q batch <<EOF
-        set dhcp.${HOSTNAME}="host"
-        set dhcp.${HOSTNAME}.name="${HOSTNAME}"
-        set dhcp.${HOSTNAME}.mac="${MAC}"
-        set dhcp.${HOSTNAME}.ip="${IPADDR}"
-        set dhcp.${HOSTNAME}.tag="${TAG}"
-        set dhcp.${TAG}="tag"
-        set dhcp.${TAG}.dhcp_option="6,${DNS1},${DNS2}"
-EOF
-    
-    uci -q add dhcp domain
-    uci -q set "dhcp.@domain[-1].name=time.android.com"
-    uci -q set "dhcp.@domain[-1].ip=203.107.6.88"
-    uci -q commit dhcp
-    
+   
     [ "$debug" = "1" ] && echo "Version updated to: $ver"
 }
 
@@ -243,45 +221,37 @@ EOF
     
     [ "$debug" = "1" ] && echo "Version updated to: $ver"
 }
-
-
 test $ver -lt 6 && {
     ver=6
-# docker
-if [ -f /etc/config/dockerd ]; then
-DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
-if [ -n "$DOCKERINDEX" ]; then 
-   uci -q del firewall.@zone[$DOCKERINDEX]
-fi
-uci -q batch <<EOF
-# del firewall.docker_to_wan
-# del firewall.lan_to_docker
-# del firewall.docker_to_lan
-add firewall zone # =cfg17dc81
-set firewall.@zone[-1].name='docker'
-set firewall.@zone[-1].input='ACCEPT'
-set firewall.@zone[-1].output='ACCEPT'
-set firewall.@zone[-1].forward='ACCEPT'
-add_list firewall.@zone[-1].subnet='172.16.0.0/12'
-set firewall.docker.name='docker'
-set firewall.docker.input='ACCEPT'
-set firewall.docker.output='ACCEPT'
-set firewall.docker.forward='ACCEPT'
-set firewall.docker.subnet='172.16.0.0/12'
-set firewall.docker_to_wan=forwarding
-set firewall.docker_to_wan.src='docker'
-set firewall.docker_to_wan.dest='wan'
-set firewall.docker_to_lan=forwarding
-set firewall.docker_to_lan.src='docker'
-set firewall.docker_to_lan.dest='lan'
-set firewall.lan_to_docker=forwarding
-set firewall.lan_to_docker.src='lan'
-set firewall.lan_to_docker.dest='docker'
-commit firewall
+    # docker
+    if [ -f /etc/config/dockerd ]; then
+        DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
+        if [ -n "$DOCKERINDEX" ]; then 
+            uci -q del firewall.@zone[$DOCKERINDEX]
+        fi
+        uci -q del firewall.docker_to_wan
+        uci -q del firewall.lan_to_docker
+        uci -q del firewall.docker_to_lan
+        uci -q batch <<EOF
+            add firewall zone
+            set firewall.@zone[-1].name='docker'
+            set firewall.@zone[-1].input='ACCEPT'
+            set firewall.@zone[-1].output='ACCEPT'
+            set firewall.@zone[-1].forward='ACCEPT'
+            add_list firewall.@zone[-1].subnet='172.16.0.0/12'
+            set firewall.docker_to_wan=forwarding
+            set firewall.docker_to_wan.src='docker'
+            set firewall.docker_to_wan.dest='wan'
+            set firewall.docker_to_lan=forwarding
+            set firewall.docker_to_lan.src='docker'
+            set firewall.docker_to_lan.dest='lan'
+            set firewall.lan_to_docker=forwarding
+            set firewall.lan_to_docker.src='lan'
+            set firewall.lan_to_docker.dest='docker'
+            commit firewall
 EOF
-fi
-    
-[ "$debug" = "1" ] && echo "Version updated to: $ver"
+    fi
+    [ "$debug" = "1" ] && echo "Version updated to: $ver"
 }
 
 for service in miniupnpd turboacc ttyd mwan3 watchdog; do
