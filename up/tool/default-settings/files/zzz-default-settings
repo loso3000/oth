@@ -249,6 +249,10 @@ test $ver -lt 6 && {
     ver=6
 # docker
 if [ -f /etc/config/dockerd ]; then
+DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
+if [ -n "$DOCKERINDEX" ]; then 
+   uci -q del firewall.@zone[$DOCKERINDEX]
+fi
 uci -q batch <<EOF
 del firewall.docker_to_wan
 add firewall zone # =cfg17dc81
