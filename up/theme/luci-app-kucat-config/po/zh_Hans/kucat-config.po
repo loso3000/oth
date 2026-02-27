@@ -199,6 +199,9 @@ msgstr "全部菜单"
 msgid "items"
 msgstr "条"
 
+msgid "Switch to Full Menus"
+msgstr "切换全部菜单"
+
 msgid "Switch to Custom Menus"
 msgstr "切换自定义菜单"
 
@@ -233,7 +236,6 @@ msgid ""
 "You can upload files in formats such as gif/jpg/png/webp to create your favorite wallpapers"
 msgstr ""
 "你可以上传gif/jpg/png/webp等格式文件，以创建自己喜欢壁纸。"
-
 
 msgid "Background file list"
 msgstr "背景文件列表"

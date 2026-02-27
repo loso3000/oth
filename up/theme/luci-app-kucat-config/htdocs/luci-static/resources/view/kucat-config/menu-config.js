@@ -265,13 +265,13 @@ return view.extend({
         
         // 分离basic和非basic菜单
         var basicMenus = [];
-        var advancedMenus = [];
+        var allmenuMenus = [];
         
         allMenus.forEach(function(menu) {
             if (basicSet.has(menu.path)) {
                 basicMenus.push(menu);
             } else {
-                advancedMenus.push(menu);
+                allmenuMenus.push(menu);
             }
         });
         
@@ -284,7 +284,7 @@ return view.extend({
                 ]),
                 
                 E('div', { 'class': 'cbi-section-node' }, [
-                    this.renderDualList(basicMenus, advancedMenus)
+                    this.renderDualList(basicMenus, allmenuMenus)
                 ])
             ])
         ]);
@@ -384,7 +384,7 @@ return view.extend({
             '}' +
             '#kucat-menu-config .button-group {' +
             '    display: flex;' +
-            '    justify-content: flex-start;' +
+            '    justify-content: center;' +
             '    align-items: center;' +
             '    gap: 10px;' +
             '}' +
@@ -422,20 +422,20 @@ return view.extend({
             '}';
     },
 
-    renderDualList: function(basicMenus, advancedMenus) {
+    renderDualList: function(basicMenus, allmenuMenus) {
         var self = this;
         
         var basicListContent = E('div', { 'class': 'list-content', 'id': 'basic-list-content' });
-        var advancedListContent = E('div', { 'class': 'list-content', 'id': 'advanced-list-content' });
+        var allmenuListContent = E('div', { 'class': 'list-content', 'id': 'allmenu-list-content' });
         
         // 渲染basic菜单列表
         basicMenus.forEach(function(menu, index) {
             basicListContent.appendChild(self.renderMenuItem(menu, 'basic', index));
         });
         
-        // 渲染advanced菜单列表
-        advancedMenus.forEach(function(menu, index) {
-            advancedListContent.appendChild(self.renderMenuItem(menu, 'advanced', index));
+        // 渲染allmenu菜单列表
+        allmenuMenus.forEach(function(menu, index) {
+            allmenuListContent.appendChild(self.renderMenuItem(menu, 'allmenu', index));
         });
         
         return E('div', { 'class': 'dual-list-container' }, [
@@ -468,7 +468,7 @@ return view.extend({
                 E('button', {
                     'class': 'cbi-button cbi-button-add',
                     'click': ui.createHandlerFn(self, 'handleAddSelected'),
-                    'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                    'disabled': allmenuMenus.length === 0 ? 'disabled' : null
                 }, ['← ' + _('Add')]),
                 E('button', {
                     'class': 'cbi-button cbi-button-remove',
@@ -478,13 +478,13 @@ return view.extend({
                 }, [_('Remove') + ' →'])
             ]),
             
-            // 右侧 Advanced 菜单列表
-            E('div', { 'class': 'list-box advanced-list' }, [
+            // 右侧 allmenu 菜单列表
+            E('div', { 'class': 'list-box allmenu-list' }, [
                 E('div', { 'class': 'list-header' }, [
                     E('h3', {}, [_('Full Menus')]),
-                    E('span', { 'class': 'list-count' }, [advancedMenus.length + ' ' + _('items')])
+                    E('span', { 'class': 'list-count' }, [allmenuMenus.length + ' ' + _('items')])
                 ]),
-                advancedListContent,
+                allmenuListContent,
                 E('div', { 'class': 'list-footer' }, [
                         E('button', {
                         'class': 'cbi-button cbi-button-save cbi-button-select',
@@ -493,15 +493,15 @@ return view.extend({
                         }, [_('Commonly Used')]),
                         E('button', {
                             'class': 'cbi-button cbi-button-apply cbi-button-select',
-                            'click': ui.createHandlerFn(self, 'handleSelectAllAdvanced'),
-                            'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                            'click': ui.createHandlerFn(self, 'handleSelectAllallmenu'),
+                            'disabled': allmenuMenus.length === 0 ? 'disabled' : null
                         }, [_('Select All')]),
                         E('button', {
                             'class': 'cbi-button cbi-button-reset cbi-button-select',
-                            'click': ui.createHandlerFn(self, 'handleDeselectAllAdvanced'),
-                            'disabled': advancedMenus.length === 0 ? 'disabled' : null
+                            'click': ui.createHandlerFn(self, 'handleDeselectAllallmenu'),
+                            'disabled': allmenuMenus.length === 0 ? 'disabled' : null
                         }, [_('Select None')]),
-                        E('span', { 'class': 'selected-count' }, ['0/' + advancedMenus.length])
+                        E('span', { 'class': 'selected-count' }, ['0/' + allmenuMenus.length])
                 ])
             ])
         ]);
@@ -554,7 +554,7 @@ return view.extend({
 
     handleAddSelected: function() {
         var self = this;
-        var selected = this.getSelectedItems('advanced-list-content');
+        var selected = this.getSelectedItems('allmenu-list-content');
         
         if (selected.length === 0) {
             ui.addNotification({
@@ -567,13 +567,13 @@ return view.extend({
         }
         
         var basicContainer = document.getElementById('basic-list-content');
-        var advancedContainer = document.getElementById('advanced-list-content');
+        var allmenuContainer = document.getElementById('allmenu-list-content');
         
-        if (!basicContainer || !advancedContainer) return;
+        if (!basicContainer || !allmenuContainer) return;
         
         // 获取当前所有菜单
         var basicItems = [];
-        var advancedItems = [];
+        var allmenuItems = [];
         
         basicContainer.querySelectorAll('.menu-checkbox').forEach(function(cb) {
             basicItems.push({
@@ -582,13 +582,13 @@ return view.extend({
             });
         });
         
-        advancedContainer.querySelectorAll('.menu-checkbox').forEach(function(cb) {
+        allmenuContainer.querySelectorAll('.menu-checkbox').forEach(function(cb) {
             var path = cb.getAttribute('data-path');
             var isSelected = selected.some(function(item) {
                 return item.path === path;
             });
             if (!isSelected) {
-                advancedItems.push({
+                allmenuItems.push({
                     path: path,
                     title: cb.getAttribute('data-title')
                 });
@@ -602,18 +602,18 @@ return view.extend({
         
         // 按主分类排序
         basicItems.sort(self.sortByMainCategory.bind(self));
-        advancedItems.sort(self.sortByMainCategory.bind(self));
+        allmenuItems.sort(self.sortByMainCategory.bind(self));
         
         // 重新渲染
         basicContainer.innerHTML = '';
-        advancedContainer.innerHTML = '';
+        allmenuContainer.innerHTML = '';
         
         basicItems.forEach(function(menu, index) {
             basicContainer.appendChild(self.renderMenuItem(menu, 'basic', index));
         });
         
-        advancedItems.forEach(function(menu, index) {
-            advancedContainer.appendChild(self.renderMenuItem(menu, 'advanced', index));
+        allmenuItems.forEach(function(menu, index) {
+            allmenuContainer.appendChild(self.renderMenuItem(menu, 'allmenu', index));
         });
         
         this.updateCounts();
@@ -641,16 +641,16 @@ return view.extend({
         }
         
         var basicContainer = document.getElementById('basic-list-content');
-        var advancedContainer = document.getElementById('advanced-list-content');
+        var allmenuContainer = document.getElementById('allmenu-list-content');
         
-        if (!basicContainer || !advancedContainer) return;
+        if (!basicContainer || !allmenuContainer) return;
         
         // 获取当前所有菜单
         var basicItems = [];
-        var advancedItems = [];
+        var allmenuItems = [];
         
-        advancedContainer.querySelectorAll('.menu-checkbox').forEach(function(cb) {
-            advancedItems.push({
+        allmenuContainer.querySelectorAll('.menu-checkbox').forEach(function(cb) {
+            allmenuItems.push({
                 path: cb.getAttribute('data-path'),
                 title: cb.getAttribute('data-title')
             });
@@ -669,25 +669,25 @@ return view.extend({
             }
         });
         
-        // 添加选中的到advanced
+        // 添加选中的到allmenu
         selected.forEach(function(item) {
-            advancedItems.push(item);
+            allmenuItems.push(item);
         });
         
         // 按主分类排序
         basicItems.sort(self.sortByMainCategory.bind(self));
-        advancedItems.sort(self.sortByMainCategory.bind(self));
+        allmenuItems.sort(self.sortByMainCategory.bind(self));
         
         // 重新渲染
         basicContainer.innerHTML = '';
-        advancedContainer.innerHTML = '';
+        allmenuContainer.innerHTML = '';
         
         basicItems.forEach(function(menu, index) {
             basicContainer.appendChild(self.renderMenuItem(menu, 'basic', index));
         });
         
-        advancedItems.forEach(function(menu, index) {
-            advancedContainer.appendChild(self.renderMenuItem(menu, 'advanced', index));
+        allmenuItems.forEach(function(menu, index) {
+            allmenuContainer.appendChild(self.renderMenuItem(menu, 'allmenu', index));
         });
         
         this.updateCounts();
@@ -733,13 +733,13 @@ return view.extend({
     },
 
     /**
-     * 全选Advanced列表
+     * 全选allmenu列表
      */
-    handleSelectAllAdvanced: function() {
-        var advancedContainer = document.getElementById('advanced-list-content');
-        if (!advancedContainer) return;
+    handleSelectAllallmenu: function() {
+        var allmenuContainer = document.getElementById('allmenu-list-content');
+        if (!allmenuContainer) return;
         
-        var checkboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        var checkboxes = allmenuContainer.querySelectorAll('.menu-checkbox');
         checkboxes.forEach(function(cb) {
             cb.checked = true;
         });
@@ -749,13 +749,13 @@ return view.extend({
     },
 
     /**
-     * 取消全选Advanced列表
+     * 取消全选allmenu列表
      */
-    handleDeselectAllAdvanced: function() {
-        var advancedContainer = document.getElementById('advanced-list-content');
-        if (!advancedContainer) return;
+    handleDeselectAllallmenu: function() {
+        var allmenuContainer = document.getElementById('allmenu-list-content');
+        if (!allmenuContainer) return;
         
-        var checkboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        var checkboxes = allmenuContainer.querySelectorAll('.menu-checkbox');
         checkboxes.forEach(function(cb) {
             cb.checked = false;
         });
@@ -795,11 +795,11 @@ return view.extend({
      * 选择推荐的菜单项
      */
     selectRecommended: function(recommendedPaths) {
-        var advancedContainer = document.getElementById('advanced-list-content');
-        if (!advancedContainer) return;
+        var allmenuContainer = document.getElementById('allmenu-list-content');
+        if (!allmenuContainer) return;
         
         // 先取消所有选中
-        var allCheckboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        var allCheckboxes = allmenuContainer.querySelectorAll('.menu-checkbox');
         allCheckboxes.forEach(function(cb) {
             cb.checked = false;
         });
@@ -817,7 +817,7 @@ return view.extend({
         this.updateSelectedCount();
         
         // 显示提示信息
-        var selectedCount = advancedContainer.querySelectorAll('.menu-checkbox:checked').length;
+        var selectedCount = allmenuContainer.querySelectorAll('.menu-checkbox:checked').length;
         ui.addNotification({
             title: _('Recommendation Applied'),
             message: _('Selected ') + selectedCount + _(' recommended menu items'),
@@ -838,7 +838,7 @@ return view.extend({
 
     updateCounts: function() {
         var basicContainer = document.getElementById('basic-list-content');
-        var advancedContainer = document.getElementById('advanced-list-content');
+        var allmenuContainer = document.getElementById('allmenu-list-content');
         
         if (basicContainer) {
             var basicCount = basicContainer.querySelectorAll('.menu-checkbox').length;
@@ -848,11 +848,11 @@ return view.extend({
             }
         }
         
-        if (advancedContainer) {
-            var advancedCount = advancedContainer.querySelectorAll('.menu-checkbox').length;
-            var advancedHeader = document.querySelector('.advanced-list .list-count');
-            if (advancedHeader) {
-                advancedHeader.textContent = advancedCount + ' ' + _('items');
+        if (allmenuContainer) {
+            var allmenuCount = allmenuContainer.querySelectorAll('.menu-checkbox').length;
+            var allmenuHeader = document.querySelector('.allmenu-list .list-count');
+            if (allmenuHeader) {
+                allmenuHeader.textContent = allmenuCount + ' ' + _('items');
             }
         }
         
@@ -865,7 +865,7 @@ return view.extend({
      */
     updateSelectedCount: function() {
         var basicContainer = document.getElementById('basic-list-content');
-        var advancedContainer = document.getElementById('advanced-list-content');
+        var allmenuContainer = document.getElementById('allmenu-list-content');
         
         if (basicContainer) {
             var basicSelected = basicContainer.querySelectorAll('.menu-checkbox:checked').length;
@@ -877,13 +877,13 @@ return view.extend({
             }
         }
         
-        if (advancedContainer) {
-            var advancedSelected = advancedContainer.querySelectorAll('.menu-checkbox:checked').length;
-            var advancedTotal = advancedContainer.querySelectorAll('.menu-checkbox').length;
-            var advancedCountEl = document.querySelector('.advanced-list .selected-count');
+        if (allmenuContainer) {
+            var allmenuSelected = allmenuContainer.querySelectorAll('.menu-checkbox:checked').length;
+            var allmenuTotal = allmenuContainer.querySelectorAll('.menu-checkbox').length;
+            var allmenuCountEl = document.querySelector('.allmenu-list .selected-count');
             
-            if (advancedCountEl) {
-                advancedCountEl.textContent = advancedSelected + '/' + advancedTotal;
+            if (allmenuCountEl) {
+                allmenuCountEl.textContent = allmenuSelected + '/' + allmenuTotal;
             }
         }
     },
@@ -996,17 +996,17 @@ return view.extend({
 
     updateButtonStates: function() {
         var basicContainer = document.getElementById('basic-list-content');
-        var advancedContainer = document.getElementById('advanced-list-content');
+        var allmenuContainer = document.getElementById('allmenu-list-content');
         
-        if (!basicContainer || !advancedContainer) return;
+        if (!basicContainer || !allmenuContainer) return;
         
         var basicCheckboxes = basicContainer.querySelectorAll('.menu-checkbox');
-        var advancedCheckboxes = advancedContainer.querySelectorAll('.menu-checkbox');
+        var allmenuCheckboxes = allmenuContainer.querySelectorAll('.menu-checkbox');
         
         var hasBasicSelected = Array.from(basicCheckboxes).some(function(cb) {
             return cb.checked;
         });
-        var hasAdvancedSelected = Array.from(advancedCheckboxes).some(function(cb) {
+        var hasallmenuSelected = Array.from(allmenuCheckboxes).some(function(cb) {
             return cb.checked;
         });
         
@@ -1017,7 +1017,7 @@ return view.extend({
         
         var addButtons = document.querySelectorAll('#kucat-menu-config .cbi-button-add');
         addButtons.forEach(function(btn) {
-            btn.disabled = !hasAdvancedSelected;
+            btn.disabled = !hasallmenuSelected;
         });
         
         // 更新选中计数

@@ -1,6 +1,6 @@
 /*
  *  luci-theme-kucat
- *  Copyright (C) 2019-2026 The Sirpdboy <herboy2008@gmail.com> 
+ *  Copyright (C) 2022-2026 The Sirpdboy <herboy2008@gmail.com> 
  *
  *  Licensed to the public under the Apache License 2.0
  */
@@ -198,7 +198,7 @@ return baseclass.extend({
     loadSavedCategory: function() {
         try {
             const savedCategory = localStorage.getItem('luci-menu-category');
-            if (savedCategory === 'basic' || savedCategory === 'advanced') {
+            if (savedCategory === 'basic' || savedCategory === 'allmenu') {
                 this.currentCategory = savedCategory;
             }
         } catch (e) {
@@ -334,7 +334,7 @@ return baseclass.extend({
                 'title': this.currentCategory === 'basic' ? _('Switch to Full Menus') : _('Switch to Custom Menus')
             }, [
                 E('span', { 
-                    'class': 'switch-icon ' + (this.currentCategory === 'basic' ? 'icon-advanced' : 'icon-basic')
+                    'class': 'switch-icon ' + (this.currentCategory === 'basic' ? 'icon-allmenu' : 'icon-basic')
                 })
             ]);
 
@@ -360,7 +360,7 @@ return baseclass.extend({
      */
     toggleCategory: function() {
         try {
-            const newCategory = this.currentCategory === 'basic' ? 'advanced' : 'basic';
+            const newCategory = this.currentCategory === 'basic' ? 'allmenu' : 'basic';
             this.switchCategory(newCategory);
             
             const switchBtn = document.querySelector('.category-switch');
@@ -369,7 +369,7 @@ return baseclass.extend({
                 const textSpan = switchBtn.querySelector('.switch-text');
                 
                 if (iconSpan) {
-                    iconSpan.className = 'switch-icon ' + (newCategory === 'basic' ? 'icon-advanced' : 'icon-basic');
+                    iconSpan.className = 'switch-icon ' + (newCategory === 'basic' ? 'icon-allmenu' : 'icon-basic');
                 }
                 
                 switchBtn.title = newCategory === 'basic' ? _('Switch to Full Menus') : _('Switch to Custom Menus');
@@ -380,7 +380,7 @@ return baseclass.extend({
     },
 
     /**
-     * Switch between Basic and Advanced categories
+     * Switch between Basic and allmenu categories
      */
     switchCategory: function(category) {
         if (category === this.currentCategory) return;
@@ -460,7 +460,7 @@ return baseclass.extend({
                 this.ensureParentMenusVisible();
                 
             } else {
-                // Advanced模式：显示所有菜单
+                // allmenu模式：显示所有菜单
                 allMenuItems.forEach(item => {
                     item.style.display = 'block';
                 });
