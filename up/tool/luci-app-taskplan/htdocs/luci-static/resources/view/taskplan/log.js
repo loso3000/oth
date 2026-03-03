@@ -69,8 +69,7 @@ return view.extend({
             E('div', { 'class': 'cbi-map' }, [
                 // 标题
                 E('h2', {}, _('Task Plan Log Viewer')),
-                
-                // 日志控制按钮
+
                 E('div', { 'class': 'cbi-section', 'style': 'margin-bottom:10px;' }, [
                     E('div', { 'class': 'cbi-section-actions' }, [
                         E('button', {
@@ -81,12 +80,7 @@ return view.extend({
                         E('button', {
                             'class': 'btn cbi-button cbi-button-edit',
                             'click': ui.createHandlerFn(this, 'handleReverseLog')
-                        }, [ _('Reverse Order') ]),
-                        ' ',
-                        E('button', {
-                            'class': 'btn cbi-button cbi-button-download',
-                            'click': ui.createHandlerFn(this, 'handleDownloadLog')
-                        }, [ _('Download Log') ])
+                        }, [ _('Reverse Order') ])
                     ])
                 ]),
                 
@@ -95,7 +89,7 @@ return view.extend({
                     E('textarea', {
                         'id': 'log_content',
                         'class': 'cbi-input-textarea',
-                        'style': 'width:100%; height:500px; font-family:monospace; font-size:12px; background:#2d2d2d; color:#f8f8f8; padding:10px; border:1px solid #444; border-radius:4px;',
+                        'style': 'width:100%; height:500px; font-family:monospace; font-size:12px; padding:10px; border-radius:4px;',
                         'readonly': 'readonly',
                         'wrap': 'off'
                     }, logContent || '')
@@ -107,7 +101,6 @@ return view.extend({
     handle: function(ev) {
         var self = this;
         
-        // 设置定时刷新（每2秒）
         poll.add(function() {
             return fs.read('/etc/taskplan/taskplan.log').then(function(content) {
                 var logArea = document.getElementById('log_content');
@@ -120,7 +113,7 @@ return view.extend({
                     }
                 }
             });
-        }, 2);
+        }, 5);
         
         return this.render.apply(this, arguments);
     }

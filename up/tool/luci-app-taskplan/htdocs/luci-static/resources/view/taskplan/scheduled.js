@@ -26,15 +26,15 @@ return view.extend({
         s.anonymous = true;
 
         var e = s.option(form.TextValue, 'customscript', _('Edit Custom Script'));
-        e.description = _('Shell commands for Customscript task type');
+        e.description = _('Shell commands for [Customscript] task type');
         e.rows = 5;
-        e.default = '#!/bin/sh\n# Add your commands here';
+        e.default = '#!/bin/bash\n# Add your commands here';
         e.optional = false;
 
         e = s.option(form.TextValue, 'customscript2', _('Edit Custom Script2'));
-        e.description = _('Shell commands for Customscript2 task type');
+        e.description = _('Shell commands for [Customscript2] task type');
         e.rows = 5;
-        e.default = '#!/bin/sh\n# Add your commands here';
+        e.default = '#!/bin/bash\n# Add your commands here';
         e.optional = false;
 
         var ss = m.section(form.TypedSection, 'stime', '');
@@ -52,7 +52,6 @@ return view.extend({
         enable.default = 1;
 
         var stype = ss.option(form.ListValue, 'stype', _('Scheduled Type'));
-        stype.description = _('Action to perform when triggered');
         stype.value(1, _('Scheduled Reboot'));
         stype.value(2, _('Scheduled Poweroff'));
         stype.value(3, _('Scheduled ReNetwork'));
@@ -71,13 +70,11 @@ return view.extend({
         stype.default = 1;
 
         var month = ss.option(form.Value, 'month', _('Month(0~11)'));
-        month.description = _('Month: 0-11 or *');
         month.rmempty = false;
         month.default = '*';
         month.datatype = 'string';
 
         var week = ss.option(form.Value, 'week', _('Week Day(0~6)'));
-        week.description = _('Week day: 0-6 or *');
         week.rmempty = true;
         week.value('*', _('Everyday'));
         week.value('0', _('Sunday'));
@@ -91,13 +88,13 @@ return view.extend({
         week.datatype = 'string';
 
         var hour = ss.option(form.Value, 'hour', _('Hour(0~23)'));
-        hour.description = _('Hour: 0-23 or *');
+        hour.description = _('1-8 is the continuous time from 1-8 clock; 11,12,16 clock are discontinuous; */3 represents every 3 hours; * every hour.');
         hour.rmempty = false;
         hour.default = 0;
         hour.datatype = 'string';
 
         var minute = ss.option(form.Value, 'minute', _('Minute(0~59)'));
-        minute.description = _('Minute: 0-59 or *');
+        minute.description = _('1-30 is continuous 1-30 minutes; 7,8,9 minutes discontinuous ; */5 means every 5 minutes ; * every minutes.');
         minute.rmempty = false;
         minute.default = 0;
         minute.datatype = 'string';

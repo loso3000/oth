@@ -1,19 +1,8 @@
-# Translation file for partexp.js
-# Copyright (C) 2022-2025 Sirpdboy <herboy2008@gmail.com>
+# Translation file for taskplan.js
+# Copyright (C) 2022-2026 Sirpdboy <herboy2008@gmail.com>
 # Licensed to the public under the Apache License 2.0
 #
-msgid ""
-msgstr ""
-"Project-Id-Version: partexp\n"
-"Report-Msgid-Bugs-To: \n"
-"Last-Translator: \n"
-"Language-Team: Chinese (Simplified)\n"
-"Language: zh_Hans\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Generated from partexp.js\n"
+
 
 msgid ""
 msgstr ""
@@ -30,10 +19,10 @@ msgstr "任务设置"
 
 # scheduled.js - 页面标题和说明
 
-msgid "Scheduled task"
+msgid "Scheduled Tasks"
 msgstr "定时执行任务"
 
-msgid "Startup task"
+msgid "Startup tasks"
 msgstr "开机启动任务"
 
 msgid "<b>The original [Timing Settings] includes scheduled task execution and startup task execution. Presets include over 10 functions, including restart, shutdown, network restart, memory release, system cleaning, network sharing, network shutdown, automatic detection of network disconnects and reconnection, MWAN3 load balancing detection of reconnection, and custom scripts</b></br>"
@@ -46,14 +35,14 @@ msgstr "N1-N5为连续，N1、N3、N5为不连续，*/N表示每N小时或每N�
 msgid "Edit Custom Script"
 msgstr "编辑自定义脚本"
 
-msgid "Shell commands for Customscript task type"
-msgstr "自定义脚本任务类型的Shell命令"
+msgid "Shell commands for [Customscript] task type"
+msgstr "【自定义脚本】任务类型的Shell命令"
 
 msgid "Edit Custom Script2"
 msgstr "编辑自定义脚本2"
 
-msgid "Shell commands for Customscript2 task type"
-msgstr "自定义脚本2任务类型的Shell命令"
+msgid "Shell commands for [Customscript2] task type"
+msgstr "【自定义脚本2】任务类型的Shell命令"
 
 # scheduled.js - 任务列表
 msgid "Remarks"
@@ -68,8 +57,6 @@ msgstr "启用"
 msgid "Scheduled Type"
 msgstr "定时类型"
 
-msgid "Action to perform when triggered"
-msgstr "触发时要执行的操作"
 
 # scheduled.js - 任务类型值
 msgid "Scheduled Reboot"
@@ -107,28 +94,22 @@ msgstr "定时重启MWAN3"
 
 msgid "Scheduled Wifiup"
 msgstr "定时开启WiFi"
-
+ 
 msgid "Scheduled Wifidown"
 msgstr "定时关闭WiFi"
 
 msgid "Scheduled Customscript"
-msgstr "定时自定义脚本"
+msgstr "定时 自定义脚本"
 
 msgid "Scheduled Customscript2"
-msgstr "定时自定义脚本2"
+msgstr "定时 自定义脚本2"
 
 # scheduled.js - 时间设置
 msgid "Month(0~11)"
 msgstr "月份(0~11)"
 
-msgid "Month: 0-11 or *"
-msgstr "月份：0-11或*"
-
 msgid "Week Day(0~6)"
 msgstr "星期(0~6)"
-
-msgid "Week day: 0-6 or *"
-msgstr "星期：0-6或*"
 
 msgid "Everyday"
 msgstr "每天"
@@ -157,14 +138,14 @@ msgstr "星期六"
 msgid "Hour(0~23)"
 msgstr "小时(0~23)"
 
-msgid "Hour: 0-23 or *"
-msgstr "小时：0-23或*"
+msgid "1-8 is the continuous time from 1-8 clock; 11,12,16 clock are discontinuous; */3 represents every 3 hours; * every hour."
+msgstr "1-8是从1点到8点的连续时间；11、12、16点钟不连续；*/3表示每3小时一次；*每小时。"
 
 msgid "Minute(0~59)"
 msgstr "分钟(0~59)"
 
-msgid "Minute: 0-59 or *"
-msgstr "分钟：0-59或*"
+msgid "1-30 is continuous 1-30 minutes; 7,8,9 minutes discontinuous ; */5 means every 5 minutes ; * every minutes."
+msgstr "1-30是连续的1-30分钟；7,8,9分钟不连续；*/5表示每5分钟一次；*每分钟。"
 
 msgid "Tasks updated"
 msgstr "任务已更新"
