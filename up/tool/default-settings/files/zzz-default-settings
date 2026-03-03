@@ -159,14 +159,14 @@ test $ver -lt 5 && {
 	    sed -i 's/invalid users = root/# invalid users = root/g' /etc/samba/smb.conf.template
         fi
     done
-
     uci -q batch <<EOF
         set luci.apply.rollback=30
         set luci.apply.holdoff=2
+        set dropbear.main.DirectInterface='lan'
+        set dropbear.main._direct='1'
         commit luci
         commit dropbear
 EOF
-
     if [ -f /etc/config/nginx ]; then
         uci -q batch <<EOF
             set nginx.global.uci_enable='true'
@@ -208,17 +208,6 @@ EOF
         /etc/init.d/network restart 2>/dev/null
         /etc/init.d/dnsmasq restart 2>/dev/null
     fi
-
-    if [ -f /etc/config/snmpd ]; then
-        uci -q batch <<EOF
-            set snmpd.default_settings=snmpd
-            set snmpd.default_settings.agentaddress='udp:127.0.0.1,udp6:[::1]:161'
-            set snmpd.default_settings.community='public'
-            set snmpd.default_settings.version='v2c'
-            commit snmpd
-EOF
-    fi
-    
     [ "$debug" = "1" ] && echo "Version updated to: $ver"
 }
 test $ver -lt 6 && {
