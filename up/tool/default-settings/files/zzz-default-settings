@@ -217,13 +217,13 @@ test $ver -lt 6 && {
 	     DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
              [ -n "$DOCKERINDEX" ] || {
 	        DOCKERINDEX=-1
-	        $UCIADD firewall zone
+	        uci -q add firewall zone
 	     }
         uci -q batch <<EOF
-            setfirewall.@zone[$DOCKERINDEX].name='docker'
-            setfirewall.@zone[$DOCKERINDEX].input='ACCEPT'
-            setfirewall.@zone[$DOCKERINDEX].output='ACCEPT'
-            setfirewall.@zone[$DOCKERINDEX].forward='ACCEPT'
+            set firewall.@zone[$DOCKERINDEX].name='docker'
+            set firewall.@zone[$DOCKERINDEX].input='ACCEPT'
+            set firewall.@zone[$DOCKERINDEX].output='ACCEPT'
+            set firewall.@zone[$DOCKERINDEX].forward='ACCEPT'
             add_list firewall.@zone[$DOCKERINDEX].subnet='172.16.0.0/12'
             set firewall.docker_to_wan=forwarding
             set firewall.docker_to_wan.src='docker'
