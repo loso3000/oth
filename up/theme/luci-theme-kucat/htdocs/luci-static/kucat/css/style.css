@@ -2985,6 +2985,7 @@ body.lang_pl.node-main-login .cbi-value-title {
     -webkit-backdrop-filter: blur(6px) !important;
     backdrop-filter: blur(6px) !important;
     box-shadow: var(--boxshadow);
+    box-shadow: 0 0.3rem 0.5rem var(--input-boxcolor);
     background-color: rgba(var(--primary-rgbbody), 0.5) !important;
     border-radius: var(--radius1);
     border: none;
