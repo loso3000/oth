@@ -162,7 +162,7 @@ test $ver -lt 5 && {
     uci -q batch <<EOF
         set luci.apply.rollback=30
         set luci.apply.holdoff=2
-        set dropbear.main.DirectInterface='lan'
+        uci del dropbear.main.DirectInterface
         set dropbear.main._direct='1'
         commit luci
         commit dropbear
