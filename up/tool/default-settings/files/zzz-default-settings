@@ -214,20 +214,17 @@ test $ver -lt 6 && {
     ver=6
     # docker
     if [ -f /etc/config/dockerd ]; then
-        DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
-        if [ -n "$DOCKERINDEX" ]; then 
-            uci -q del firewall.@zone[$DOCKERINDEX]
-        fi
-        uci -q del firewall.docker_to_wan
-        uci -q del firewall.lan_to_docker
-        uci -q del firewall.docker_to_lan
+	     DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
+             [ -n "$DOCKERINDEX" ] || {
+	        DOCKERINDEX=-1
+	        $UCIADD firewall zone
+	     }
         uci -q batch <<EOF
-            add firewall zone
-            set firewall.@zone[-1].name='docker'
-            set firewall.@zone[-1].input='ACCEPT'
-            set firewall.@zone[-1].output='ACCEPT'
-            set firewall.@zone[-1].forward='ACCEPT'
-            add_list firewall.@zone[-1].subnet='172.16.0.0/12'
+            setfirewall.@zone[$DOCKERINDEX].name='docker'
+            setfirewall.@zone[$DOCKERINDEX].input='ACCEPT'
+            setfirewall.@zone[$DOCKERINDEX].output='ACCEPT'
+            setfirewall.@zone[$DOCKERINDEX].forward='ACCEPT'
+            add_list firewall.@zone[$DOCKERINDEX].subnet='172.16.0.0/12'
             set firewall.docker_to_wan=forwarding
             set firewall.docker_to_wan.src='docker'
             set firewall.docker_to_wan.dest='wan'
