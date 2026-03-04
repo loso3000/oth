@@ -215,11 +215,9 @@ test $ver -lt 6 && {
     # docker
     if [ -f /etc/config/dockerd ]; then
 	     DOCKERINDEX=$(uci show firewall | grep -E "@zone\[[0-9]+\].name='docker'" | sed -n 's/.*@zone\[\([0-9]*\)\].name.*/\1/p')
-             [ -n "$DOCKERINDEX" ] || {
-	        DOCKERINDEX=-1
-	        uci -q add firewall zone
-	     }
+         [ -n "$DOCKERINDEX" ] && uci del firewall.@zone[$DOCKERINDEX]
         uci -q batch <<EOF
+            add firewall zone
             set firewall.@zone[$DOCKERINDEX].name='docker'
             set firewall.@zone[$DOCKERINDEX].input='ACCEPT'
             set firewall.@zone[$DOCKERINDEX].output='ACCEPT'
