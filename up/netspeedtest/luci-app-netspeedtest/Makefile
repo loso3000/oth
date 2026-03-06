@@ -13,7 +13,8 @@ PKG_VERSION:=5.1.2
 PKG_RELEASE:=20260306
 
 LUCI_TITLE:=LuCI Support for netspeedtest
-LUCI_DEPENDS:=+ookla-speedtest +speedtest-cli +homebox +jq $(if $(find_package iperf3-ssl),+iperf3-ssl,+iperf3)
+LUCI_DEPENDS:=+ookla-speedtest +homebox +python3-light +python3-pkg-resources +python3-xml +python3-email \
+	  +python3-urllib +python3-codecs +python3-openssl +jq $(if $(find_package iperf3-ssl),+iperf3-ssl,+iperf3)
 LUCI_PKGARCH:=all
 PKG_MAINTAINER:=sirpdboy  <herboy2008@gmail.com>
 

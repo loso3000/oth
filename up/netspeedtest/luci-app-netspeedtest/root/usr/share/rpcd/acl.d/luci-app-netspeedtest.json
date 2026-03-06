@@ -11,10 +11,12 @@
         "/bin/sh": [ "exec" ],
         "/bin/cat": [ "exec" ],
         "/usr/bin/iperf3": [ "exec" ],
-	"/usr/bin/nohup": [ "exec" ],
+        "/usr/bin/nohup": [ "exec" ],
         "/usr/bin/speedtest": [ "exec" ],
-        "/tmp/netspeedtest_result": [ "read" ],
         "/usr/bin/ookla-speedtest": [ "exec" ],
+        "/tmp/netspeedtest_result": [ "read" ],
+        "/tmp/netspeedtest_progress": [ "read" ],
+        "/var/run/netspeedtest.pid": [ "read" ],
         "/tmp/netspeedtest.log": [ "read" ]
       },
       "ubus": {
@@ -22,9 +24,15 @@
       }
     },
     "write": {
-			"ubus": {
-				"luci.netspeedtest": [ "get_servers" ]
-			}
-		}
+      "file": {
+        "/tmp/netspeedtest_result": [ "write" ],
+        "/tmp/netspeedtest_progress": [ "write" ],
+        "/var/run/netspeedtest.pid": [ "write" ],
+        "/tmp/netspeedtest.log": [ "write" ]
+      },
+      "ubus": {
+        "luci.netspeedtest": [ "get_servers" ]
+      }
+    }
   }
 }
